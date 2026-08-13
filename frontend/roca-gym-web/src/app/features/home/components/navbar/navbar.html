@@ -65,14 +65,49 @@
 
     </div>
 
-    <!-- DESKTOP LOGIN -->
-    <div class="hidden lg:block">
-      <a
-        href="#login"
-        class="rounded-lg bg-red-600 px-5 py-3 text-sm font-black uppercase tracking-wider text-white shadow-[0_0_20px_rgba(220,38,38,0.25)] transition hover:bg-red-500 hover:shadow-[0_0_30px_rgba(220,38,38,0.45)]"
+    <!-- DESKTOP LOGIN / USER BADGE / CART -->
+    <div class="hidden lg:flex lg:items-center lg:gap-4">
+      <!-- Botón Carrito -->
+      <button
+        type="button"
+        (click)="cart.openCart()"
+        class="relative flex h-10 w-10 items-center justify-center rounded-lg border border-white/10 bg-white/5 text-white transition hover:border-red-600/50 hover:bg-red-600/10"
+        title="Ver Carrito de Compras"
       >
-        Iniciar sesión
-      </a>
+        <span class="text-lg">🛒</span>
+        @if (cart.itemCount() > 0) {
+          <span class="absolute -right-1.5 -top-1.5 flex h-5 w-5 items-center justify-center rounded-full bg-red-600 text-[10px] font-black text-white shadow-[0_0_10px_rgba(220,38,38,0.6)]">
+            {{ cart.itemCount() }}
+          </span>
+        }
+      </button>
+
+      @if (auth.isLoggedIn()) {
+        <div class="flex items-center gap-4">
+          <div class="flex items-center gap-3 rounded-full border border-red-600/30 bg-red-950/40 px-4 py-2">
+            <div class="flex h-7 w-7 items-center justify-center rounded-full bg-red-600 text-xs font-black text-white">
+              {{ auth.currentUser()?.name?.charAt(0) }}
+            </div>
+            <span class="text-sm font-bold text-white">
+              {{ auth.currentUser()?.name }}
+            </span>
+          </div>
+          <button
+            type="button"
+            (click)="onLogout()"
+            class="rounded-lg border border-white/10 bg-white/5 px-4 py-2.5 text-xs font-bold uppercase tracking-wider text-gray-300 transition hover:border-red-600/50 hover:bg-red-600/10 hover:text-red-500"
+          >
+            Cerrar sesión
+          </button>
+        </div>
+      } @else {
+        <a
+          routerLink="/login"
+          class="rounded-lg bg-red-600 px-5 py-3 text-sm font-black uppercase tracking-wider text-white shadow-[0_0_20px_rgba(220,38,38,0.25)] transition hover:bg-red-500 hover:shadow-[0_0_30px_rgba(220,38,38,0.45)]"
+        >
+          Iniciar sesión
+        </a>
+      }
     </div>
 
     <!-- MOBILE BUTTON -->
@@ -165,15 +200,32 @@
         </a>
 
         <div class="mt-4 border-t border-white/10 pt-4">
-
-          <a
-            href="#login"
-            (click)="closeMenu()"
-            class="block rounded-lg bg-red-600 px-5 py-4 text-center text-sm font-black uppercase tracking-wider text-white"
-          >
-            Iniciar sesión
-          </a>
-
+          @if (auth.isLoggedIn()) {
+            <div class="mb-3 flex items-center gap-3 rounded-lg border border-red-600/30 bg-red-950/40 px-4 py-3">
+              <div class="flex h-8 w-8 items-center justify-center rounded-full bg-red-600 text-xs font-black text-white">
+                {{ auth.currentUser()?.name?.charAt(0) }}
+              </div>
+              <div>
+                <p class="text-sm font-bold text-white">{{ auth.currentUser()?.name }}</p>
+                <p class="text-xs text-gray-400">{{ auth.currentUser()?.plan }}</p>
+              </div>
+            </div>
+            <button
+              type="button"
+              (click)="onLogout()"
+              class="w-full rounded-lg border border-red-600/40 bg-red-600/10 px-5 py-3 text-center text-sm font-black uppercase tracking-wider text-red-500"
+            >
+              Cerrar sesión
+            </button>
+          } @else {
+            <a
+              routerLink="/login"
+              (click)="closeMenu()"
+              class="block rounded-lg bg-red-600 px-5 py-4 text-center text-sm font-black uppercase tracking-wider text-white"
+            >
+              Iniciar sesión
+            </a>
+          }
         </div>
 
       </div>

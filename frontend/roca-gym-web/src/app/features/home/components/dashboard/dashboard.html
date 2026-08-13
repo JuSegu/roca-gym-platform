@@ -1,0 +1,321 @@
+<section class="relative min-h-screen bg-black px-6 pt-28 pb-20 sm:px-10 lg:px-16">
+  <!-- Fondo con efectos de luz -->
+  <div class="absolute left-1/2 top-10 h-96 w-96 -translate-x-1/2 rounded-full bg-red-600/10 blur-3xl pointer-events-none"></div>
+  <div class="absolute right-10 bottom-20 h-80 w-80 rounded-full bg-red-900/10 blur-3xl pointer-events-none"></div>
+
+  <div class="relative mx-auto max-w-7xl">
+
+    <!-- ENCABEZADO DE BIENVENIDA -->
+    <div class="flex flex-col justify-between gap-6 rounded-2xl border border-white/10 bg-zinc-950/80 p-6 backdrop-blur-xl md:flex-row md:items-center md:p-8">
+      <div>
+        <div class="inline-flex items-center gap-2 rounded-full border border-red-600/30 bg-red-600/10 px-3.5 py-1 text-xs font-black uppercase tracking-wider text-red-500">
+          <span class="h-2 w-2 animate-pulse rounded-full bg-red-500"></span>
+          {{ auth.currentUser()?.role || 'Miembro Activo' }}
+        </div>
+        <h1 class="mt-3 text-3xl font-black uppercase text-white sm:text-4xl">
+          ¡Hola de nuevo, <span class="text-red-600">{{ auth.currentUser()?.name }}</span>! 💪
+        </h1>
+        <p class="mt-1 text-sm text-gray-400">
+          Membresía: <strong class="text-gray-200">{{ auth.currentUser()?.plan }}</strong> · Activo desde {{ auth.currentUser()?.activeSince }}
+        </p>
+      </div>
+
+      <div class="flex flex-wrap items-center gap-3">
+        <button
+          type="button"
+          (click)="toggleQrModal()"
+          class="flex items-center gap-2 rounded-xl bg-red-600 px-5 py-3.5 text-xs font-black uppercase tracking-wider text-white shadow-[0_0_25px_rgba(220,38,38,0.3)] transition hover:bg-red-500 hover:shadow-[0_0_35px_rgba(220,38,38,0.5)]"
+        >
+          <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v1m6 11h2m-6 0h-2v4m0-11v3m0 0h.01M12 12h4.01M16 20h4M4 12h4m12 0h.01M5 8h2a1 1 0 001-1V5a1 1 0 00-1-1H5a1 1 0 00-1 1v2a1 1 0 001 1zm12 0h2a1 1 0 001-1V5a1 1 0 00-1-1h-2a1 1 0 00-1 1v2a1 1 0 001 1zM5 20h2a1 1 0 001-1v-2a1 1 0 00-1-1H5a1 1 0 00-1 1v2a1 1 0 001 1z" />
+          </svg>
+          Pase QR de Entrada
+        </button>
+      </div>
+    </div>
+
+    <!-- MÉTRICAS DINÁMICAS -->
+    <div class="mt-8 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+      
+      <!-- Asistencias -->
+      <div class="rounded-2xl border border-white/10 bg-zinc-950 p-6 transition hover:border-red-600/40">
+        <div class="flex items-center justify-between">
+          <span class="text-xs font-bold uppercase tracking-wider text-gray-400">Asistencias del Mes</span>
+          <div class="flex h-9 w-9 items-center justify-center rounded-lg bg-red-600/10 text-red-500">
+            📅
+          </div>
+        </div>
+        <div class="mt-4 flex items-baseline gap-2">
+          <span class="text-3xl font-black text-white">{{ auth.currentUser()?.stats?.attendances || 18 }}</span>
+          <span class="text-xs font-bold text-gray-500">/ 24 Meta</span>
+        </div>
+        <div class="mt-3 h-2 w-full overflow-hidden rounded-full bg-white/10">
+          <div class="h-full w-[75%] rounded-full bg-red-600"></div>
+        </div>
+      </div>
+
+      <!-- Calorías -->
+      <div class="rounded-2xl border border-white/10 bg-zinc-950 p-6 transition hover:border-red-600/40">
+        <div class="flex items-center justify-between">
+          <span class="text-xs font-bold uppercase tracking-wider text-gray-400">Calorías Quemadas</span>
+          <div class="flex h-9 w-9 items-center justify-center rounded-lg bg-red-600/10 text-red-500">
+            🔥
+          </div>
+        </div>
+        <div class="mt-4 flex items-baseline gap-2">
+          <span class="text-3xl font-black text-white">{{ auth.currentUser()?.stats?.calories || 14850 }}</span>
+          <span class="text-xs font-bold text-gray-500">kcal</span>
+        </div>
+        <p class="mt-3 text-xs text-red-400 font-semibold">+12% vs el mes anterior</p>
+      </div>
+
+      <!-- Horas Entrenadas -->
+      <div class="rounded-2xl border border-white/10 bg-zinc-950 p-6 transition hover:border-red-600/40">
+        <div class="flex items-center justify-between">
+          <span class="text-xs font-bold uppercase tracking-wider text-gray-400">Tiempo de Entreno</span>
+          <div class="flex h-9 w-9 items-center justify-center rounded-lg bg-red-600/10 text-red-500">
+            ⏱️
+          </div>
+        </div>
+        <div class="mt-4 flex items-baseline gap-2">
+          <span class="text-3xl font-black text-white">{{ auth.currentUser()?.stats?.workoutHours || 24.5 }}</span>
+          <span class="text-xs font-bold text-gray-500">Horas acumuladas</span>
+        </div>
+        <p class="mt-3 text-xs text-gray-500">Promedio 1.2h por sesión</p>
+      </div>
+
+      <!-- Racha -->
+      <div class="rounded-2xl border border-red-600/30 bg-red-950/20 p-6 transition hover:border-red-600/60">
+        <div class="flex items-center justify-between">
+          <span class="text-xs font-bold uppercase tracking-wider text-red-400">Racha Actual</span>
+          <div class="flex h-9 w-9 items-center justify-center rounded-lg bg-red-600/20 text-red-500">
+            ⚡
+          </div>
+        </div>
+        <div class="mt-4 flex items-baseline gap-2">
+          <span class="text-3xl font-black text-white">{{ auth.currentUser()?.stats?.streak || 4 }} Días</span>
+          <span class="text-xs font-bold text-red-400">¡Imparable!</span>
+        </div>
+        <p class="mt-3 text-xs text-gray-400">¡Sigue así para mantener tu récord!</p>
+      </div>
+
+    </div>
+
+    <!-- CONTENIDO PRINCIPAL: RUTINA Y CLASES -->
+    <div class="mt-8 grid gap-8 lg:grid-cols-3">
+
+      <!-- COLUMNA IZQUIERDA: RUTINA DEL DÍA -->
+      <div class="lg:col-span-2 space-y-8">
+        
+        <div class="rounded-2xl border border-white/10 bg-zinc-950 p-6 sm:p-8">
+          <div class="flex flex-col justify-between gap-4 border-b border-white/10 pb-6 sm:flex-row sm:items-center">
+            <div>
+              <span class="text-xs font-black uppercase tracking-[0.2em] text-red-600">Entrenamiento de Hoy</span>
+              <h2 class="mt-1 text-2xl font-black text-white">Día 3: Pecho & Tríceps (Hipertrofia)</h2>
+            </div>
+            <button
+              type="button"
+              (click)="toggleWorkoutModal()"
+              class="w-fit rounded-lg bg-red-600 px-5 py-3 text-xs font-black uppercase tracking-wider text-white shadow-[0_0_20px_rgba(220,38,38,0.3)] transition hover:bg-red-500 hover:shadow-[0_0_30px_rgba(220,38,38,0.5)]"
+            >
+              INICIAR RUTINA ▶
+            </button>
+          </div>
+
+          <!-- Lista de Ejercicios -->
+          <div class="mt-6 space-y-4">
+            <div class="flex items-center justify-between rounded-xl border border-white/5 bg-black/60 p-4">
+              <div class="flex items-center gap-4">
+                <div class="flex h-10 w-10 items-center justify-center rounded-lg border border-red-600/30 bg-red-600/10 font-black text-red-500">1</div>
+                <div>
+                  <h4 class="font-bold text-white">Press de Banca Plano con Barra</h4>
+                  <p class="text-xs text-gray-400">4 Series × 10 Repeticiones · Descanso: 90s</p>
+                </div>
+              </div>
+              <span class="rounded-full bg-white/5 px-3 py-1 text-xs font-bold text-gray-300">80 kg</span>
+            </div>
+
+            <div class="flex items-center justify-between rounded-xl border border-white/5 bg-black/60 p-4">
+              <div class="flex items-center gap-4">
+                <div class="flex h-10 w-10 items-center justify-center rounded-lg border border-red-600/30 bg-red-600/10 font-black text-red-500">2</div>
+                <div>
+                  <h4 class="font-bold text-white">Press Inclinado con Mancuernas</h4>
+                  <p class="text-xs text-gray-400">4 Series × 12 Repeticiones · Descanso: 60s</p>
+                </div>
+              </div>
+              <span class="rounded-full bg-white/5 px-3 py-1 text-xs font-bold text-gray-300">26 kg c/u</span>
+            </div>
+
+            <div class="flex items-center justify-between rounded-xl border border-white/5 bg-black/60 p-4">
+              <div class="flex items-center gap-4">
+                <div class="flex h-10 w-10 items-center justify-center rounded-lg border border-red-600/30 bg-red-600/10 font-black text-red-500">3</div>
+                <div>
+                  <h4 class="font-bold text-white">Fondos en Paralelas (Dips)</h4>
+                  <p class="text-xs text-gray-400">3 Series al Fallo Técnico · Descanso: 60s</p>
+                </div>
+              </div>
+              <span class="rounded-full bg-white/5 px-3 py-1 text-xs font-bold text-gray-300">Peso Corporal</span>
+            </div>
+
+            <div class="flex items-center justify-between rounded-xl border border-white/5 bg-black/60 p-4">
+              <div class="flex items-center gap-4">
+                <div class="flex h-10 w-10 items-center justify-center rounded-lg border border-red-600/30 bg-red-600/10 font-black text-red-500">4</div>
+                <div>
+                  <h4 class="font-bold text-white">Extensión de Tríceps en Polea Alta</h4>
+                  <p class="text-xs text-gray-400">4 Series × 12 Repeticiones · Descanso: 45s</p>
+                </div>
+              </div>
+              <span class="rounded-full bg-white/5 px-3 py-1 text-xs font-bold text-gray-300">35 kg</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Banner Promocional Tienda -->
+        <div class="flex flex-col items-center justify-between gap-6 rounded-2xl border border-red-600/30 bg-gradient-to-r from-red-950/40 via-zinc-950 to-black p-6 sm:flex-row sm:p-8">
+          <div>
+            <span class="rounded-full bg-red-600 px-3 py-1 text-[10px] font-black uppercase text-white">Descuento VIP 15%</span>
+            <h3 class="mt-2 text-xl font-black uppercase text-white">Suplementos & Proteínas ROCA</h3>
+            <p class="mt-1 text-xs text-gray-400">Por ser miembro VIP tienes descuento especial en creatina y proteína whey.</p>
+          </div>
+          <a
+            href="#tienda"
+            class="whitespace-nowrap rounded-lg border border-red-600 bg-red-600/20 px-5 py-3 text-xs font-black uppercase tracking-wider text-red-400 transition hover:bg-red-600 hover:text-white"
+          >
+            Ver Tienda
+          </a>
+        </div>
+
+      </div>
+
+      <!-- COLUMNA DERECHA: CLASES GRUPALES -->
+      <div class="space-y-8">
+        
+        <div class="rounded-2xl border border-white/10 bg-zinc-950 p-6">
+          <div class="flex items-center justify-between border-b border-white/10 pb-4">
+            <h3 class="text-lg font-black uppercase text-white">Clases de Hoy</h3>
+            <span class="text-xs text-gray-500">Sede Central</span>
+          </div>
+
+          <div class="mt-4 space-y-4">
+            @for (c of classes(); track c.id) {
+              <div class="rounded-xl border border-white/10 bg-black/60 p-4">
+                <div class="flex items-start justify-between">
+                  <div>
+                    <span class="text-[10px] font-bold uppercase tracking-wider text-red-500">{{ c.category }}</span>
+                    <h4 class="font-black text-white">{{ c.name }}</h4>
+                  </div>
+                  <span
+                    class="text-[10px] font-black uppercase px-2 py-0.5 rounded"
+                    [class]="c.isFull ? 'bg-zinc-800 text-gray-500' : 'bg-red-600/20 text-red-400'"
+                  >
+                    {{ c.capacity }}
+                  </span>
+                </div>
+
+                <div class="mt-3 flex items-center justify-between text-xs text-gray-400">
+                  <span>⏰ {{ c.time }}</span>
+                  <span>👨‍🏫 {{ c.trainer }}</span>
+                </div>
+
+                <button
+                  type="button"
+                  (click)="toggleBooking(c.id)"
+                  [disabled]="c.isFull"
+                  class="mt-4 w-full rounded-lg border py-2 text-xs font-black uppercase tracking-wider transition"
+                  [class]="
+                    c.booked
+                      ? 'border-green-600/50 bg-green-950/40 text-green-400'
+                      : c.isFull
+                      ? 'border-white/10 bg-zinc-900 text-gray-600 cursor-not-allowed'
+                      : 'border-red-600/50 bg-red-600/10 text-red-500 hover:bg-red-600 hover:text-white'
+                  "
+                >
+                  @if (c.booked) {
+                    ✓ Clase Reservada
+                  } @else if (c.isFull) {
+                    Cupos Agotados
+                  } @else {
+                    Reservar Cupo
+                  }
+                </button>
+              </div>
+            }
+          </div>
+        </div>
+
+        <!-- Estado de Membresía -->
+        <div class="rounded-2xl border border-white/10 bg-zinc-950 p-6">
+          <h3 class="text-lg font-black uppercase text-white border-b border-white/10 pb-4">Detalle de Membresía</h3>
+          
+          <div class="mt-4 space-y-3 text-sm">
+            <div class="flex justify-between">
+              <span class="text-gray-400">Plan contratado:</span>
+              <strong class="text-white font-bold">{{ auth.currentUser()?.plan }}</strong>
+            </div>
+            <div class="flex justify-between">
+              <span class="text-gray-400">Estado del pago:</span>
+              <span class="font-bold text-green-400">Al día (Vigente)</span>
+            </div>
+            <div class="flex justify-between">
+              <span class="text-gray-400">Próxima renovación:</span>
+              <span class="text-gray-200 font-semibold">15 Sep 2026</span>
+            </div>
+          </div>
+
+          <div class="mt-6 border-t border-white/10 pt-4">
+            <p class="text-xs text-gray-500">Beneficios incluidos: Acceso 24/7, evaluación física mensual, pase de invitado mensual.</p>
+          </div>
+        </div>
+
+      </div>
+
+    </div>
+
+  </div>
+</section>
+
+<!-- MODAL DE ENTRENAMIENTO ACTIVO -->
+@if (showWorkoutModal()) {
+  <app-workout-modal (close)="toggleWorkoutModal()" />
+}
+
+<!-- MODAL DE CÓDIGO QR -->
+@if (showQrModal()) {
+  <div class="fixed inset-0 z-50 flex items-center justify-center bg-black/80 p-4 backdrop-blur-md">
+    <div class="relative w-full max-w-sm rounded-2xl border border-white/10 bg-zinc-950 p-6 text-center shadow-[0_0_50px_rgba(220,38,38,0.2)]">
+      <button
+        type="button"
+        (click)="toggleQrModal()"
+        class="absolute right-4 top-4 text-gray-400 hover:text-white"
+      >
+        ✕
+      </button>
+
+      <span class="text-xs font-black uppercase tracking-[0.2em] text-red-600">Acceso a Instalaciones</span>
+      <h3 class="mt-1 text-2xl font-black text-white">Escanea en Torniquete</h3>
+      <p class="mt-1 text-xs text-gray-400">Pasa este código QR por el lector del gimnasio para ingresar.</p>
+
+      <div class="mx-auto my-6 flex h-48 w-48 items-center justify-center rounded-xl bg-white p-4 shadow-inner">
+        <div class="grid h-full w-full grid-cols-6 grid-rows-6 gap-1 bg-black p-2 rounded">
+          <div class="col-span-2 row-span-2 bg-white"></div>
+          <div class="col-span-2 bg-white"></div>
+          <div class="col-span-2 row-span-2 bg-white"></div>
+          <div class="row-span-2 bg-white"></div>
+          <div class="col-span-2 row-span-2 bg-white"></div>
+          <div class="col-span-2 row-span-2 bg-white"></div>
+          <div class="bg-white"></div>
+        </div>
+      </div>
+
+      <p class="text-xs font-mono text-gray-400">ID: RG-8829-4921</p>
+
+      <button
+        type="button"
+        (click)="toggleQrModal()"
+        class="mt-6 w-full rounded-xl bg-red-600 py-3 text-xs font-black uppercase tracking-wider text-white transition hover:bg-red-500"
+      >
+        Cerrar
+      </button>
+    </div>
+  </div>
+}

@@ -1,9 +1,24 @@
 <app-navbar />
 
 <main>
-  <app-hero />
-  <app-about />
-  <app-facilities />
-  <app-plans />
-  <app-store />
+  @if (auth.isLoggedIn()) {
+    <app-dashboard />
+  } @else {
+    <app-hero />
+    <app-about />
+    <app-facilities />
+    <app-plans />
+    <app-store />
+  }
 </main>
+
+<!-- Drawer del Carrito de Compras -->
+<app-cart-modal />
+
+<!-- Notification Toast -->
+@if (cart.toastMessageSignal()) {
+  <div class="fixed bottom-6 right-6 z-50 flex items-center gap-3 rounded-xl border border-red-600/40 bg-zinc-950 px-5 py-3.5 text-xs font-black uppercase text-white shadow-[0_0_30px_rgba(220,38,38,0.4)] animate-bounce">
+    <span class="text-base">🛍️</span>
+    {{ cart.toastMessageSignal() }}
+  </div>
+}
