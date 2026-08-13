@@ -1,0 +1,307 @@
+<!--
+  ============================================================
+  SECCIÓN DE INSTALACIONES - ROCA GYM
+  ============================================================
+  Aquí mostramos las diferentes zonas del gimnasio.
+-->
+
+<section
+  id="instalaciones"
+  class="relative overflow-hidden border-t border-white/10 bg-black px-6 py-24 sm:px-10 lg:px-16"
+>
+
+  <!--
+    Efecto de iluminación rojo.
+    Es solamente decorativo y ayuda a darle profundidad
+    al fondo de la sección.
+  -->
+  <div
+    class="absolute right-0 top-1/3 h-96 w-96 rounded-full bg-red-600/10 blur-3xl"
+  ></div>
+
+
+  <!--
+    CONTENEDOR PRINCIPAL
+
+    max-w-7xl:
+    Limita el ancho máximo para que el contenido
+    no quede demasiado estirado en monitores grandes.
+
+    mx-auto:
+    Centra el contenido horizontalmente.
+  -->
+  <div class="relative mx-auto max-w-7xl">
+
+
+    <!-- ====================================================== -->
+    <!-- ENCABEZADO DE LA SECCIÓN -->
+    <!-- ====================================================== -->
+
+    <div class="max-w-3xl">
+
+      <!--
+        Pequeña etiqueta superior.
+        El color rojo ayuda a mantener la identidad
+        visual de ROCA GYM.
+      -->
+      <span
+        class="text-xs font-black uppercase tracking-[0.3em] text-red-600"
+      >
+        Nuestras instalaciones
+      </span>
+
+
+      <!--
+        TÍTULO PRINCIPAL
+
+        sm:text-5xl:
+        Aumenta el tamaño en pantallas pequeñas.
+
+        lg:text-6xl:
+        Lo hace todavía más grande en pantallas grandes.
+      -->
+      <h2
+        class="mt-4 text-4xl font-black uppercase leading-tight text-white sm:text-5xl lg:text-6xl"
+      >
+        Un espacio para
+
+        <!--
+          Esta segunda línea aparece en rojo.
+        -->
+        <span class="block text-red-600">
+          superar tus límites.
+        </span>
+      </h2>
+
+
+      <!-- Descripción de la sección -->
+      <p class="mt-6 text-lg leading-relaxed text-gray-400">
+        Descubre cada espacio de ROCA GYM y encuentra el lugar perfecto
+        para llevar tu entrenamiento al siguiente nivel.
+      </p>
+
+    </div>
+
+
+    <!-- ====================================================== -->
+    <!-- GALERÍA DE INSTALACIONES -->
+    <!-- ====================================================== -->
+
+    <!--
+      grid:
+      Utilizamos CSS Grid mediante Tailwind.
+
+      lg:grid-cols-3:
+      En pantallas grandes tendremos 3 columnas.
+
+      gap-5:
+      Espacio entre las tarjetas.
+    -->
+    <div class="mt-16 grid gap-5 lg:grid-cols-3">
+
+
+      <!-- ==================================================== -->
+      <!-- TARJETA 1 - ZONA DE ENTRENAMIENTO -->
+      <!-- ==================================================== -->
+
+      <!--
+        group:
+        Permite que elementos internos reaccionen
+        cuando colocamos el mouse sobre toda la tarjeta.
+
+        lg:col-span-2:
+        Esta tarjeta ocupa 2 de las 3 columnas.
+      -->
+      <div
+        class="group relative min-h-[420px] overflow-hidden rounded-2xl border border-white/10 bg-zinc-950 lg:col-span-2"
+      >
+
+        <!--
+          IMAGEN REAL
+
+          Las imágenes que están dentro de public/
+          se pueden acceder directamente desde /images/...
+        -->
+        <img
+          src="/images/facilities/entrenamiento.jpg"
+          alt="Zona de entrenamiento de ROCA GYM"
+          class="absolute inset-0 h-full w-full object-cover transition duration-500 group-hover:scale-105"
+        />
+
+
+        <!--
+          OVERLAY
+
+          Esta capa oscurece ligeramente la fotografía
+          para que el texto pueda leerse fácilmente.
+
+          group-hover:bg-black/40:
+          Cuando pasamos el mouse, la imagen se oscurece
+          un poco más.
+        -->
+        <div
+          class="absolute inset-0 bg-black/20 transition duration-500 group-hover:bg-black/40"
+        ></div>
+
+
+        <!--
+          CONTENIDO DE LA TARJETA
+
+          absolute bottom-0:
+          Coloca el texto en la parte inferior.
+
+          p-8:
+          Agrega espacio alrededor del contenido.
+        -->
+        <div class="absolute bottom-0 left-0 p-8">
+
+          <!-- Categoría -->
+          <p
+            class="text-xs font-black uppercase tracking-[0.3em] text-red-600"
+          >
+            Entrenamiento
+          </p>
+
+          <!-- Título -->
+          <h3
+            class="mt-2 text-2xl font-black uppercase text-white sm:text-3xl"
+          >
+            Zona de entrenamiento
+          </h3>
+
+        </div>
+
+      </div>
+
+
+      <!-- ==================================================== -->
+      <!-- TARJETA 2 - ZONA DE PESAS -->
+      <!-- ==================================================== -->
+
+      <div
+        class="group relative min-h-[200px] overflow-hidden rounded-2xl border border-white/10 bg-zinc-950"
+      >
+
+        <!-- Imagen de la zona de pesas -->
+        <img
+          src="/images/facilities/pesas.JPG"
+          alt="Zona de pesas de ROCA GYM"
+          class="absolute inset-0 h-full w-full object-cover transition duration-500 group-hover:scale-105"
+        />
+
+
+        <!-- Overlay oscuro -->
+        <div
+          class="absolute inset-0 bg-black/25 transition duration-500 group-hover:bg-black/45"
+        ></div>
+
+
+        <!-- Texto -->
+        <div class="absolute bottom-0 left-0 p-6">
+
+          <p
+            class="text-xs font-black uppercase tracking-[0.3em] text-red-600"
+          >
+            Fuerza
+          </p>
+
+          <h3
+            class="mt-2 text-xl font-black uppercase text-white"
+          >
+            Zona de pesas
+          </h3>
+
+        </div>
+
+      </div>
+
+
+      <!-- ==================================================== -->
+      <!-- TARJETA 3 - CARDIO -->
+      <!-- ==================================================== -->
+
+      <div
+        class="group relative min-h-[200px] overflow-hidden rounded-2xl border border-white/10 bg-zinc-950"
+      >
+
+        <!-- Imagen de cardio -->
+        <img
+          src="/images/facilities/cardio.JPG"
+          alt="Zona de cardio de ROCA GYM"
+          class="absolute inset-0 h-full w-full object-cover transition duration-500 group-hover:scale-105"
+        />
+
+
+        <!-- Overlay -->
+        <div
+          class="absolute inset-0 bg-black/25 transition duration-500 group-hover:bg-black/45"
+        ></div>
+
+
+        <!-- Texto -->
+        <div class="absolute bottom-0 left-0 p-6">
+
+          <p
+            class="text-xs font-black uppercase tracking-[0.3em] text-red-600"
+          >
+            Resistencia
+          </p>
+
+          <h3
+            class="mt-2 text-xl font-black uppercase text-white"
+          >
+            Cardio
+          </h3>
+
+        </div>
+
+      </div>
+
+
+      <!-- ==================================================== -->
+      <!-- TARJETA 4 - AMBIENTE -->
+      <!-- ==================================================== -->
+
+      <div
+        class="group relative min-h-[200px] overflow-hidden rounded-2xl border border-white/10 bg-zinc-950 lg:col-span-2"
+      >
+
+        <!-- Imagen general del ambiente -->
+        <img
+          src="/images/facilities/ambiente.JPG"
+          alt="Ambiente de ROCA GYM"
+          class="absolute inset-0 h-full w-full object-cover transition duration-500 group-hover:scale-105"
+        />
+
+
+        <!-- Overlay -->
+        <div
+          class="absolute inset-0 bg-black/25 transition duration-500 group-hover:bg-black/45"
+        ></div>
+
+
+        <!-- Texto -->
+        <div class="absolute bottom-0 left-0 p-6">
+
+          <p
+            class="text-xs font-black uppercase tracking-[0.3em] text-red-600"
+          >
+            Comunidad
+          </p>
+
+          <h3
+            class="mt-2 text-xl font-black uppercase text-white sm:text-2xl"
+          >
+            Tu próximo entrenamiento
+          </h3>
+
+        </div>
+
+      </div>
+
+
+    </div>
+
+  </div>
+
+</section>

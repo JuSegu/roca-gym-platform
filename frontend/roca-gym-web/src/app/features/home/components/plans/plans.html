@@ -1,0 +1,214 @@
+<!--
+  ============================================================
+  SECCIÓN DE PLANES - ROCA GYM
+  ============================================================
+
+  Aquí mostramos las diferentes opciones de membresía
+  disponibles para los clientes.
+-->
+
+<section
+  id="planes"
+  class="relative overflow-hidden border-t border-white/10 bg-zinc-950 px-6 py-24 sm:px-10 lg:px-16"
+>
+
+  <!--
+    EFECTO DE LUZ ROJA
+
+    Es únicamente decorativo.
+    Crea ese brillo rojo que estamos utilizando
+    en diferentes partes de ROCA GYM.
+  -->
+  <div
+    class="absolute left-1/2 top-0 h-96 w-96 -translate-x-1/2 rounded-full bg-red-600/10 blur-3xl"
+  ></div>
+
+
+  <!-- CONTENEDOR PRINCIPAL -->
+  <div class="relative mx-auto max-w-7xl">
+
+
+    <!-- ====================================================== -->
+    <!-- ENCABEZADO -->
+    <!-- ====================================================== -->
+
+    <div class="mx-auto max-w-3xl text-center">
+
+      <!-- Pequeña etiqueta roja -->
+      <span
+        class="text-xs font-black uppercase tracking-[0.3em] text-red-600"
+      >
+        Nuestros planes
+      </span>
+
+
+      <!-- Título principal -->
+      <h2
+        class="mt-4 text-4xl font-black uppercase leading-tight text-white sm:text-5xl lg:text-6xl"
+      >
+        Elige tu
+
+        <span class="text-red-600">
+          mejor opción.
+        </span>
+      </h2>
+
+
+      <!-- Descripción -->
+      <p
+        class="mx-auto mt-6 max-w-2xl text-lg leading-relaxed text-gray-400"
+      >
+        Entrena, mejora y supera tus límites.
+        Elige el plan que mejor se adapte a ti.
+      </p>
+
+    </div>
+
+
+    <!-- ====================================================== -->
+    <!-- TARJETAS DE PLANES -->
+    <!-- ====================================================== -->
+
+    <!--
+      @for
+
+      Angular recorrerá el arreglo "plans" que tenemos
+      definido en plans.ts.
+
+      Por cada elemento creará una tarjeta.
+    -->
+
+    <div
+      class="mt-16 grid gap-6 md:grid-cols-2 lg:grid-cols-4"
+    >
+
+      @for (plan of plans; track plan.name) {
+
+        <!--
+          TARJETA DEL PLAN
+
+          [class...]
+
+          Angular puede agregar clases dinámicamente
+          dependiendo del valor de "featured".
+
+          Si featured es true, nuestro plan tendrá
+          un diseño especial.
+        -->
+        <article
+          class="group relative flex flex-col overflow-hidden rounded-2xl border border-white/10 bg-black p-7 transition duration-300 hover:-translate-y-2 hover:border-red-600/60"
+          [class.border-red-600]="plan.featured"
+          [class.shadow-[0_0_40px_rgba(220,38,38,0.15)]]="plan.featured"
+        >
+
+          <!--
+            ETIQUETA DEL PLAN DESTACADO
+
+            Solo aparecerá cuando featured sea true.
+          -->
+          @if (plan.featured) {
+
+            <div
+              class="absolute right-4 top-4 rounded-full bg-red-600 px-3 py-1 text-[10px] font-black uppercase tracking-wider text-white"
+            >
+              Recomendado
+            </div>
+
+          }
+
+
+          <!-- Nombre del plan -->
+          <p
+            class="text-sm font-black uppercase tracking-[0.25em] text-gray-400"
+          >
+            {{ plan.name }}
+          </p>
+
+
+          <!-- Precio -->
+          <h3
+            class="mt-6 text-4xl font-black text-white"
+          >
+            {{ plan.price }}
+          </h3>
+
+
+          <!-- Línea decorativa -->
+          <div
+            class="mt-6 h-px w-full bg-white/10"
+          ></div>
+
+
+          <!-- Promoción -->
+          @if (plan.promotion) {
+
+            <span
+              class="mt-6 inline-block w-fit rounded-full border border-red-600/40 bg-red-600/10 px-3 py-1 text-xs font-black uppercase tracking-wider text-red-500"
+            >
+              {{ plan.promotion }}
+            </span>
+
+          }
+
+
+          <!-- Descripción -->
+          <p
+            class="mt-5 min-h-[48px] text-sm leading-relaxed text-gray-400"
+          >
+            {{ plan.description }}
+          </p>
+
+
+          <!--
+            BOTÓN
+
+            Por ahora el botón es visual.
+
+            Más adelante podremos conectarlo con:
+            - Login
+            - Registro
+            - Pagos
+            - Base de datos
+          -->
+          <button
+            type="button"
+            class="mt-auto w-full rounded-lg border border-white/10 bg-white/5 px-5 py-3 text-sm font-black uppercase tracking-wide text-white transition duration-300 hover:border-red-600 hover:bg-red-600"
+          >
+            Elegir plan
+          </button>
+
+        </article>
+
+      }
+
+    </div>
+
+
+    <!-- ====================================================== -->
+    <!-- MENSAJE PROMOCIONAL -->
+    <!-- ====================================================== -->
+
+    <div
+      class="mt-16 overflow-hidden rounded-2xl border border-red-600/30 bg-red-600/5 px-6 py-10 text-center"
+    >
+
+      <!-- Texto principal -->
+      <p
+        class="text-2xl font-black uppercase text-white sm:text-3xl"
+      >
+        ¡No necesitas saber entrenar!
+      </p>
+
+
+      <!-- Texto destacado -->
+      <p
+        class="mt-2 text-2xl font-black uppercase text-red-600 sm:text-3xl"
+      >
+        ¡Aquí te enseñamos!
+      </p>
+
+    </div>
+
+  </div>
+
+</section>
