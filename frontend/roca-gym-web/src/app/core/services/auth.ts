@@ -1,4 +1,13 @@
-import { Injectable, signal, computed } from '@angular/core';
+import { Injectable, computed, inject, signal } from '@angular/core';
+import {
+  createUserWithEmailAndPassword,
+  onAuthStateChanged,
+  sendPasswordResetEmail,
+  signInWithEmailAndPassword,
+  signOut,
+} from 'firebase/auth';
+import { doc, getDoc, setDoc } from 'firebase/firestore';
+import { FirebaseService } from '../firebase/firebase.service';
 
 export interface UserStats {
   attendances: number;
@@ -8,6 +17,7 @@ export interface UserStats {
 }
 
 export interface UserProfile {
+  uid?: string;
   name: string;
   email: string;
   phone?: string;
@@ -21,6 +31,7 @@ export interface UserProfile {
   providedIn: 'root',
 })
 export class Auth {
+  private readonly firebase = inject(FirebaseService);
   private readonly STORAGE_KEY = 'roca_gym_user_session';
   private readonly USERS_DB_KEY = 'roca_gym_users_db';
 
@@ -46,7 +57,80 @@ export class Auth {
   readonly isLoggedIn = computed(() => this.currentUserSignal() !== null);
 
   constructor() {
-    this.initUserDb();
+    if (this.firebase.auth) {
+      onAuthStateChanged(this.firebase.auth, async (firebaseUser) => {
+        if (!firebaseUser) {
+          this.currentUserSignal.set(null);
+          return;
+        }
+        const profile = await this.loadFirebaseProfile(firebaseUser.uid, firebaseUser.email ?? '');
+        this.currentUserSignal.set(profile);
+        this.saveUserSession(profile);
+      });
+    } else {
+      this.initUserDb();
+    }
+  }
+
+  private async loadFirebaseProfile(uid: string, email: string): Promise<UserProfile> {
+    if (this.firebase.firestore) {
+      try {
+        const snapshot = await getDoc(doc(this.firebase.firestore, 'users', uid));
+        if (snapshot.exists()) return snapshot.data() as UserProfile;
+      } catch (error) {
+        console.warn('Firebase profile could not be loaded', error);
+      }
+    }
+
+    return {
+      uid,
+      name: email.split('@')[0] || 'Miembro ROCA',
+      email,
+      role: 'Miembro Activo',
+      plan: 'Plan por definir',
+      activeSince: 'Hoy',
+      stats: { ...this.defaultStats, attendances: 0, calories: 0, workoutHours: 0, streak: 0 },
+    };
+  }
+
+  async loginWithFirebase(email: string, password: string): Promise<void> {
+    if (!this.firebase.auth) throw new Error('Firebase no está disponible en este navegador.');
+    const credential = await signInWithEmailAndPassword(this.firebase.auth, email, password);
+    const profile = await this.loadFirebaseProfile(credential.user.uid, credential.user.email ?? email);
+    this.currentUserSignal.set(profile);
+    this.saveUserSession(profile);
+  }
+
+  async registerWithFirebase(data: {
+    name: string;
+    email: string;
+    phone?: string;
+    password: string;
+    plan: string;
+  }): Promise<void> {
+    if (!this.firebase.auth) throw new Error('Firebase no está disponible en este navegador.');
+    const credential = await createUserWithEmailAndPassword(this.firebase.auth, data.email, data.password);
+    const profile: UserProfile = {
+      uid: credential.user.uid,
+      name: data.name,
+      email: data.email,
+      phone: data.phone,
+      role: data.plan.includes('VIP') ? 'Miembro VIP' : 'Miembro Activo',
+      plan: data.plan,
+      activeSince: 'Hoy',
+      stats: { attendances: 0, calories: 0, workoutHours: 0, streak: 0 },
+    };
+
+    if (this.firebase.firestore) {
+      await setDoc(doc(this.firebase.firestore, 'users', credential.user.uid), profile);
+    }
+    this.currentUserSignal.set(profile);
+    this.saveUserSession(profile);
+  }
+
+  async requestPasswordReset(email: string): Promise<void> {
+    if (!this.firebase.auth) throw new Error('Firebase no está disponible en este navegador.');
+    await sendPasswordResetEmail(this.firebase.auth, email);
   }
 
   private isBrowser(): boolean {
@@ -182,6 +266,9 @@ export class Auth {
   }
 
   logout(): void {
+    if (this.firebase.auth) {
+      void signOut(this.firebase.auth);
+    }
     this.currentUserSignal.set(null);
     this.saveUserSession(null);
   }

@@ -1,0 +1,43 @@
+<main class="min-h-screen bg-zinc-950 px-4 py-8 text-white sm:px-6 lg:px-8">
+  <div class="mx-auto max-w-7xl">
+    <header class="mb-8 flex flex-col gap-4 border-b border-white/10 pb-6 sm:flex-row sm:items-center sm:justify-between">
+      <div>
+        <a routerLink="/" class="text-xs font-bold uppercase tracking-widest text-red-500">← Volver al sitio</a>
+        <h1 class="mt-2 text-3xl font-black uppercase tracking-tight">Panel ROCA GYM</h1>
+        <p class="mt-1 text-sm text-zinc-400">Operación diaria del gimnasio</p>
+      </div>
+      <div class="rounded-xl border border-red-600/30 bg-red-950/30 px-4 py-3 text-sm">Aforo actual: <strong class="text-red-400">{{ db.currentCapacity() }} / {{ db.maxCapacity }}</strong></div>
+    </header>
+
+    <nav class="mb-6 flex gap-2 overflow-x-auto pb-1" aria-label="Secciones administrativas">
+      <button type="button" (click)="activeTab.set('qr')" class="whitespace-nowrap rounded-lg px-4 py-2 text-xs font-black uppercase tracking-wider" [class.bg-red-600]="activeTab() === 'qr'" [class.bg-white/5]="activeTab() !== 'qr'">Control de acceso</button>
+      <button type="button" (click)="activeTab.set('members')" class="whitespace-nowrap rounded-lg px-4 py-2 text-xs font-black uppercase tracking-wider" [class.bg-red-600]="activeTab() === 'members'" [class.bg-white/5]="activeTab() !== 'members'">Miembros</button>
+      <button type="button" (click)="activeTab.set('orders')" class="whitespace-nowrap rounded-lg px-4 py-2 text-xs font-black uppercase tracking-wider" [class.bg-red-600]="activeTab() === 'orders'" [class.bg-white/5]="activeTab() !== 'orders'">Pedidos</button>
+    </nav>
+
+    @if (activeTab() === 'qr') {
+      <section class="grid gap-6 lg:grid-cols-2">
+        <div class="rounded-2xl border border-white/10 bg-zinc-900/60 p-6">
+          <p class="text-xs font-bold uppercase tracking-widest text-red-500">Escáner QR</p><h2 class="mt-2 text-2xl font-black">Registrar acceso</h2>
+          <label class="mt-6 block text-sm font-semibold" for="qr-code">Código del miembro</label>
+          <input id="qr-code" [ngModel]="qrInput()" (ngModelChange)="qrInput.set($event)" (keyup.enter)="processQrScan()" class="mt-2 w-full rounded-xl border border-white/10 bg-black px-4 py-3 font-mono text-white outline-none focus:border-red-500" placeholder="RG-0000-0000" />
+          <button type="button" (click)="processQrScan()" class="mt-4 w-full rounded-xl bg-red-600 px-4 py-3 text-sm font-black uppercase tracking-wider">Validar acceso</button>
+        </div>
+        <div class="rounded-2xl border border-white/10 bg-zinc-900/60 p-6">
+          <p class="text-xs font-bold uppercase tracking-widest text-zinc-400">Resultado</p>
+          @if (scanResult(); as result) {
+            <div class="mt-6 rounded-xl border p-5" [class.border-green-500/40]="result.success" [class.bg-green-950/20]="result.success" [class.border-red-500/40]="!result.success" [class.bg-red-950/20]="!result.success"><p class="font-black" [class.text-green-400]="result.success" [class.text-red-400]="!result.success">{{ result.message }}</p><p class="mt-4 text-lg font-bold">{{ result.name }}</p><p class="text-sm text-zinc-400">{{ result.plan }} · {{ result.email }}</p></div>
+          } @else { <p class="mt-6 text-sm text-zinc-500">Ingresa o escanea un código para ver el resultado.</p> }
+        </div>
+      </section>
+    }
+
+    @if (activeTab() === 'members') {
+      <section class="rounded-2xl border border-white/10 bg-zinc-900/60 p-6"><div class="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between"><h2 class="text-2xl font-black">Miembros</h2><input [ngModel]="searchQuery()" (ngModelChange)="searchQuery.set($event)" class="rounded-xl border border-white/10 bg-black px-4 py-2 text-sm outline-none focus:border-red-500" placeholder="Buscar miembro" /></div><div class="mt-5 divide-y divide-white/10">@for (member of filteredMembers(); track member.id) { <div class="flex flex-col gap-2 py-4 sm:flex-row sm:items-center sm:justify-between"><div><p class="font-bold">{{ member.name }}</p><p class="text-sm text-zinc-400">{{ member.email }} · {{ member.plan }}</p></div><span class="w-fit rounded-full px-3 py-1 text-xs font-bold" [class.bg-green-500/15]="member.status === 'Al día'" [class.text-green-400]="member.status === 'Al día'" [class.bg-amber-500/15]="member.status !== 'Al día'" [class.text-amber-400]="member.status !== 'Al día'">{{ member.status }}</span></div> }</div></section>
+    }
+
+    @if (activeTab() === 'orders') {
+      <section class="rounded-2xl border border-white/10 bg-zinc-900/60 p-6"><h2 class="text-2xl font-black">Pedidos de tienda</h2><div class="mt-5 space-y-3">@for (order of db.orders(); track order.id) { <article class="rounded-xl border border-white/10 bg-black/40 p-4"><div class="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between"><div><p class="font-bold">{{ order.id }} · {{ order.userName }}</p><p class="text-sm text-zinc-400">{{ order.items.length }} producto(s) · ${{ order.total.toFixed(2) }} USD · {{ order.pickupCode }}</p></div><select [ngModel]="order.status" (ngModelChange)="updateOrderStatus(order.id, $event)" class="rounded-lg border border-white/10 bg-zinc-900 px-3 py-2 text-sm"><option>Pendiente en recepción</option><option>Entregado</option><option>Cancelado</option></select></div></article> } @empty { <p class="text-sm text-zinc-500">Aún no hay pedidos.</p> }</div></section>
+    }
+  </div>
+</main>

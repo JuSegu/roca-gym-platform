@@ -1,4 +1,5 @@
 import { Component, EventEmitter, Output, inject, signal, OnDestroy } from '@angular/core';
+import { FormsModule } from '@angular/forms';
 import { Auth } from '../../../../core/services/auth';
 
 interface Exercise {
@@ -7,6 +8,7 @@ interface Exercise {
   targetSeries: number;
   targetReps: string;
   defaultWeight: string;
+  image: string;
   restSeconds: number;
   completedSeries: boolean[];
 }
@@ -14,7 +16,7 @@ interface Exercise {
 @Component({
   selector: 'app-workout-modal',
   standalone: true,
-  imports: [],
+  imports: [FormsModule],
   templateUrl: './workout-modal.html',
   styleUrl: './workout-modal.css',
 })
@@ -34,6 +36,7 @@ export class WorkoutModal implements OnDestroy {
       targetSeries: 4,
       targetReps: '10 reps',
       defaultWeight: '80 kg',
+      image: '/images/facilities/pesas.JPG',
       restSeconds: 90,
       completedSeries: [false, false, false, false],
     },
@@ -43,6 +46,7 @@ export class WorkoutModal implements OnDestroy {
       targetSeries: 4,
       targetReps: '12 reps',
       defaultWeight: '26 kg c/u',
+      image: '/images/facilities/entrenamiento.jpg',
       restSeconds: 60,
       completedSeries: [false, false, false, false],
     },
@@ -52,6 +56,7 @@ export class WorkoutModal implements OnDestroy {
       targetSeries: 3,
       targetReps: 'Fallo técnico',
       defaultWeight: 'Peso Corporal',
+      image: '/images/facilities/ambiente.JPG',
       restSeconds: 60,
       completedSeries: [false, false, false],
     },
@@ -61,6 +66,7 @@ export class WorkoutModal implements OnDestroy {
       targetSeries: 4,
       targetReps: '12 reps',
       defaultWeight: '35 kg',
+      image: '/images/facilities/cardio.JPG',
       restSeconds: 45,
       completedSeries: [false, false, false, false],
     },
@@ -89,6 +95,14 @@ export class WorkoutModal implements OnDestroy {
     if (currentEx) {
       this.startRestTimer(currentEx.restSeconds);
     }
+  }
+
+  updateWeight(exerciseId: number, weight: string): void {
+    this.exercises.update((list) =>
+      list.map((exercise) =>
+        exercise.id === exerciseId ? { ...exercise, defaultWeight: weight } : exercise
+      )
+    );
   }
 
   startRestTimer(seconds: number): void {

@@ -21,8 +21,7 @@ export class CartModal {
   }
 
   checkout(): void {
-    if (this.cart.items().length === 0) return;
-    this.isOrderPlaced.set(true);
-    this.cart.clearCart();
+    const order = this.cart.checkout();
+    if (order) this.isOrderPlaced.set(true);
   }
 }

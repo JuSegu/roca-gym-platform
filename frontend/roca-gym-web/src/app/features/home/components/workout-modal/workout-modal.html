@@ -70,6 +70,7 @@
       <div class="mt-6 space-y-6 max-h-[50vh] overflow-y-auto pr-2">
         @for (ex of exercises(); track ex.id) {
           <div class="rounded-xl border border-white/10 bg-black/60 p-5">
+            <img [src]="ex.image" [alt]="ex.name" class="mb-4 h-32 w-full rounded-lg object-cover" />
             <div class="flex flex-col justify-between gap-2 sm:flex-row sm:items-center">
               <div>
                 <h3 class="font-black text-white text-lg">{{ ex.name }}</h3>
@@ -79,6 +80,11 @@
                 Peso: {{ ex.defaultWeight }}
               </span>
             </div>
+
+            <label class="mt-4 block">
+              <span class="text-[10px] font-black uppercase tracking-wider text-gray-500">Peso usado</span>
+              <input [ngModel]="ex.defaultWeight" (ngModelChange)="updateWeight(ex.id, $event)" class="mt-1 w-full rounded-lg border border-white/10 bg-zinc-900 px-3 py-2 text-sm font-bold text-white outline-none focus:border-red-500" [attr.aria-label]="'Peso usado en ' + ex.name" />
+            </label>
 
             <!-- BOTONES DE SERIES -->
             <div class="mt-4 grid grid-cols-2 gap-3 sm:grid-cols-4">

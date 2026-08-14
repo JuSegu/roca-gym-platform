@@ -50,7 +50,7 @@ export class Login {
 // ENVIAR FORMULARIO
 // ==========================================
 
-onSubmit(): void {
+async onSubmit(): Promise<void> {
 
   // Si el formulario no es válido,
   // detenemos la ejecución.
@@ -70,6 +70,18 @@ onSubmit(): void {
   const password = this.loginForm.value.password ?? '';
 
   // Enviamos las credenciales al servicio Auth.
+  try {
+    await this.auth.loginWithFirebase(email, password);
+    this.errorMessage = null;
+    this.router.navigate(['/']);
+  } catch (error: unknown) {
+    const message = error instanceof Error ? error.message : '';
+    this.errorMessage = message.includes('auth/invalid-credential')
+      ? 'Correo electrónico o contraseña incorrectos.'
+      : 'No fue posible iniciar sesión. Verifica que Email/Password esté habilitado en Firebase.';
+  }
+
+  /*
   const loginSuccessful = this.auth.login(email, password);
 
   // Comprobamos si el servicio aceptó las credenciales.
@@ -82,6 +94,7 @@ onSubmit(): void {
     console.log('❌ Correo o contraseña incorrectos');
     this.errorMessage = 'Correo electrónico o contraseña incorrectos.';
   }
+  */
 
 }
 }

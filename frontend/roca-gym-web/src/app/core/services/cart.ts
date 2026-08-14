@@ -1,5 +1,6 @@
 import { Injectable, signal, computed, inject } from '@angular/core';
 import { Auth } from './auth';
+import { DatabaseService, StoreOrder } from './database';
 
 export interface CartItem {
   id: number;
@@ -16,19 +17,17 @@ export interface CartItem {
 })
 export class CartService {
   private readonly auth = inject(Auth);
+  private readonly db = inject(DatabaseService);
 
-  // Signal para los elementos en el carrito
   private readonly cartItemsSignal = signal<CartItem[]>([]);
   readonly items = this.cartItemsSignal.asReadonly();
 
-  // Signal para la visibilidad del modal del carrito
   readonly isCartOpenSignal = signal<boolean>(false);
   readonly isCartOpen = this.isCartOpenSignal.asReadonly();
 
-  // Signal de notificación/toast al añadir item
   readonly toastMessageSignal = signal<string | null>(null);
+  readonly lastOrderSignal = signal<StoreOrder | null>(null);
 
-  // Computados
   readonly itemCount = computed(() =>
     this.cartItemsSignal().reduce((acc, item) => acc + item.quantity, 0)
   );
@@ -37,11 +36,8 @@ export class CartService {
     this.cartItemsSignal().reduce((acc, item) => acc + item.price * item.quantity, 0)
   );
 
-  // Aplicar 15% de descuento VIP si el usuario está autenticado
   readonly discountRate = computed(() => (this.auth.isLoggedIn() ? 0.15 : 0));
-
   readonly discountAmount = computed(() => this.subtotal() * this.discountRate());
-
   readonly total = computed(() => this.subtotal() - this.discountAmount());
 
   toggleCart(): void {
@@ -97,6 +93,30 @@ export class CartService {
 
   removeItem(productId: number): void {
     this.cartItemsSignal.update((current) => current.filter((item) => item.id !== productId));
+  }
+
+  checkout(): StoreOrder | null {
+    if (this.cartItemsSignal().length === 0) return null;
+
+    const user = this.auth.currentUser();
+    const order = this.db.createOrder({
+      userEmail: user ? user.email : 'invitado@rocagym.com',
+      userName: user ? user.name : 'Cliente Invitado',
+      items: this.cartItemsSignal().map((i) => ({
+        id: i.id,
+        name: i.name,
+        price: i.price,
+        quantity: i.quantity,
+        icon: i.icon,
+      })),
+      subtotal: this.subtotal(),
+      discount: this.discountAmount(),
+      total: this.total(),
+    });
+
+    this.lastOrderSignal.set(order);
+    this.clearCart();
+    return order;
   }
 
   clearCart(): void {

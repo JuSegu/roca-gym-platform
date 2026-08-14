@@ -1,5 +1,6 @@
 import { Component, inject, signal } from '@angular/core';
 import { Auth } from '../../../../core/services/auth';
+import { DatabaseService } from '../../../../core/services/database';
 import { WorkoutModal } from '../workout-modal/workout-modal';
 
 interface ClassSession {
@@ -22,12 +23,22 @@ interface ClassSession {
 })
 export class Dashboard {
   readonly auth = inject(Auth);
+  readonly db = inject(DatabaseService);
+
+  // Pestaña activa del dashboard
+  activeTab = signal<'home' | 'orders'>('home');
 
   // Estado reactivo de modales
   showQrModal = signal(false);
   showWorkoutModal = signal(false);
 
-  // Estado reactivo de reserva de clases
+  // Mis compras filtradas por usuario actual
+  myOrders = () => {
+    const email = this.auth.currentUser()?.email;
+    if (!email) return [];
+    return this.db.orders().filter((o) => o.userEmail === email);
+  };
+
   classes = signal<ClassSession[]>([
     {
       id: 1,

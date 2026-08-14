@@ -112,18 +112,52 @@
           </div>
         }
       } @else {
-        <!-- Confirmación de pedido -->
-        <div class="my-auto text-center py-10">
+        <!-- Confirmación de pedido con detalles -->
+        <div class="my-auto py-6 text-center">
           <div class="mx-auto flex h-16 w-16 items-center justify-center rounded-full bg-green-950 text-3xl text-green-400 border border-green-500/40">
             ✓
           </div>
           <h3 class="mt-4 text-2xl font-black uppercase text-white">¡Pedido Confirmado!</h3>
-          <p class="mt-2 text-xs text-gray-400">Tu compra ha sido procesada con éxito. Puedes reclamar tus productos en la recepción de ROCA GYM.</p>
-          
+
+          @if (cart.lastOrderSignal(); as order) {
+            <div class="mt-4 rounded-xl border border-white/10 bg-zinc-900 p-4 text-left">
+              <div class="flex items-center justify-between">
+                <span class="text-xs font-bold uppercase text-gray-400">N° Pedido</span>
+                <span class="font-mono text-sm font-black text-red-400">{{ order.id }}</span>
+              </div>
+              <div class="mt-2 flex items-center justify-between">
+                <span class="text-xs font-bold uppercase text-gray-400">Código de Retiro</span>
+                <span class="rounded bg-red-600/20 px-2 py-0.5 font-mono text-sm font-black text-red-300">{{ order.pickupCode }}</span>
+              </div>
+              <div class="mt-3 border-t border-white/10 pt-3 space-y-1">
+                @for (item of order.items; track item.id) {
+                  <div class="flex justify-between text-xs text-gray-300">
+                    <span>{{ item.icon }} {{ item.name }} ×{{ item.quantity }}</span>
+                    <span>${{ (item.price * item.quantity).toFixed(2) }}</span>
+                  </div>
+                }
+              </div>
+              @if (order.discount > 0) {
+                <div class="mt-2 flex justify-between text-xs text-red-400 font-bold">
+                  <span>Descuento VIP (15%)</span>
+                  <span>-${{ order.discount.toFixed(2) }}</span>
+                </div>
+              }
+              <div class="mt-2 flex justify-between border-t border-white/10 pt-2 font-black text-white">
+                <span>Total Pagado</span>
+                <span class="text-red-500">${{ order.total.toFixed(2) }} USD</span>
+              </div>
+            </div>
+
+            <p class="mt-3 text-xs text-gray-400">
+              Presenta el código <strong class="text-white">{{ order.pickupCode }}</strong> en recepción para retirar tus productos.
+            </p>
+          }
+
           <button
             type="button"
             (click)="closeCart()"
-            class="mt-8 w-full rounded-xl bg-red-600 py-3 text-xs font-black uppercase tracking-wider text-white transition hover:bg-red-500"
+            class="mt-6 w-full rounded-xl bg-red-600 py-3 text-xs font-black uppercase tracking-wider text-white transition hover:bg-red-500"
           >
             Continuar Comprando
           </button>

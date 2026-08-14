@@ -1,0 +1,22 @@
+rules_version = '2';
+
+service cloud.firestore {
+  match /databases/{database}/documents {
+    // Each member owns their profile and can never overwrite a different user.
+    match /users/{userId} {
+      allow create: if request.auth != null && request.auth.uid == userId;
+      allow read, update: if request.auth != null && request.auth.uid == userId;
+      allow delete: if false;
+    }
+
+    // Workout logs belong exclusively to the member who created them.
+    match /users/{userId}/workouts/{workoutId} {
+      allow read, write: if request.auth != null && request.auth.uid == userId;
+    }
+
+    // Keep every other collection closed until its role-based rule is defined.
+    match /{document=**} {
+      allow read, write: if false;
+    }
+  }
+}

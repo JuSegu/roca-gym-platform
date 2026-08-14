@@ -1,6 +1,7 @@
-import { Component, signal } from '@angular/core';
+import { Component, inject, signal } from '@angular/core';
 import { ReactiveFormsModule, FormGroup, FormControl, Validators } from '@angular/forms';
 import { RouterLink } from '@angular/router';
+import { Auth } from '../../../core/services/auth';
 
 @Component({
   selector: 'app-forgot-password',
@@ -10,17 +11,25 @@ import { RouterLink } from '@angular/router';
   styleUrl: './forgot-password.css',
 })
 export class ForgotPassword {
+  private readonly auth = inject(Auth);
   isSubmitted = signal(false);
+  errorMessage = signal<string | null>(null);
 
   forgotForm = new FormGroup({
     email: new FormControl('', [Validators.required, Validators.email]),
   });
 
-  onSubmit(): void {
+  async onSubmit(): Promise<void> {
     if (this.forgotForm.invalid) {
       this.forgotForm.markAllAsTouched();
       return;
     }
-    this.isSubmitted.set(true);
+    try {
+      await this.auth.requestPasswordReset(this.forgotForm.value.email ?? '');
+      this.errorMessage.set(null);
+      this.isSubmitted.set(true);
+    } catch {
+      this.errorMessage.set('No fue posible enviar el correo. Verifica la configuración de Firebase.');
+    }
   }
 }

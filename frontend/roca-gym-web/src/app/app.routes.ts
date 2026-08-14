@@ -11,6 +11,8 @@ import { Register } from './features/auth/register/register';
 
 // Recuperar contraseña
 import { ForgotPassword } from './features/auth/forgot-password/forgot-password';
+import { Admin } from './features/admin/admin';
+import { adminGuard } from './core/guards/admin.guard';
 
 export const routes: Routes = [
   // Página principal
@@ -35,6 +37,11 @@ export const routes: Routes = [
   {
     path: 'forgot-password',
     component: ForgotPassword,
+  },
+  {
+    path: 'admin',
+    component: Admin,
+    canActivate: [adminGuard],
   },
 
   // Cualquier ruta inexistente vuelve al inicio

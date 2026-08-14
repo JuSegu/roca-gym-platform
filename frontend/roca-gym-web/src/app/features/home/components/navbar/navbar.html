@@ -84,6 +84,14 @@
 
       @if (auth.isLoggedIn()) {
         <div class="flex items-center gap-4">
+          @if (auth.currentUser()?.email === 'admin@rocagym.com') {
+            <a
+              routerLink="/admin"
+              class="flex items-center gap-1.5 rounded-lg border border-amber-500/30 bg-amber-500/10 px-3 py-2 text-xs font-black uppercase tracking-wider text-amber-400 transition hover:bg-amber-500/20"
+            >
+              ⚙️ Admin
+            </a>
+          }
           <div class="flex items-center gap-3 rounded-full border border-red-600/30 bg-red-950/40 px-4 py-2">
             <div class="flex h-7 w-7 items-center justify-center rounded-full bg-red-600 text-xs font-black text-white">
               {{ auth.currentUser()?.name?.charAt(0) }}
@@ -110,10 +118,22 @@
       }
     </div>
 
-    <!-- MOBILE BUTTON -->
+    <!-- MOBILE ACTIONS -->
+    <div class="flex items-center gap-2 lg:hidden">
     <button
       type="button"
-      class="flex h-11 w-11 items-center justify-center rounded-lg border border-white/10 bg-white/5 text-white lg:hidden"
+      (click)="cart.openCart()"
+      class="relative flex h-11 w-11 items-center justify-center rounded-lg border border-white/10 bg-white/5 text-white"
+      aria-label="Ver carrito de compras"
+    >
+      <span class="text-lg">🛒</span>
+      @if (cart.itemCount() > 0) {
+        <span class="absolute -right-1 -top-1 flex h-5 w-5 items-center justify-center rounded-full bg-red-600 text-[10px] font-black text-white">{{ cart.itemCount() }}</span>
+      }
+    </button>
+    <button
+      type="button"
+      class="flex h-11 w-11 items-center justify-center rounded-lg border border-white/10 bg-white/5 text-white"
       (click)="toggleMenu()"
       [attr.aria-expanded]="menuOpen()"
       aria-label="Abrir menú"
@@ -150,6 +170,7 @@
         </svg>
       }
     </button>
+    </div>
 
   </div>
 
@@ -210,6 +231,15 @@
                 <p class="text-xs text-gray-400">{{ auth.currentUser()?.plan }}</p>
               </div>
             </div>
+            @if (auth.currentUser()?.email === 'admin@rocagym.com') {
+              <a
+                routerLink="/admin"
+                (click)="closeMenu()"
+                class="mb-2 flex items-center justify-center gap-2 rounded-lg border border-amber-500/30 bg-amber-500/10 px-5 py-3 text-sm font-black uppercase tracking-wider text-amber-400"
+              >
+                ⚙️ Panel de Administración
+              </a>
+            }
             <button
               type="button"
               (click)="onLogout()"

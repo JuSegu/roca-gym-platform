@@ -7,6 +7,7 @@ import { Plans } from './components/plans/plans';
 import { Store } from './components/store/store';
 import { Dashboard } from './components/dashboard/dashboard';
 import { CartModal } from './components/cart-modal/cart-modal';
+import { Footer } from './components/footer/footer';
 import { Auth } from '../../core/services/auth';
 import { CartService } from '../../core/services/cart';
 
@@ -22,6 +23,7 @@ import { CartService } from '../../core/services/cart';
     Store,
     Dashboard,
     CartModal,
+    Footer,
   ],
   templateUrl: './home.html',
   styleUrl: './home.css',

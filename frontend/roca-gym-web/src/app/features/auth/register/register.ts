@@ -26,7 +26,7 @@ export class Register {
     terms: new FormControl(true, [Validators.requiredTrue]),
   });
 
-  onSubmit(): void {
+  async onSubmit(): Promise<void> {
     if (this.registerForm.invalid) {
       this.registerForm.markAllAsTouched();
       return;
@@ -36,6 +36,25 @@ export class Register {
 
     if (val.password !== val.confirmPassword) {
       this.errorMessage = 'Las contraseñas no coinciden.';
+      return;
+    }
+
+    try {
+      await this.auth.registerWithFirebase({
+        name: val.name || '',
+        email: val.email || '',
+        phone: val.phone || '',
+        password: val.password || '',
+        plan: val.plan || 'Plan Anual VIP',
+      });
+      this.errorMessage = null;
+      this.router.navigate(['/']);
+      return;
+    } catch (error: unknown) {
+      const message = error instanceof Error ? error.message : '';
+      this.errorMessage = message.includes('auth/email-already-in-use')
+        ? 'Este correo ya está registrado.'
+        : 'No fue posible crear la cuenta. Activa Email/Password y crea Firestore en Firebase.';
       return;
     }
 
