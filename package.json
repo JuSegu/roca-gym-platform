@@ -1,0 +1,9 @@
+{
+  "name": "roca-gym-platform",
+  "version": "1.0.0",
+  "private": true,
+  "scripts": {
+    "build": "cd frontend/roca-gym-web && npm install && npm run build",
+    "start": "cd frontend/roca-gym-web && npm start"
+  }
+}
