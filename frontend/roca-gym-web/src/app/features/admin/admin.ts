@@ -23,7 +23,7 @@ export class Admin {
   readonly db = inject(DatabaseService);
 
   // Pestaña activa en el panel admin
-  activeTab = signal<'qr' | 'members' | 'orders' | 'classes'>('qr');
+  activeTab = signal<'qr' | 'members' | 'orders'>('qr');
 
   // Input de búsqueda para Escáner QR
   qrInput = signal('RG-8829-4921');
@@ -45,7 +45,7 @@ export class Admin {
       id: 'RG-8829-4921',
       name: 'Julián Roca',
       email: 'admin@rocagym.com',
-      plan: 'Plan Anual Premium',
+      plan: 'Plan Anual VIP',
       status: 'Al día',
       lastAccess: 'Hoy, 07:15 AM',
     },
@@ -53,7 +53,7 @@ export class Admin {
       id: 'RG-5510-1022',
       name: 'María López',
       email: 'maria@email.com',
-      plan: 'Plan Trimestral Pro',
+      plan: 'Plan 4 Meses (Promo 8 meses)',
       status: 'Al día',
       lastAccess: 'Hoy, 08:00 AM',
     },
@@ -61,7 +61,7 @@ export class Admin {
       id: 'RG-3391-9920',
       name: 'Carlos Mendoza',
       email: 'carlos@email.com',
-      plan: 'Plan Mensual Básico',
+      plan: 'Plan Mensual',
       status: 'Pendiente',
       lastAccess: 'Ayer, 06:30 PM',
     },
@@ -69,9 +69,25 @@ export class Admin {
       id: 'RG-1102-4419',
       name: 'Sofía Ramos',
       email: 'sofia@email.com',
-      plan: 'Plan Anual Premium',
+      plan: 'Plan Anual VIP',
       status: 'Al día',
       lastAccess: 'Hace 2 días',
+    },
+    {
+      id: 'RG-7741-2098',
+      name: 'Mateo Silva',
+      email: 'mateo@email.com',
+      plan: 'Plan 3 Meses',
+      status: 'Al día',
+      lastAccess: 'Hoy, 11:45 AM',
+    },
+    {
+      id: 'RG-9904-3311',
+      name: 'Valentina Torres',
+      email: 'valentina@email.com',
+      plan: 'Plan Mensual',
+      status: 'Inactivo',
+      lastAccess: 'Hace 1 semana',
     },
   ]);
 
@@ -109,7 +125,7 @@ export class Admin {
           email: member.email,
           plan: member.plan,
           status: member.status,
-          message: 'ACCESO DENEGADO - Pago o Membresía Pendiente',
+          message: 'ACCESO DENEGADO - Cuota o Membresía Pendiente',
         });
         this.db.recordAttendance(member.email, member.name, member.plan, 'Denegado');
       }

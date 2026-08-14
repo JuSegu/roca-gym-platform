@@ -1,69 +1,74 @@
-import { Component } from '@angular/core';
+import { Component, inject } from '@angular/core';
+import { Router } from '@angular/router';
+import { Auth } from '../../../../core/services/auth';
+
+export interface PlanItem {
+  name: string;
+  price: string;
+  period: string;
+  description: string;
+  promotion: string;
+  featured: boolean;
+  benefits: string[];
+}
 
 @Component({
-  // Nombre del componente.
-  // Lo utilizaremos cuando lo insertemos dentro de Home.
   selector: 'app-plans',
-
-  // Este componente es independiente.
   standalone: true,
-
-  // Por ahora no necesitamos importar otros componentes.
   imports: [],
-
-  // HTML de la sección de planes.
   templateUrl: './plans.html',
-
-  // Estilos propios del componente.
   styleUrl: './plans.css',
 })
 export class Plans {
+  private readonly router = inject(Router);
+  readonly auth = inject(Auth);
 
-  /*
-    ============================================================
-    PLANES DE ROCA GYM
-    ============================================================
-
-    Guardamos la información de los planes en un arreglo.
-
-    Más adelante Angular podrá recorrer este arreglo
-    automáticamente para crear las tarjetas.
-
-    Esto es mejor que escribir cuatro tarjetas completas
-    manualmente porque los precios y textos están centralizados.
-  */
-
-  plans = [
+  plans: PlanItem[] = [
     {
-      name: 'Mensual',
+      name: 'Plan Mensual',
       price: '$75.000',
-      description: 'Acceso durante un mes',
+      period: '/mes',
+      description: 'Acceso total durante 30 días sin permanencia obligatoria.',
       promotion: '',
       featured: false,
+      benefits: ['Acceso a todas las máquinas', 'Zona de pesas libres & cardio', 'Vestidores y lockers'],
     },
-
     {
-      name: '3 Meses',
+      name: 'Plan 3 Meses',
       price: '$225.000',
-      description: 'Pagá 3, llevá 5',
-      promotion: 'PROMOCIÓN',
+      period: 'x 5 Meses',
+      description: '¡Pagas 3 meses y entrenas 5 meses completos!',
+      promotion: 'PROMOCIÓN 5X3',
       featured: false,
+      benefits: ['5 meses de acceso total', '1 Evaluación física inicial', '5% OFF en Tienda ROCA'],
     },
-
     {
-      name: '4 Meses',
+      name: 'Plan 4 Meses',
       price: '$300.000',
-      description: 'Pagá 4, llevá 8',
+      period: 'x 8 Meses',
+      description: '¡Pagas 4 meses y te llevas 8 meses de entrenamiento!',
       promotion: 'MEJOR VALOR',
       featured: false,
+      benefits: ['8 meses de acceso continuo', '2 Evaluaciones físicas', '10% OFF en Tienda ROCA'],
     },
-
     {
-      name: 'Anual',
+      name: 'Plan Anual VIP',
       price: '$450.000',
-      description: 'Entrenamiento durante todo el año',
+      period: '/año completo',
+      description: 'Acceso ilimitado los 365 días del año con estatus VIP.',
       promotion: 'OFERTA ESPECIAL',
       featured: true,
+      benefits: ['Acceso 365 días + 24/7', '15% OFF Exclusivo en Tienda', '1 Pase de invitado al mes', 'Rutinas personalizadas'],
     },
   ];
+
+  selectPlan(plan: PlanItem): void {
+    if (this.auth.isLoggedIn()) {
+      alert(`¡Excelente! Has seleccionado el ${plan.name}. Tu membresía está activa.`);
+    } else {
+      this.router.navigate(['/register'], {
+        queryParams: { plan: plan.name },
+      });
+    }
+  }
 }

@@ -1,6 +1,6 @@
-import { Component, inject } from '@angular/core';
+import { Component, inject, OnInit } from '@angular/core';
 import { ReactiveFormsModule, FormGroup, FormControl, Validators } from '@angular/forms';
-import { Router, RouterLink } from '@angular/router';
+import { Router, RouterLink, ActivatedRoute } from '@angular/router';
 import { Auth } from '../../../core/services/auth';
 
 @Component({
@@ -10,9 +10,10 @@ import { Auth } from '../../../core/services/auth';
   templateUrl: './register.html',
   styleUrl: './register.css',
 })
-export class Register {
+export class Register implements OnInit {
   private readonly auth = inject(Auth);
   private readonly router = inject(Router);
+  private readonly route = inject(ActivatedRoute);
 
   errorMessage: string | null = null;
 
@@ -25,6 +26,13 @@ export class Register {
     confirmPassword: new FormControl('', [Validators.required]),
     terms: new FormControl(true, [Validators.requiredTrue]),
   });
+
+  ngOnInit(): void {
+    const selectedPlan = this.route.snapshot.queryParamMap.get('plan');
+    if (selectedPlan) {
+      this.registerForm.patchValue({ plan: selectedPlan });
+    }
+  }
 
   async onSubmit(): Promise<void> {
     if (this.registerForm.invalid) {
