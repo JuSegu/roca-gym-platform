@@ -1,8 +1,8 @@
 {
   "$schema": "https://openapi.vercel.sh/vercel.json",
   "framework": null,
-  "buildCommand": "npx ng build",
-  "outputDirectory": "dist/roca-gym-web/browser",
+  "buildCommand": "cd frontend/roca-gym-web && npm install && npx ng build",
+  "outputDirectory": "frontend/roca-gym-web/dist/roca-gym-web/browser",
   "rewrites": [
     {
       "source": "/(.*)",
