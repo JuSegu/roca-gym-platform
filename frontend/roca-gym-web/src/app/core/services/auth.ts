@@ -110,13 +110,14 @@ export class Auth {
   }): Promise<void> {
     if (!this.firebase.auth) throw new Error('Firebase no está disponible en este navegador.');
     const credential = await createUserWithEmailAndPassword(this.firebase.auth, data.email, data.password);
+    const isInitialAdmin = data.email.toLowerCase() === 'admin@rocagym.com';
     const profile: UserProfile = {
       uid: credential.user.uid,
       name: data.name,
       email: data.email,
       phone: data.phone,
-      role: data.plan.includes('VIP') ? 'Miembro VIP' : 'Miembro Activo',
-      plan: data.plan,
+      role: isInitialAdmin ? 'Administrador' : (data.plan.includes('VIP') ? 'Miembro VIP' : 'Miembro Activo'),
+      plan: isInitialAdmin ? 'Plan Anual Premium' : data.plan,
       activeSince: 'Hoy',
       stats: { attendances: 0, calories: 0, workoutHours: 0, streak: 0 },
     };

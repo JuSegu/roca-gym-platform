@@ -84,7 +84,7 @@
 
       @if (auth.isLoggedIn()) {
         <div class="flex items-center gap-4">
-          @if (auth.currentUser()?.email === 'admin@rocagym.com') {
+          @if (auth.currentUser()?.email === 'admin@rocagym.com' || auth.currentUser()?.role === 'Administrador') {
             <a
               routerLink="/admin"
               class="flex items-center gap-1.5 rounded-lg border border-amber-500/30 bg-amber-500/10 px-3 py-2 text-xs font-black uppercase tracking-wider text-amber-400 transition hover:bg-amber-500/20"
@@ -231,7 +231,7 @@
                 <p class="text-xs text-gray-400">{{ auth.currentUser()?.plan }}</p>
               </div>
             </div>
-            @if (auth.currentUser()?.email === 'admin@rocagym.com') {
+            @if (auth.currentUser()?.email === 'admin@rocagym.com' || auth.currentUser()?.role === 'Administrador') {
               <a
                 routerLink="/admin"
                 (click)="closeMenu()"

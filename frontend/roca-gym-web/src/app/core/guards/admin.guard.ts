@@ -9,7 +9,11 @@ export const adminGuard: CanActivateFn = () => {
 
   const auth = inject(Auth);
   const router = inject(Router);
-  return auth.currentUser()?.email === 'admin@rocagym.com'
-    ? true
-    : router.createUrlTree(['/login']);
+  const user = auth.currentUser();
+  const isAdmin =
+    user?.email?.toLowerCase() === 'admin@rocagym.com' ||
+    user?.role === 'Administrador' ||
+    user?.role === 'Admin';
+
+  return isAdmin ? true : router.createUrlTree(['/login']);
 };
