@@ -4,7 +4,7 @@
 >
   <!-- Background glow -->
   <div
-    class="absolute left-0 top-1/2 h-96 w-96 -translate-y-1/2 rounded-full bg-red-600/10 blur-3xl"
+    class="absolute left-0 top-1/2 h-96 w-96 -translate-y-1/2 rounded-full bg-red-600/10 blur-3xl pointer-events-none"
   ></div>
 
   <div class="relative mx-auto max-w-7xl">
@@ -36,34 +36,21 @@
     <!-- CONTENT -->
     <div class="grid gap-12 lg:grid-cols-2 lg:items-center">
 
-      <!-- IMAGE PLACEHOLDER -->
+      <!-- FOTO PRINCIPAL COMUNIDAD ROCA GYM -->
       <div
-        class="group relative aspect-[4/3] overflow-hidden rounded-2xl border border-white/10 bg-black"
+        class="group relative aspect-[4/3] overflow-hidden rounded-2xl border border-white/10 bg-zinc-900 shadow-2xl"
       >
-        <div
-          class="absolute inset-0 bg-gradient-to-br from-red-600/20 via-transparent to-black"
-        ></div>
-
-        <div
-          class="absolute inset-0 flex items-center justify-center"
-        >
-          <div class="text-center">
-            <div
-              class="mx-auto mb-4 flex h-16 w-16 items-center justify-center rounded-full border border-red-600/50 bg-red-600/10"
-            >
-              <span class="text-2xl font-black text-red-600">
-                RG
-              </span>
-            </div>
-
-            <p class="text-sm font-bold uppercase tracking-widest text-gray-500">
-              Próximamente
-            </p>
-
-            <p class="mt-2 text-xs text-gray-600">
-              Foto real de ROCA GYM
-            </p>
+        <img
+          src="/images/facilities/entrenamiento.jpg"
+          alt="Comunidad y entrenamiento en ROCA GYM"
+          class="h-full w-full object-cover transition duration-700 group-hover:scale-105"
+        />
+        <div class="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent"></div>
+        <div class="absolute bottom-6 left-6 right-6">
+          <div class="inline-flex items-center gap-2 rounded-full border border-red-600/50 bg-red-950/60 px-3.5 py-1 text-[10px] font-black uppercase tracking-wider text-red-400">
+            🔥 Comunidad ROCA
           </div>
+          <p class="mt-2 text-lg font-black uppercase text-white">Cultura de Esfuerzo & Superación</p>
         </div>
       </div>
 
@@ -76,16 +63,13 @@
 
         <p class="mt-6 leading-relaxed text-gray-400">
           Queremos construir un espacio donde cada persona pueda entrenar,
-          progresar y sentirse parte de una comunidad.
+          progresar y sentirse parte de una comunidad unida por la misma meta: ser mejores que ayer.
         </p>
 
         <p class="mt-4 leading-relaxed text-gray-400">
-          Desde quienes están comenzando hasta quienes llevan años
-          entrenando, ROCA GYM está pensado para ayudarte a superar tus
-          propios límites.
+          Desde quienes están comenzando hasta atletas de alto rendimiento, ROCA GYM cuenta con la mejor asesoría, maquinaria biomecánica y el ambiente perfecto para romper tus propios límites.
         </p>
 
-        <!-- VALUES -->
         <div class="mt-10 grid grid-cols-2 gap-6">
 
           <div
@@ -94,7 +78,6 @@
             <p class="text-3xl font-black text-red-600">
               100%
             </p>
-
             <p class="mt-2 text-xs font-bold uppercase tracking-wider text-gray-500">
               Disciplina
             </p>
@@ -106,7 +89,6 @@
             <p class="text-3xl font-black text-white">
               ∞
             </p>
-
             <p class="mt-2 text-xs font-bold uppercase tracking-wider text-gray-500">
               Progreso
             </p>
