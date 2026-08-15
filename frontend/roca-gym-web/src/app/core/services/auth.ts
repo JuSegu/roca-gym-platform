@@ -24,6 +24,7 @@ export interface UserProfile {
   role: string;
   plan: string;
   activeSince: string;
+  qrCode?: string;
   stats: UserStats;
 }
 
@@ -35,20 +36,21 @@ export class Auth {
   private readonly STORAGE_KEY = 'roca_gym_user_session';
   private readonly USERS_DB_KEY = 'roca_gym_users_db';
 
-  private readonly defaultStats: UserStats = {
-    attendances: 18,
-    calories: 14850,
-    workoutHours: 24.5,
-    streak: 4,
+  private readonly initialEmptyStats: UserStats = {
+    attendances: 0,
+    calories: 0,
+    workoutHours: 0,
+    streak: 0,
   };
 
   private readonly defaultTestUser: UserProfile = {
     name: 'Julián Roca',
     email: 'admin@rocagym.com',
-    role: 'Miembro VIP',
-    plan: 'Plan Anual Premium',
-    activeSince: 'Enero 2026',
-    stats: { ...this.defaultStats },
+    role: 'Administrador',
+    plan: 'Plan Anual VIP',
+    activeSince: 'Hoy',
+    qrCode: 'RG-8829-4921',
+    stats: { ...this.initialEmptyStats },
   };
 
   private readonly currentUserSignal = signal<UserProfile | null>(this.loadStoredUser());
@@ -72,24 +74,39 @@ export class Auth {
     }
   }
 
+  private generateUserQr(name: string): string {
+    const hash = Math.floor(1000 + Math.random() * 9000);
+    const hash2 = Math.floor(1000 + Math.random() * 9000);
+    return `RG-${hash}-${hash2}`;
+  }
+
   private async loadFirebaseProfile(uid: string, email: string): Promise<UserProfile> {
     if (this.firebase.firestore) {
       try {
         const snapshot = await getDoc(doc(this.firebase.firestore, 'users', uid));
-        if (snapshot.exists()) return snapshot.data() as UserProfile;
+        if (snapshot.exists()) {
+          const data = snapshot.data() as UserProfile;
+          return {
+            ...data,
+            stats: data.stats || { ...this.initialEmptyStats },
+            qrCode: data.qrCode || this.generateUserQr(data.name || email),
+          };
+        }
       } catch (error) {
         console.warn('Firebase profile could not be loaded', error);
       }
     }
 
+    const isInitialAdmin = email.toLowerCase() === 'admin@rocagym.com';
     return {
       uid,
       name: email.split('@')[0] || 'Miembro ROCA',
       email,
-      role: 'Miembro Activo',
-      plan: 'Plan por definir',
+      role: isInitialAdmin ? 'Administrador' : 'Miembro Activo',
+      plan: isInitialAdmin ? 'Plan Anual VIP' : 'Plan Mensual',
       activeSince: 'Hoy',
-      stats: { ...this.defaultStats, attendances: 0, calories: 0, workoutHours: 0, streak: 0 },
+      qrCode: isInitialAdmin ? 'RG-8829-4921' : this.generateUserQr(email),
+      stats: { ...this.initialEmptyStats },
     };
   }
 
@@ -117,9 +134,10 @@ export class Auth {
       email: data.email,
       phone: data.phone,
       role: isInitialAdmin ? 'Administrador' : (data.plan.includes('VIP') ? 'Miembro VIP' : 'Miembro Activo'),
-      plan: isInitialAdmin ? 'Plan Anual Premium' : data.plan,
+      plan: isInitialAdmin ? 'Plan Anual VIP' : data.plan,
       activeSince: 'Hoy',
-      stats: { attendances: 0, calories: 0, workoutHours: 0, streak: 0 },
+      qrCode: isInitialAdmin ? 'RG-8829-4921' : this.generateUserQr(data.name),
+      stats: { ...this.initialEmptyStats },
     };
 
     if (this.firebase.firestore) {
@@ -142,7 +160,16 @@ export class Auth {
     if (!this.isBrowser()) return null;
     try {
       const saved = localStorage.getItem(this.STORAGE_KEY);
-      return saved ? JSON.parse(saved) : null;
+      if (saved) {
+        const parsed = JSON.parse(saved) as UserProfile;
+        // Garantizar que las estadísticas sean las reales y no valores ficticios residuales
+        return {
+          ...parsed,
+          qrCode: parsed.qrCode || (parsed.email === 'admin@rocagym.com' ? 'RG-8829-4921' : this.generateUserQr(parsed.name)),
+          stats: parsed.stats || { ...this.initialEmptyStats },
+        };
+      }
+      return null;
     } catch {
       return null;
     }
@@ -198,7 +225,8 @@ export class Auth {
             const { password: _, ...cleanProfile } = found;
             const profile: UserProfile = {
               ...cleanProfile,
-              stats: cleanProfile.stats || { ...this.defaultStats },
+              qrCode: cleanProfile.qrCode || this.generateUserQr(cleanProfile.name),
+              stats: cleanProfile.stats || { ...this.initialEmptyStats },
             };
             this.currentUserSignal.set(profile);
             this.saveUserSession(profile);
@@ -214,19 +242,16 @@ export class Auth {
   }
 
   register(data: { name: string; email: string; phone?: string; password: string; plan: string }): boolean {
+    const isInitialAdmin = data.email.toLowerCase() === 'admin@rocagym.com';
     const newProfile: UserProfile = {
       name: data.name,
       email: data.email,
       phone: data.phone,
-      role: data.plan.includes('VIP') ? 'Miembro VIP' : 'Miembro Activo',
-      plan: data.plan,
+      role: isInitialAdmin ? 'Administrador' : (data.plan.includes('VIP') ? 'Miembro VIP' : 'Miembro Activo'),
+      plan: isInitialAdmin ? 'Plan Anual VIP' : data.plan,
       activeSince: 'Hoy',
-      stats: {
-        attendances: 1,
-        calories: 450,
-        workoutHours: 1.0,
-        streak: 1,
-      },
+      qrCode: isInitialAdmin ? 'RG-8829-4921' : this.generateUserQr(data.name),
+      stats: { ...this.initialEmptyStats },
     };
 
     if (this.isBrowser()) {
@@ -249,12 +274,13 @@ export class Auth {
     const current = this.currentUserSignal();
     if (!current) return;
 
+    const currentStats = current.stats || { ...this.initialEmptyStats };
     const hoursAdded = parseFloat((durationMinutes / 60).toFixed(1));
     const updatedStats: UserStats = {
-      attendances: current.stats.attendances + 1,
-      calories: current.stats.calories + caloriesBurned,
-      workoutHours: parseFloat((current.stats.workoutHours + hoursAdded).toFixed(1)),
-      streak: current.stats.streak + 1,
+      attendances: currentStats.attendances + 1,
+      calories: currentStats.calories + caloriesBurned,
+      workoutHours: parseFloat((currentStats.workoutHours + hoursAdded).toFixed(1)),
+      streak: currentStats.streak + 1,
     };
 
     const updatedUser: UserProfile = {
@@ -264,6 +290,11 @@ export class Auth {
 
     this.currentUserSignal.set(updatedUser);
     this.saveUserSession(updatedUser);
+
+    // Si está conectado a Firebase Firestore, guardar también en la nube
+    if (this.firebase.firestore && current.uid) {
+      void setDoc(doc(this.firebase.firestore, 'users', current.uid), updatedUser, { merge: true });
+    }
   }
 
   logout(): void {

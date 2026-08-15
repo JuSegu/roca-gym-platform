@@ -68,9 +68,14 @@ export class Dashboard {
       trainer: 'Sofía Ramos',
       capacity: '10 / 15 Cupos',
       isFull: false,
-      booked: true,
+      booked: false,
     },
   ]);
+
+  calcPercentage(value: number, target: number): number {
+    if (!target || target <= 0) return 0;
+    return Math.min(100, Math.round((value / target) * 100));
+  }
 
   toggleQrModal(): void {
     this.showQrModal.update((v) => !v);
