@@ -129,7 +129,7 @@ export class CartService {
       discount: this.discountAmount(),
       total: this.total(),
       paymentMethod,
-      transactionRef: transactionRef || (paymentMethod === 'Efectivo o Datáfono en Recepción' ? 'PAGO-RECEPCION' : 'APROB-' + Math.floor(100000 + Math.random() * 900000)),
+      transactionRef: transactionRef || (paymentMethod === 'Efectivo en Recepción' ? 'PAGO-RECEPCION' : 'APROB-' + Math.floor(100000 + Math.random() * 900000)),
     });
 
     this.lastOrderSignal.set(order);
