@@ -1,0 +1,106 @@
+<!-- ROCA GYM — SCREENSAVER CINEMATOGRÁFICO (Estilo Rockstar / GTA VI) -->
+@if (isVisible()) {
+  <div
+    class="rg-screensaver"
+    (click)="dismiss()"
+    role="presentation"
+    aria-label="Presiona cualquier tecla para continuar"
+  >
+
+    <!-- ── FONDO: SLIDES CINEMATOGRÁFICAS ─────────────────────────────────── -->
+    <div class="rg-bg-layer">
+      @for (scene of scenes; track scene.image; let i = $index) {
+        <div
+          class="rg-bg-slide"
+          [class.rg-bg-slide--active]="currentScene() === i"
+        >
+          <img
+            [src]="scene.image"
+            [alt]="scene.label"
+            class="rg-bg-img"
+            loading="lazy"
+          />
+        </div>
+      }
+    </div>
+
+    <!-- ── CAPAS DE GRADIENTE CINEMATOGRÁFICO ──────────────────────────────── -->
+    <div class="rg-overlay rg-overlay--vignette"></div>
+    <div class="rg-overlay rg-overlay--bottom"></div>
+    <div class="rg-overlay rg-overlay--radial"></div>
+    <div class="rg-overlay rg-overlay--scanlines"></div>
+
+    <!-- ── LABEL DE ESCENA ACTIVA (esquina sup-der) ────────────────────────── -->
+    <div class="rg-scene-label">
+      <span class="rg-dot"></span>
+      <span>{{ scenes[currentScene()].label }}</span>
+    </div>
+
+    <!-- ── LOGO PRINCIPAL — ANIMACIÓN ESCALONADA ──────────────────────────── -->
+    <div class="rg-center">
+
+      <!-- Subtítulo superior (aparece primero) -->
+      <div
+        class="rg-subtitle-top"
+        [class.rg-subtitle-top--visible]="logoPhase() !== 'hidden'"
+      >
+        ENTRENA · SUPERA · TRANSFORMA
+      </div>
+
+      <!-- Logo principal ROCA GYM -->
+      <div class="rg-logo-wrap">
+        <!-- ROCA -->
+        <div
+          class="rg-word rg-word--roca"
+          [class.rg-word--visible]="logoPhase() === 'title' || logoPhase() === 'full'"
+        >
+          ROCA
+        </div>
+
+        <!-- GYM -->
+        <div
+          class="rg-word rg-word--gym"
+          [class.rg-word--visible]="logoPhase() === 'full'"
+        >
+          GYM
+        </div>
+      </div>
+
+      <!-- Tagline inferior -->
+      <div
+        class="rg-tagline"
+        [class.rg-tagline--visible]="logoPhase() === 'full'"
+      >
+        <div class="rg-tagline-line"></div>
+        <span>Calle 80 · Sede Principal · Abierto los 7 días</span>
+        <div class="rg-tagline-line"></div>
+      </div>
+
+      <!-- Badge de año -->
+      <div
+        class="rg-year-badge"
+        [class.rg-year-badge--visible]="logoPhase() === 'full'"
+      >
+        EST. 2024
+      </div>
+
+    </div>
+
+    <!-- ── INSTRUCCIÓN DE SALIDA (parpadea en la parte inferior) ────────────── -->
+    <div
+      class="rg-dismiss-hint"
+      [class.rg-dismiss-hint--visible]="logoPhase() === 'full'"
+    >
+      <span class="rg-pulse-dot"></span>
+      PRESIONA CUALQUIER TECLA O TOCA LA PANTALLA PARA CONTINUAR
+    </div>
+
+    <!-- ── DOTS INDICADORES DE ESCENA ─────────────────────────────────────── -->
+    <div class="rg-dots">
+      @for (scene of scenes; track scene.image; let i = $index) {
+        <span class="rg-dot-item" [class.rg-dot-item--active]="currentScene() === i"></span>
+      }
+    </div>
+
+  </div>
+}

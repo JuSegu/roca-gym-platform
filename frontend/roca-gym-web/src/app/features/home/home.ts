@@ -10,6 +10,7 @@ import { Dashboard } from './components/dashboard/dashboard';
 import { CartModal } from './components/cart-modal/cart-modal';
 import { Footer } from './components/footer/footer';
 import { GymRadio } from './components/gym-radio/gym-radio';
+import { IdleScreen } from './components/idle-screen/idle-screen';
 import { Auth } from '../../core/services/auth';
 import { CartService } from '../../core/services/cart';
 
@@ -28,6 +29,7 @@ import { CartService } from '../../core/services/cart';
     CartModal,
     GymRadio,
     Footer,
+    IdleScreen,
   ],
   templateUrl: './home.html',
   styleUrl: './home.css',

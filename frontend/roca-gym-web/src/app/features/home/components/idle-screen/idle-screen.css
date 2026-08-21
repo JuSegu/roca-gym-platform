@@ -1,0 +1,342 @@
+/* ================================================================
+   ROCA GYM — SCREENSAVER CINEMATOGRÁFICO
+   Estética: Rockstar Games / GTA VI — Oscuro, épico, dramático
+   ================================================================ */
+
+/* ── Contenedor principal ──────────────────────────────────────── */
+.rg-screensaver {
+  position: fixed;
+  inset: 0;
+  z-index: 9999;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  overflow: hidden;
+  background: #000;
+  animation: ss-fade-in 1.2s ease-out forwards;
+}
+
+@keyframes ss-fade-in {
+  from { opacity: 0; }
+  to   { opacity: 1; }
+}
+
+/* ── Fondo con slides ──────────────────────────────────────────── */
+.rg-bg-layer {
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+}
+
+.rg-bg-slide {
+  position: absolute;
+  inset: 0;
+  opacity: 0;
+  transition: opacity 1.8s ease-in-out;
+}
+
+.rg-bg-slide--active {
+  opacity: 1;
+}
+
+.rg-bg-img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: center;
+  filter: brightness(0.35) contrast(1.15) saturate(0.8);
+  transform: scale(1.06);
+  animation: ss-ken-burns 25s ease-out infinite alternate;
+}
+
+@keyframes ss-ken-burns {
+  from { transform: scale(1.06) translate(0, 0); }
+  to   { transform: scale(1.0)  translate(-1.5%, 0.5%); }
+}
+
+/* ── Capas de gradiente ────────────────────────────────────────── */
+.rg-overlay {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+}
+
+/* Viñeta perimetral */
+.rg-overlay--vignette {
+  background: radial-gradient(
+    ellipse at 50% 50%,
+    transparent 30%,
+    rgba(0, 0, 0, 0.85) 100%
+  );
+  z-index: 1;
+}
+
+/* Gradiente oscuro inferior */
+.rg-overlay--bottom {
+  background: linear-gradient(
+    to top,
+    rgba(0, 0, 0, 0.95) 0%,
+    rgba(0, 0, 0, 0.6)  35%,
+    transparent         65%,
+    rgba(0, 0, 0, 0.5)  100%
+  );
+  z-index: 2;
+}
+
+/* Toque de rojo dramático */
+.rg-overlay--radial {
+  background: radial-gradient(
+    ellipse at 50% 60%,
+    rgba(180, 20, 20, 0.18) 0%,
+    transparent 60%
+  );
+  z-index: 3;
+}
+
+/* Scanlines estilo retro / cine */
+.rg-overlay--scanlines {
+  background: repeating-linear-gradient(
+    to bottom,
+    transparent 0px,
+    transparent 3px,
+    rgba(0, 0, 0, 0.12) 3px,
+    rgba(0, 0, 0, 0.12) 4px
+  );
+  z-index: 4;
+  opacity: 0.4;
+}
+
+/* ── Label de escena activa ────────────────────────────────────── */
+.rg-scene-label {
+  position: absolute;
+  top: 1.5rem;
+  right: 1.75rem;
+  z-index: 10;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-size: 0.625rem;
+  font-weight: 900;
+  letter-spacing: 0.25em;
+  text-transform: uppercase;
+  color: rgba(255, 255, 255, 0.5);
+  animation: ss-fade-in 2s ease-out forwards;
+}
+
+.rg-dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: #dc2626;
+  animation: ss-pulse 1.8s ease-in-out infinite;
+}
+
+@keyframes ss-pulse {
+  0%, 100% { opacity: 1;   transform: scale(1); }
+  50%       { opacity: 0.4; transform: scale(0.7); }
+}
+
+/* ── Centro: Logo principal ────────────────────────────────────── */
+.rg-center {
+  position: relative;
+  z-index: 10;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  user-select: none;
+}
+
+/* ── Subtítulo superior ────────────────────────────────────────── */
+.rg-subtitle-top {
+  font-size: 0.625rem;
+  font-weight: 900;
+  letter-spacing: 0.4em;
+  text-transform: uppercase;
+  color: rgba(220, 38, 38, 0.85);
+  margin-bottom: 1.5rem;
+  opacity: 0;
+  transform: translateY(-12px);
+  transition: opacity 1s ease-out, transform 1s ease-out;
+}
+
+.rg-subtitle-top--visible {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+/* ── Logo wrap ─────────────────────────────────────────────────── */
+.rg-logo-wrap {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  line-height: 0.82;
+}
+
+/* ── Palabras del logo ─────────────────────────────────────────── */
+.rg-word {
+  opacity: 0;
+  filter: blur(18px);
+  transform: scale(0.88);
+  transition: opacity 1.2s cubic-bezier(0.16, 1, 0.3, 1),
+              filter  1.2s cubic-bezier(0.16, 1, 0.3, 1),
+              transform 1.2s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.rg-word--visible {
+  opacity: 1;
+  filter: blur(0);
+  transform: scale(1);
+}
+
+/* ROCA — grande, blanco, impactante */
+.rg-word--roca {
+  font-size: clamp(5rem, 18vw, 14rem);
+  font-weight: 900;
+  color: #ffffff;
+  letter-spacing: -0.02em;
+  text-transform: uppercase;
+  text-shadow:
+    0 0 60px rgba(255, 255, 255, 0.25),
+    0 4px 80px rgba(0, 0, 0, 0.9);
+}
+
+/* GYM — rojo, amplio tracking */
+.rg-word--gym {
+  font-size: clamp(4rem, 14vw, 11rem);
+  font-weight: 900;
+  color: #dc2626;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  text-shadow:
+    0 0 80px rgba(220, 38, 38, 0.65),
+    0 0 120px rgba(220, 38, 38, 0.35),
+    0 4px 80px rgba(0, 0, 0, 0.9);
+  transition-delay: 0.2s;
+}
+
+/* ── Tagline ───────────────────────────────────────────────────── */
+.rg-tagline {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  margin-top: 2rem;
+  font-size: 0.6rem;
+  font-weight: 700;
+  letter-spacing: 0.3em;
+  text-transform: uppercase;
+  color: rgba(255, 255, 255, 0.4);
+  opacity: 0;
+  transform: translateY(10px);
+  transition: opacity 1.2s ease-out 0.3s, transform 1.2s ease-out 0.3s;
+}
+
+.rg-tagline--visible {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+.rg-tagline-line {
+  width: 3rem;
+  height: 1px;
+  background: rgba(220, 38, 38, 0.5);
+}
+
+/* ── Badge año ─────────────────────────────────────────────────── */
+.rg-year-badge {
+  margin-top: 1.25rem;
+  font-size: 0.55rem;
+  font-weight: 900;
+  letter-spacing: 0.5em;
+  text-transform: uppercase;
+  color: rgba(220, 38, 38, 0.6);
+  border: 1px solid rgba(220, 38, 38, 0.2);
+  padding: 0.35rem 1.2rem;
+  border-radius: 9999px;
+  opacity: 0;
+  transition: opacity 1.5s ease-out 0.6s;
+}
+
+.rg-year-badge--visible {
+  opacity: 1;
+}
+
+/* ── Hint de salida ────────────────────────────────────────────── */
+.rg-dismiss-hint {
+  position: absolute;
+  bottom: 2.5rem;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 10;
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  font-size: 0.5rem;
+  font-weight: 700;
+  letter-spacing: 0.35em;
+  text-transform: uppercase;
+  color: rgba(255, 255, 255, 0.3);
+  white-space: nowrap;
+  opacity: 0;
+  transition: opacity 1.5s ease-out;
+  animation-fill-mode: forwards;
+}
+
+.rg-dismiss-hint--visible {
+  opacity: 1;
+  animation: ss-blink 3s ease-in-out infinite;
+}
+
+@keyframes ss-blink {
+  0%, 100% { opacity: 1; }
+  50%       { opacity: 0.35; }
+}
+
+.rg-pulse-dot {
+  width: 5px;
+  height: 5px;
+  border-radius: 50%;
+  background: #dc2626;
+  animation: ss-pulse 1.4s ease-in-out infinite;
+  flex-shrink: 0;
+}
+
+/* ── Dots de escena ────────────────────────────────────────────── */
+.rg-dots {
+  position: absolute;
+  bottom: 5rem;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 10;
+  display: flex;
+  gap: 0.4rem;
+}
+
+.rg-dot-item {
+  width: 0.35rem;
+  height: 0.35rem;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.25);
+  transition: all 0.4s ease;
+}
+
+.rg-dot-item--active {
+  width: 1.25rem;
+  border-radius: 9999px;
+  background: #dc2626;
+}
+
+/* ── Responsive ────────────────────────────────────────────────── */
+@media (max-width: 640px) {
+  .rg-scene-label { display: none; }
+  .rg-tagline     { display: none; }
+  .rg-dismiss-hint {
+    font-size: 0.45rem;
+    letter-spacing: 0.2em;
+    white-space: normal;
+    text-align: center;
+    padding: 0 1rem;
+    bottom: 4rem;
+  }
+}
