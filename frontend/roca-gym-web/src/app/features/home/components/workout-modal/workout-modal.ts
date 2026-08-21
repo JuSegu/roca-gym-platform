@@ -41,24 +41,37 @@ export class WorkoutModal implements OnInit, OnDestroy {
 
   @Output() close = new EventEmitter<void>();
 
+  // Navegación de Fases del Entrenamiento (Estilo Symmetry Pro)
+  currentPhase = signal<'warmup' | 'lifting' | 'cardio' | 'summary'>('warmup');
+
   isFinished = signal(false);
   activeRoutine = this.routineService.activeRoutine;
   exercises = signal<ActiveExercise[]>([]);
 
-  // Live Workout Clock & Calories
+  // Cronómetros
   elapsedSeconds = signal(0);
   private workoutClockInterval: any = null;
 
-  // Rest Timer
+  // Calentamiento
+  warmupTimerSeconds = signal(600); // 10 min
+  isWarmupRunning = signal(false);
+  private warmupInterval: any = null;
+
+  // Cardio Finisher
+  cardioSeconds = signal(900); // 15 min
+  isCardioRunning = signal(false);
+  private cardioInterval: any = null;
+
+  // Temporizador de Descanso
   restTime = signal(60);
   initialRestTime = signal(60);
   isTimerRunning = signal(false);
   private timerInterval: any = null;
 
-  // Achievement Popups during workout
+  // Alerta de PR en vivo
   newPrCelebration = signal<string | null>(null);
 
-  // Total Volume & Sets Computed
+  // Métricas Computadas
   totalSetsCompleted = computed(() => {
     return this.exercises().reduce(
       (acc, ex) => acc + ex.sets.filter((s) => s.completed).length,
@@ -83,8 +96,9 @@ export class WorkoutModal implements OnInit, OnDestroy {
 
   estimatedCalories = computed(() => {
     const base = Math.floor(this.elapsedSeconds() * 0.12);
-    const setBonus = this.totalSetsCompleted() * 18;
-    return base + setBonus;
+    const setBonus = this.totalSetsCompleted() * 20;
+    const cardioBonus = this.currentPhase() === 'summary' ? this.activeRoutine().cardioFinisher.estimatedCalories : 0;
+    return base + setBonus + cardioBonus;
   });
 
   formattedWorkoutTime = computed(() => {
@@ -94,10 +108,28 @@ export class WorkoutModal implements OnInit, OnDestroy {
     return `${mins.toString().padStart(2, '0')}:${secs.toString().padStart(2, '0')}`;
   });
 
+  // Puntuación de Simetría AI (Inspirada en Symmetry App)
+  symmetryScore = computed(() => {
+    const volume = this.totalVolumeKg();
+    const sets = this.totalSetsCompleted();
+    const base = 75;
+    const volumeFactor = Math.min(15, Math.floor(volume / 400));
+    const setFactor = Math.min(10, sets * 1.5);
+    const overall = Math.min(99, Math.round(base + volumeFactor + setFactor));
+
+    return {
+      overall,
+      potential: Math.min(98, overall + 6),
+      vTaper: Math.min(96, overall - 2),
+      muscleDensity: Math.min(99, overall + 2),
+      rank: overall >= 92 ? 'TITÁN SIMÉTRICO 🔥' : overall >= 85 ? 'DIAMANTE I' : overall >= 78 ? 'PLATINO II' : 'ORO III',
+    };
+  });
+
   ngOnInit(): void {
     const routine = this.activeRoutine();
     const exList: ActiveExercise[] = routine.exercises.map((ex) => {
-      const defaultWeightNum = parseInt(ex.defaultWeight) || 50;
+      const defaultWeightNum = parseInt(ex.defaultWeight) || 60;
       const targetRepsNum = parseInt(ex.targetReps) || 10;
 
       const sets: SetEntry[] = Array.from({ length: ex.targetSeries }, (_, i) => ({
@@ -116,13 +148,77 @@ export class WorkoutModal implements OnInit, OnDestroy {
     this.exercises.set(exList);
     this.initialRestTime.set(exList[0]?.restSeconds || 60);
     this.restTime.set(exList[0]?.restSeconds || 60);
+    this.warmupTimerSeconds.set(routine.warmupMinutes * 60);
+    this.cardioSeconds.set(routine.cardioFinisher.durationMinutes * 60);
 
-    // Iniciar cronómetro de entrenamiento en vivo
+    // Iniciar cronómetro general
     this.workoutClockInterval = setInterval(() => {
       this.elapsedSeconds.update((s) => s + 1);
     }, 1000);
   }
 
+  setPhase(phase: 'warmup' | 'lifting' | 'cardio' | 'summary'): void {
+    this.currentPhase.set(phase);
+    if (phase === 'lifting') {
+      this.audio.playSetDoneSound();
+    }
+  }
+
+  // Controles de Calentamiento
+  startWarmupTimer(): void {
+    this.isWarmupRunning.set(true);
+    this.warmupInterval = setInterval(() => {
+      this.warmupTimerSeconds.update((s) => {
+        if (s <= 1) {
+          clearInterval(this.warmupInterval);
+          this.isWarmupRunning.set(false);
+          this.audio.playLevelUpSound();
+          return 0;
+        }
+        return s - 1;
+      });
+    }, 1000);
+  }
+
+  pauseWarmupTimer(): void {
+    if (this.warmupInterval) {
+      clearInterval(this.warmupInterval);
+      this.warmupInterval = null;
+    }
+    this.isWarmupRunning.set(false);
+  }
+
+  formatSeconds(secs: number): string {
+    const m = Math.floor(secs / 60);
+    const s = secs % 60;
+    return `${m.toString().padStart(2, '0')}:${s.toString().padStart(2, '0')}`;
+  }
+
+  // Controles de Cardio Finisher
+  startCardioTimer(): void {
+    this.isCardioRunning.set(true);
+    this.cardioInterval = setInterval(() => {
+      this.cardioSeconds.update((s) => {
+        if (s <= 1) {
+          clearInterval(this.cardioInterval);
+          this.isCardioRunning.set(false);
+          this.audio.playLevelUpSound();
+          return 0;
+        }
+        return s - 1;
+      });
+    }, 1000);
+  }
+
+  pauseCardioTimer(): void {
+    if (this.cardioInterval) {
+      clearInterval(this.cardioInterval);
+      this.cardioInterval = null;
+    }
+    this.isCardioRunning.set(false);
+  }
+
+  // Controles de Series de Levantamiento
   toggleSet(exerciseId: number, setIndex: number): void {
     let completedNow = false;
     let exerciseName = '';
@@ -152,12 +248,11 @@ export class WorkoutModal implements OnInit, OnDestroy {
     );
 
     if (completedNow) {
-      // Reproducir sonido de serie lograda
       this.audio.playSetDoneSound();
       this.gamification.addXp(35, `Serie completada en ${exerciseName}`);
 
-      // Comprobar si supera Récord Personal
-      if (currentWeight >= 80) {
+      // Comprobar si califica como PR
+      if (currentWeight >= 75) {
         this.routineService.addPersonalRecord(
           exerciseName,
           currentWeight,
@@ -168,7 +263,6 @@ export class WorkoutModal implements OnInit, OnDestroy {
         setTimeout(() => this.newPrCelebration.set(null), 4000);
       }
 
-      // Disparar timer de descanso automáticamente
       const currentEx = this.exercises().find((e) => e.id === exerciseId);
       if (currentEx) {
         this.startRestTimer(currentEx.restSeconds);
@@ -239,18 +333,20 @@ export class WorkoutModal implements OnInit, OnDestroy {
       clearInterval(this.workoutClockInterval);
       this.workoutClockInterval = null;
     }
+    if (this.warmupInterval) clearInterval(this.warmupInterval);
+    if (this.cardioInterval) clearInterval(this.cardioInterval);
 
     const durationMins = Math.max(1, Math.round(this.elapsedSeconds() / 60));
     const calories = this.estimatedCalories();
     const routine = this.activeRoutine();
 
-    // 1. Guardar en Auth y estadísticas de usuario
+    // 1. Persistir en Auth
     this.auth.recordWorkout(calories, durationMins);
 
     // 2. Entregar XP Masivo
-    this.gamification.addXp(300, `Rutina completada: ${routine.name}`);
+    this.gamification.addXp(350, `Rutina completada: ${routine.name}`);
 
-    // 3. Evaluar logros
+    // 3. Evaluar Logros
     const user = this.auth.currentUser();
     if (user) {
       this.gamification.evaluateStats(user.stats);
@@ -259,21 +355,22 @@ export class WorkoutModal implements OnInit, OnDestroy {
     // 4. Fanfarria de Victoria
     this.audio.playVictorySound();
 
+    this.currentPhase.set('summary');
     this.isFinished.set(true);
   }
 
   onClose(): void {
     this.stopRestTimer();
-    if (this.workoutClockInterval) {
-      clearInterval(this.workoutClockInterval);
-    }
+    if (this.workoutClockInterval) clearInterval(this.workoutClockInterval);
+    if (this.warmupInterval) clearInterval(this.warmupInterval);
+    if (this.cardioInterval) clearInterval(this.cardioInterval);
     this.close.emit();
   }
 
   ngOnDestroy(): void {
     this.stopRestTimer();
-    if (this.workoutClockInterval) {
-      clearInterval(this.workoutClockInterval);
-    }
+    if (this.workoutClockInterval) clearInterval(this.workoutClockInterval);
+    if (this.warmupInterval) clearInterval(this.warmupInterval);
+    if (this.cardioInterval) clearInterval(this.cardioInterval);
   }
 }

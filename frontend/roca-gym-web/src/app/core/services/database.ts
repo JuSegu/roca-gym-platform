@@ -19,6 +19,7 @@ export interface StoreOrder {
   id: string;
   userEmail: string;
   userName: string;
+  customerPhone?: string;
   items: OrderItem[];
   subtotal: number;
   discount: number;

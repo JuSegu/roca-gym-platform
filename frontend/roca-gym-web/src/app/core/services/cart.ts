@@ -102,13 +102,22 @@ export class CartService {
     this.cartItemsSignal.update((current) => current.filter((item) => item.id !== productId));
   }
 
-  checkout(paymentMethod: PaymentMethod = 'Nequi / Daviplata', transactionRef?: string): StoreOrder | null {
+  checkout(
+    paymentMethod: PaymentMethod = 'Nequi / Daviplata',
+    transactionRef?: string,
+    customerInfo?: { name?: string; phone?: string; email?: string }
+  ): StoreOrder | null {
     if (this.cartItemsSignal().length === 0) return null;
 
     const user = this.auth.currentUser();
+    const finalName = customerInfo?.name?.trim() || (user ? user.name : 'Cliente ROCA');
+    const finalEmail = customerInfo?.email?.trim() || (user ? user.email : 'cliente@rocagym.com');
+    const finalPhone = customerInfo?.phone?.trim() || (user?.phone || '+57 300 000 0000');
+
     const order = this.db.createOrder({
-      userEmail: user ? user.email : 'cliente@rocagym.com',
-      userName: user ? user.name : 'Cliente ROCA',
+      userEmail: finalEmail,
+      userName: finalName,
+      customerPhone: finalPhone,
       items: this.cartItemsSignal().map((i) => ({
         id: i.id,
         name: i.name,
