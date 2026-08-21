@@ -1,6 +1,10 @@
-import { Component, inject, signal } from '@angular/core';
+import { Component, inject, signal, computed } from '@angular/core';
+import { CommonModule } from '@angular/common';
+import { FormsModule } from '@angular/forms';
 import { Auth } from '../../../../core/services/auth';
 import { DatabaseService } from '../../../../core/services/database';
+import { GamificationService } from '../../../../core/services/gamification.service';
+import { RoutineService } from '../../../../core/services/routine.service';
 import { WorkoutModal } from '../workout-modal/workout-modal';
 
 interface ClassSession {
@@ -17,22 +21,38 @@ interface ClassSession {
 @Component({
   selector: 'app-dashboard',
   standalone: true,
-  imports: [WorkoutModal],
+  imports: [CommonModule, FormsModule, WorkoutModal],
   templateUrl: './dashboard.html',
   styleUrl: './dashboard.css',
 })
 export class Dashboard {
   readonly auth = inject(Auth);
   readonly db = inject(DatabaseService);
+  readonly gamification = inject(GamificationService);
+  readonly routineService = inject(RoutineService);
 
-  // Pestaña activa del dashboard
-  activeTab = signal<'home' | 'orders'>('home');
+  // Active Tab
+  activeTab = signal<'home' | 'routines' | 'gamification' | 'prs' | 'orders'>('home');
 
-  // Estado reactivo de modales
+  // Modals
   showQrModal = signal(false);
   showWorkoutModal = signal(false);
 
-  // Mis compras filtradas por usuario actual
+  // 1RM Calculator State
+  calcExercise = signal<string>('Press de Banca Plano');
+  calcWeight = signal<number>(80);
+  calcReps = signal<number>(6);
+  prSuccessMsg = signal<string | null>(null);
+
+  calculated1RM = computed(() =>
+    this.routineService.calculateOneRepMax(this.calcWeight(), this.calcReps())
+  );
+
+  calculatedPercentages = computed(() =>
+    this.routineService.getPercentagesTable(this.calculated1RM())
+  );
+
+  // Filtered orders
   myOrders = () => {
     const email = this.auth.currentUser()?.email;
     if (!email) return [];
@@ -85,6 +105,11 @@ export class Dashboard {
     this.showWorkoutModal.update((v) => !v);
   }
 
+  startSpecificRoutine(routineId: string): void {
+    this.routineService.setActiveRoutine(routineId);
+    this.showWorkoutModal.set(true);
+  }
+
   toggleBooking(classId: number): void {
     this.classes.update((items) =>
       items.map((item) => {
@@ -94,5 +119,18 @@ export class Dashboard {
         return item;
       })
     );
+  }
+
+  saveCalculatedPR(): void {
+    const exercise = this.calcExercise();
+    const weight = this.calcWeight();
+    const reps = this.calcReps();
+
+    this.routineService.addPersonalRecord(exercise, weight, reps, `Calculado: ${weight}kg x ${reps} reps`);
+
+    this.prSuccessMsg.set(`¡Récord guardado: ${this.calculated1RM()} kg en ${exercise}! (+120 XP)`);
+    setTimeout(() => {
+      this.prSuccessMsg.set(null);
+    }, 4000);
   }
 }

@@ -1,6 +1,7 @@
 import { Injectable, signal, computed, inject } from '@angular/core';
 import { Auth } from './auth';
 import { DatabaseService, StoreOrder } from './database';
+import { GamificationService } from './gamification.service';
 
 export interface CartItem {
   id: number;
@@ -18,6 +19,7 @@ export interface CartItem {
 export class CartService {
   private readonly auth = inject(Auth);
   private readonly db = inject(DatabaseService);
+  private readonly gamification = inject(GamificationService);
 
   private readonly cartItemsSignal = signal<CartItem[]>([]);
   readonly items = this.cartItemsSignal.asReadonly();
@@ -116,6 +118,11 @@ export class CartService {
 
     this.lastOrderSignal.set(order);
     this.clearCart();
+
+    // Recompensar con XP y desbloqueo de logro de nutrición
+    this.gamification.unlockBadge('vip_supplements');
+    this.gamification.addXp(100, 'Pedido en tienda ROCA completado');
+
     return order;
   }
 

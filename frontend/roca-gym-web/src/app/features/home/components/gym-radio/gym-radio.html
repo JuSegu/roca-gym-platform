@@ -1,0 +1,204 @@
+@if (audio.isVisible()) {
+  <div class="fixed bottom-5 right-5 z-40 flex flex-col items-end">
+    
+    <!-- TARJETA EXPANDIDA DEL REPRODUCTOR -->
+    @if (audio.isExpanded()) {
+      <div class="mb-3 w-80 sm:w-96 rounded-2xl border border-red-600/40 bg-zinc-950/95 p-5 shadow-[0_0_50px_rgba(220,38,38,0.35)] backdrop-blur-2xl transition-all duration-300 animate-fadeIn">
+        
+        <!-- Header de la Radio -->
+        <div class="flex items-center justify-between border-b border-white/10 pb-3">
+          <div class="flex items-center gap-2">
+            <span class="flex h-2.5 w-2.5 rounded-full bg-red-600" [class.animate-ping]="audio.isPlaying()"></span>
+            <span class="text-[11px] font-black uppercase tracking-[0.2em] text-red-500">ROCA GYM RADIO</span>
+          </div>
+
+          <div class="flex items-center gap-2">
+            <!-- Minimizar -->
+            <button
+              type="button"
+              (click)="audio.toggleExpanded()"
+              class="rounded-lg border border-white/10 bg-white/5 p-1.5 text-xs text-gray-400 hover:text-white hover:bg-white/10"
+              title="Minimizar reproductor"
+            >
+              🔽
+            </button>
+            <!-- Apagar / Cerrar -->
+            <button
+              type="button"
+              (click)="audio.toggleVisibility()"
+              class="rounded-lg border border-red-600/30 bg-red-950/40 p-1.5 text-xs text-red-400 hover:text-red-300 hover:bg-red-900/50"
+              title="Apagar y ocultar radio"
+            >
+              ✕
+            </button>
+          </div>
+        </div>
+
+        <!-- Info de la Canción Actual -->
+        <div class="mt-4 flex items-center gap-4 rounded-xl border border-white/5 bg-black/60 p-3.5">
+          <div class="flex h-14 w-14 flex-shrink-0 items-center justify-center rounded-xl bg-gradient-to-br from-red-600/30 to-black text-3xl border border-red-600/30 shadow-[0_0_15px_rgba(220,38,38,0.2)]">
+            {{ audio.currentTrack().icon }}
+          </div>
+
+          <div class="flex-1 overflow-hidden">
+            <span class="rounded bg-red-600/20 px-1.5 py-0.5 text-[9px] font-black uppercase text-red-400">
+              {{ audio.currentTrack().bpm }} BPM · {{ audio.currentTrack().genre }}
+            </span>
+            <h4 class="mt-1 truncate text-sm font-black uppercase text-white">{{ audio.currentTrack().title }}</h4>
+            <p class="truncate text-xs text-gray-400">{{ audio.currentTrack().artist }}</p>
+          </div>
+        </div>
+
+        <!-- Visualizador de Ondas de Audio -->
+        <div class="my-4 flex h-10 items-end justify-between gap-1.5 rounded-xl border border-white/5 bg-black/40 px-4 py-2">
+          @for (bar of audio.visualizerBars(); track $index) {
+            <div
+              class="w-full rounded-t-sm bg-gradient-to-t from-red-800 to-red-500 transition-all duration-100"
+              [style.height.%]="audio.isPlaying() ? bar : 15"
+            ></div>
+          }
+        </div>
+
+        <!-- Controles de Reproducción -->
+        <div class="flex items-center justify-between">
+          <button
+            type="button"
+            (click)="audio.prevTrack()"
+            class="flex h-9 w-9 items-center justify-center rounded-lg border border-white/10 bg-white/5 text-sm text-gray-300 transition hover:border-red-600/40 hover:bg-red-600/10 hover:text-white"
+            title="Anterior estación"
+          >
+            ⏮
+          </button>
+
+          <button
+            type="button"
+            (click)="audio.togglePlay()"
+            class="flex h-12 w-12 items-center justify-center rounded-full bg-red-600 text-lg font-black text-white shadow-[0_0_25px_rgba(220,38,38,0.5)] transition hover:scale-105 hover:bg-red-500"
+            [title]="audio.isPlaying() ? 'Pausar música' : 'Reproducir música de entreno'"
+          >
+            {{ audio.isPlaying() ? '⏸' : '▶' }}
+          </button>
+
+          <button
+            type="button"
+            (click)="audio.nextTrack()"
+            class="flex h-9 w-9 items-center justify-center rounded-lg border border-white/10 bg-white/5 text-sm text-gray-300 transition hover:border-red-600/40 hover:bg-red-600/10 hover:text-white"
+            title="Siguiente estación"
+          >
+            ⏭
+          </button>
+        </div>
+
+        <!-- Selector de Estaciones -->
+        <div class="mt-4 border-t border-white/10 pt-3">
+          <p class="text-[10px] font-black uppercase tracking-wider text-gray-400">Canales de Motivación</p>
+          <div class="mt-2 grid grid-cols-2 gap-1.5">
+            @for (t of audio.tracks; track t.id; let i = $index) {
+              <button
+                type="button"
+                (click)="audio.selectTrack(i)"
+                class="flex items-center gap-2 rounded-lg border px-2.5 py-1.5 text-left text-xs transition"
+                [class]="audio.currentTrackIndex() === i ? 'border-red-600 bg-red-600/20 text-white font-bold' : 'border-white/5 bg-white/[0.02] text-gray-400 hover:border-white/10 hover:text-gray-200'"
+              >
+                <span>{{ t.icon }}</span>
+                <span class="truncate text-[11px]">{{ t.title.split(' ')[0] }}</span>
+              </button>
+            }
+          </div>
+        </div>
+
+        <!-- Control de Volumen -->
+        <div class="mt-4 flex items-center gap-3 border-t border-white/10 pt-3">
+          <span class="text-xs text-gray-400">🔈</span>
+          <input
+            type="range"
+            min="0"
+            max="1"
+            step="0.05"
+            [value]="audio.volume()"
+            (input)="onVolumeChange($event)"
+            class="h-1.5 w-full accent-red-600 cursor-pointer rounded-lg bg-zinc-800"
+            aria-label="Volumen de música"
+          />
+          <span class="text-xs text-gray-400">🔊</span>
+        </div>
+
+      </div>
+    }
+
+    <!-- BARRA FLOTANTE COMPACTA (PILL) -->
+    <div class="flex items-center gap-2 rounded-full border border-red-600/50 bg-zinc-950/90 py-2 pl-3.5 pr-2 shadow-[0_0_30px_rgba(220,38,38,0.35)] backdrop-blur-xl transition hover:border-red-500">
+      
+      <!-- Icono & Ecualizador mini -->
+      <button
+        type="button"
+        (click)="audio.toggleExpanded()"
+        class="flex items-center gap-2.5 text-left"
+        title="Abrir reproductor de música"
+      >
+        <span class="text-base">{{ audio.currentTrack().icon }}</span>
+        
+        <!-- Barras de ecualizador mini -->
+        <div class="flex h-3.5 items-end gap-0.5">
+          <div class="w-1 rounded-sm bg-red-500" [class.animate-pulse]="audio.isPlaying()" [style.height.%]="audio.isPlaying() ? 80 : 30"></div>
+          <div class="w-1 rounded-sm bg-red-500" [class.animate-pulse]="audio.isPlaying()" [style.height.%]="audio.isPlaying() ? 100 : 30"></div>
+          <div class="w-1 rounded-sm bg-red-500" [class.animate-pulse]="audio.isPlaying()" [style.height.%]="audio.isPlaying() ? 60 : 30"></div>
+        </div>
+
+        <div class="max-w-[120px] sm:max-w-[160px]">
+          <p class="truncate text-xs font-black uppercase text-white leading-tight">
+            {{ audio.currentTrack().title }}
+          </p>
+          <p class="text-[9px] font-bold text-red-500 uppercase tracking-wider">
+            ROCA Radio
+          </p>
+        </div>
+      </button>
+
+      <!-- Botón Play/Pause -->
+      <button
+        type="button"
+        (click)="audio.togglePlay()"
+        class="flex h-8 w-8 items-center justify-center rounded-full bg-red-600 text-xs font-black text-white shadow-[0_0_15px_rgba(220,38,38,0.4)] transition hover:bg-red-500"
+        [title]="audio.isPlaying() ? 'Pausar' : 'Reproducir'"
+      >
+        {{ audio.isPlaying() ? '⏸' : '▶' }}
+      </button>
+
+      <!-- Botón Desplegar / Expandir -->
+      <button
+        type="button"
+        (click)="audio.toggleExpanded()"
+        class="flex h-8 w-8 items-center justify-center rounded-full border border-white/10 bg-white/5 text-xs text-gray-300 hover:text-white hover:bg-white/10"
+        title="Más controles de música"
+      >
+        {{ audio.isExpanded() ? '▲' : '⚡' }}
+      </button>
+
+      <!-- Botón Apagar / Desactivar -->
+      <button
+        type="button"
+        (click)="audio.toggleVisibility()"
+        class="flex h-8 w-8 items-center justify-center rounded-full text-xs text-gray-500 hover:text-red-400 hover:bg-red-950/40"
+        title="Apagar reproductor"
+      >
+        ✕
+      </button>
+
+    </div>
+
+  </div>
+} @else {
+  <!-- Botón Discreto para Reactivar la Radio si fue apagada -->
+  <div class="fixed bottom-5 right-5 z-40">
+    <button
+      type="button"
+      (click)="audio.toggleVisibility()"
+      class="flex items-center gap-2 rounded-full border border-white/10 bg-zinc-950/80 px-3.5 py-2 text-xs font-black uppercase tracking-wider text-gray-400 shadow-xl backdrop-blur-md transition hover:border-red-600/50 hover:bg-red-950/40 hover:text-white"
+      title="Encender Gym Radio"
+    >
+      <span>📻</span>
+      <span>Gym Radio</span>
+    </button>
+  </div>
+}

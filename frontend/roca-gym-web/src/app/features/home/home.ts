@@ -8,6 +8,7 @@ import { Store } from './components/store/store';
 import { Dashboard } from './components/dashboard/dashboard';
 import { CartModal } from './components/cart-modal/cart-modal';
 import { Footer } from './components/footer/footer';
+import { GymRadio } from './components/gym-radio/gym-radio';
 import { Auth } from '../../core/services/auth';
 import { CartService } from '../../core/services/cart';
 
@@ -23,6 +24,7 @@ import { CartService } from '../../core/services/cart';
     Store,
     Dashboard,
     CartModal,
+    GymRadio,
     Footer,
   ],
   templateUrl: './home.html',

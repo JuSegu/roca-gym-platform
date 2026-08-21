@@ -1,96 +1,79 @@
-import { Component, EventEmitter, Output, inject, signal, OnDestroy } from '@angular/core';
+import { Component, EventEmitter, Output, inject, signal, OnDestroy, OnInit } from '@angular/core';
+import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { Auth } from '../../../../core/services/auth';
+import { RoutineService } from '../../../../core/services/routine.service';
+import { GamificationService } from '../../../../core/services/gamification.service';
+import { AudioPlayerService } from '../../../../core/services/audio-player.service';
 
-interface Exercise {
+interface ActiveExercise {
   id: number;
   name: string;
+  muscleGroup: string;
   targetSeries: number;
   targetReps: string;
   defaultWeight: string;
   image: string;
   restSeconds: number;
+  notes: string;
   completedSeries: boolean[];
 }
 
 @Component({
   selector: 'app-workout-modal',
   standalone: true,
-  imports: [FormsModule],
+  imports: [CommonModule, FormsModule],
   templateUrl: './workout-modal.html',
   styleUrl: './workout-modal.css',
 })
-export class WorkoutModal implements OnDestroy {
-  private readonly auth = inject(Auth);
+export class WorkoutModal implements OnInit, OnDestroy {
+  readonly auth = inject(Auth);
+  readonly routineService = inject(RoutineService);
+  readonly gamification = inject(GamificationService);
+  readonly audio = inject(AudioPlayerService);
 
   @Output() close = new EventEmitter<void>();
 
-  // Estado de finalización
   isFinished = signal(false);
+  activeRoutine = this.routineService.activeRoutine;
+  exercises = signal<ActiveExercise[]>([]);
 
-  // Ejercicios de la rutina Pecho & Tríceps
-  exercises = signal<Exercise[]>([
-    {
-      id: 1,
-      name: 'Press de Banca Plano con Barra',
-      targetSeries: 4,
-      targetReps: '10 reps',
-      defaultWeight: '80 kg',
-      image: '/images/facilities/pesas.JPG',
-      restSeconds: 90,
-      completedSeries: [false, false, false, false],
-    },
-    {
-      id: 2,
-      name: 'Press Inclinado con Mancuernas',
-      targetSeries: 4,
-      targetReps: '12 reps',
-      defaultWeight: '26 kg c/u',
-      image: '/images/facilities/entrenamiento.jpg',
-      restSeconds: 60,
-      completedSeries: [false, false, false, false],
-    },
-    {
-      id: 3,
-      name: 'Fondos en Paralelas (Dips)',
-      targetSeries: 3,
-      targetReps: 'Fallo técnico',
-      defaultWeight: 'Peso Corporal',
-      image: '/images/facilities/ambiente.JPG',
-      restSeconds: 60,
-      completedSeries: [false, false, false],
-    },
-    {
-      id: 4,
-      name: 'Extensión de Tríceps en Polea Alta',
-      targetSeries: 4,
-      targetReps: '12 reps',
-      defaultWeight: '35 kg',
-      image: '/images/facilities/cardio.JPG',
-      restSeconds: 45,
-      completedSeries: [false, false, false, false],
-    },
-  ]);
-
-  // Temporizador de descanso
+  // Rest Timer
   restTime = signal(60);
   initialRestTime = signal(60);
   isTimerRunning = signal(false);
   private timerInterval: any = null;
 
+  ngOnInit(): void {
+    const routine = this.activeRoutine();
+    const exList: ActiveExercise[] = routine.exercises.map((ex) => ({
+      ...ex,
+      completedSeries: Array.from({ length: ex.targetSeries }, () => false),
+    }));
+    this.exercises.set(exList);
+    this.initialRestTime.set(exList[0]?.restSeconds || 60);
+    this.restTime.set(exList[0]?.restSeconds || 60);
+  }
+
   toggleSerie(exerciseId: number, serieIndex: number): void {
+    let wasNewlyCompleted = false;
+
     this.exercises.update((list) =>
       list.map((ex) => {
         if (ex.id === exerciseId) {
           const updatedSeries = [...ex.completedSeries];
           updatedSeries[serieIndex] = !updatedSeries[serieIndex];
+          if (updatedSeries[serieIndex]) wasNewlyCompleted = true;
           return { ...ex, completedSeries: updatedSeries };
         }
         return ex;
       })
     );
 
-    // Iniciar temporizador de descanso automáticamente
+    if (wasNewlyCompleted) {
+      this.audio.playSetDoneSound();
+    }
+
     const currentEx = this.exercises().find((e) => e.id === exerciseId);
     if (currentEx) {
       this.startRestTimer(currentEx.restSeconds);
@@ -99,9 +82,7 @@ export class WorkoutModal implements OnDestroy {
 
   updateWeight(exerciseId: number, weight: string): void {
     this.exercises.update((list) =>
-      list.map((exercise) =>
-        exercise.id === exerciseId ? { ...exercise, defaultWeight: weight } : exercise
-      )
+      list.map((ex) => (ex.id === exerciseId ? { ...ex, defaultWeight: weight } : ex))
     );
   }
 
@@ -141,8 +122,23 @@ export class WorkoutModal implements OnDestroy {
 
   finishWorkout(): void {
     this.stopRestTimer();
-    // Registrar el entrenamiento en Auth service (ej: 480 kcal, 55 minutos)
-    this.auth.recordWorkout(480, 55);
+    const routine = this.activeRoutine();
+
+    // 1. Record in Auth service
+    this.auth.recordWorkout(routine.estimatedCalories, routine.durationMinutes);
+
+    // 2. Award XP in Gamification service
+    this.gamification.addXp(180, `Rutina completada: ${routine.name}`);
+
+    // 3. Evaluate Achievements
+    const user = this.auth.currentUser();
+    if (user) {
+      this.gamification.evaluateStats(user.stats);
+    }
+
+    // 4. Play Victory fanfare
+    this.audio.playVictorySound();
+
     this.isFinished.set(true);
   }
 

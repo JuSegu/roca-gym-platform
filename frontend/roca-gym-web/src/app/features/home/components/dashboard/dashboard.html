@@ -5,13 +5,22 @@
 
   <div class="relative mx-auto max-w-7xl">
 
-    <!-- ENCABEZADO DE BIENVENIDA -->
+    <!-- ENCABEZADO DE BIENVENIDA & LIGA ROCA -->
     <div class="flex flex-col justify-between gap-6 rounded-2xl border border-white/10 bg-zinc-950/80 p-6 backdrop-blur-xl md:flex-row md:items-center md:p-8">
       <div>
-        <div class="inline-flex items-center gap-2 rounded-full border border-red-600/30 bg-red-600/10 px-3.5 py-1 text-xs font-black uppercase tracking-wider text-red-500">
-          <span class="h-2 w-2 animate-pulse rounded-full bg-red-500"></span>
-          {{ auth.currentUser()?.role || 'Miembro Activo' }}
+        <div class="flex flex-wrap items-center gap-2">
+          <div class="inline-flex items-center gap-2 rounded-full border border-red-600/30 bg-red-600/10 px-3.5 py-1 text-xs font-black uppercase tracking-wider text-red-500">
+            <span class="h-2 w-2 animate-pulse rounded-full bg-red-500"></span>
+            {{ auth.currentUser()?.role || 'Miembro Activo' }}
+          </div>
+
+          <div class="inline-flex items-center gap-1.5 rounded-full border px-3 py-1 text-xs font-black uppercase tracking-wider" [class]="gamification.currentLeague().color">
+            <span>{{ gamification.currentLeague().icon }}</span>
+            <span>{{ gamification.currentLeague().name }}</span>
+            <span class="text-[10px] text-gray-400">({{ gamification.userXp() }} XP)</span>
+          </div>
         </div>
+
         <h1 class="mt-3 text-3xl font-black uppercase text-white sm:text-4xl">
           ¡Hola de nuevo, <span class="text-red-600">{{ auth.currentUser()?.name }}</span>! 💪
         </h1>
@@ -35,19 +44,50 @@
     </div>
 
     <!-- NAVEGACIÓN DE TABS DEL DASHBOARD -->
-    <div class="mt-6 flex gap-2 border-b border-white/10 pb-0">
+    <div class="mt-8 flex gap-2 overflow-x-auto border-b border-white/10 pb-0">
       <button
         type="button"
         (click)="activeTab.set('home')"
-        class="px-4 py-3 text-xs font-black uppercase tracking-wider transition border-b-2"
+        class="whitespace-nowrap px-4 py-3 text-xs font-black uppercase tracking-wider transition border-b-2"
         [class]="activeTab() === 'home' ? 'border-red-600 text-white' : 'border-transparent text-gray-500 hover:text-gray-300'"
       >
         🏠 Mi Panel
       </button>
+
+      <button
+        type="button"
+        (click)="activeTab.set('routines')"
+        class="whitespace-nowrap px-4 py-3 text-xs font-black uppercase tracking-wider transition border-b-2"
+        [class]="activeTab() === 'routines' ? 'border-red-600 text-white' : 'border-transparent text-gray-500 hover:text-gray-300'"
+      >
+        🏋️ Rutinas & Ejercicios
+      </button>
+
+      <button
+        type="button"
+        (click)="activeTab.set('gamification')"
+        class="flex items-center gap-1.5 whitespace-nowrap px-4 py-3 text-xs font-black uppercase tracking-wider transition border-b-2"
+        [class]="activeTab() === 'gamification' ? 'border-red-600 text-white' : 'border-transparent text-gray-500 hover:text-gray-300'"
+      >
+        🏆 Logros & Ranking
+        <span class="rounded-full bg-yellow-500/20 px-1.5 py-0.5 text-[9px] font-black text-yellow-400">
+          {{ gamification.unlockedCount() }}/{{ gamification.badges().length }}
+        </span>
+      </button>
+
+      <button
+        type="button"
+        (click)="activeTab.set('prs')"
+        class="whitespace-nowrap px-4 py-3 text-xs font-black uppercase tracking-wider transition border-b-2"
+        [class]="activeTab() === 'prs' ? 'border-red-600 text-white' : 'border-transparent text-gray-500 hover:text-gray-300'"
+      >
+        📈 Récords & PRs (1RM)
+      </button>
+
       <button
         type="button"
         (click)="activeTab.set('orders')"
-        class="flex items-center gap-1.5 px-4 py-3 text-xs font-black uppercase tracking-wider transition border-b-2"
+        class="flex items-center gap-1.5 whitespace-nowrap px-4 py-3 text-xs font-black uppercase tracking-wider transition border-b-2"
         [class]="activeTab() === 'orders' ? 'border-red-600 text-white' : 'border-transparent text-gray-500 hover:text-gray-300'"
       >
         🛍️ Mis Compras
@@ -57,312 +97,676 @@
       </button>
     </div>
 
+    <!-- ======================================================== -->
+    <!-- TAB 1: MI PANEL (GENERAL) -->
+    <!-- ======================================================== -->
     @if (activeTab() === 'home') {
-    <!-- MÉTRICAS DINÁMICAS -->
-    <div class="mt-8 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
-      
-      <!-- Asistencias -->
-      <div class="rounded-2xl border border-white/10 bg-zinc-950 p-6 transition hover:border-red-600/40">
-        <div class="flex items-center justify-between">
-          <span class="text-xs font-bold uppercase tracking-wider text-gray-400">Asistencias del Mes</span>
-          <div class="flex h-9 w-9 items-center justify-center rounded-lg bg-red-600/10 text-red-500">
-            📅
+      <!-- MÉTRICAS DINÁMICAS -->
+      <div class="mt-8 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+        
+        <!-- Asistencias -->
+        <div class="rounded-2xl border border-white/10 bg-zinc-950 p-6 transition hover:border-red-600/40">
+          <div class="flex items-center justify-between">
+            <span class="text-xs font-bold uppercase tracking-wider text-gray-400">Asistencias del Mes</span>
+            <div class="flex h-9 w-9 items-center justify-center rounded-lg bg-red-600/10 text-red-500">📅</div>
+          </div>
+          <div class="mt-4 flex items-baseline gap-2">
+            <span class="text-3xl font-black text-white">{{ auth.currentUser()?.stats?.attendances ?? 0 }}</span>
+            <span class="text-xs font-bold text-gray-500">/ 24 Meta</span>
+          </div>
+          <div class="mt-3 h-2 w-full overflow-hidden rounded-full bg-white/10">
+            <div
+              class="h-full rounded-full bg-red-600 transition-all duration-500"
+              [style.width.%]="calcPercentage(auth.currentUser()?.stats?.attendances ?? 0, 24)"
+            ></div>
           </div>
         </div>
-        <div class="mt-4 flex items-baseline gap-2">
-          <span class="text-3xl font-black text-white">{{ auth.currentUser()?.stats?.attendances ?? 0 }}</span>
-          <span class="text-xs font-bold text-gray-500">/ 24 Meta</span>
-        </div>
-        <div class="mt-3 h-2 w-full overflow-hidden rounded-full bg-white/10">
-          <div
-            class="h-full rounded-full bg-red-600 transition-all duration-500"
-            [style.width.%]="calcPercentage(auth.currentUser()?.stats?.attendances ?? 0, 24)"
-          ></div>
-        </div>
-      </div>
 
-      <!-- Calorías -->
-      <div class="rounded-2xl border border-white/10 bg-zinc-950 p-6 transition hover:border-red-600/40">
-        <div class="flex items-center justify-between">
-          <span class="text-xs font-bold uppercase tracking-wider text-gray-400">Calorías Quemadas</span>
-          <div class="flex h-9 w-9 items-center justify-center rounded-lg bg-red-600/10 text-red-500">
-            🔥
+        <!-- Calorías -->
+        <div class="rounded-2xl border border-white/10 bg-zinc-950 p-6 transition hover:border-red-600/40">
+          <div class="flex items-center justify-between">
+            <span class="text-xs font-bold uppercase tracking-wider text-gray-400">Calorías Quemadas</span>
+            <div class="flex h-9 w-9 items-center justify-center rounded-lg bg-red-600/10 text-red-500">🔥</div>
           </div>
-        </div>
-        <div class="mt-4 flex items-baseline gap-2">
-          <span class="text-3xl font-black text-white">{{ auth.currentUser()?.stats?.calories ?? 0 }}</span>
-          <span class="text-xs font-bold text-gray-500">kcal</span>
-        </div>
-        <p class="mt-3 text-xs text-red-400 font-semibold">
-          @if ((auth.currentUser()?.stats?.calories ?? 0) > 0) {
-            🔥 ¡Quemando grasa y ganando músculo!
-          } @else {
-            Completa tu primera rutina hoy
-          }
-        </p>
-      </div>
-
-      <!-- Horas Entrenadas -->
-      <div class="rounded-2xl border border-white/10 bg-zinc-950 p-6 transition hover:border-red-600/40">
-        <div class="flex items-center justify-between">
-          <span class="text-xs font-bold uppercase tracking-wider text-gray-400">Tiempo de Entreno</span>
-          <div class="flex h-9 w-9 items-center justify-center rounded-lg bg-red-600/10 text-red-500">
-            ⏱️
+          <div class="mt-4 flex items-baseline gap-2">
+            <span class="text-3xl font-black text-white">{{ auth.currentUser()?.stats?.calories ?? 0 }}</span>
+            <span class="text-xs font-bold text-gray-500">kcal</span>
           </div>
-        </div>
-        <div class="mt-4 flex items-baseline gap-2">
-          <span class="text-3xl font-black text-white">{{ auth.currentUser()?.stats?.workoutHours ?? 0 }}h</span>
-          <span class="text-xs font-bold text-gray-500">Acumuladas</span>
-        </div>
-        <p class="mt-3 text-xs text-gray-500">
-          @if ((auth.currentUser()?.stats?.workoutHours ?? 0) > 0) {
-            Tiempo registrado en sala
-          } @else {
-            Inicia una rutina con el botón abajo
-          }
-        </p>
-      </div>
-
-      <!-- Racha -->
-      <div class="rounded-2xl border border-red-600/30 bg-red-950/20 p-6 transition hover:border-red-600/60">
-        <div class="flex items-center justify-between">
-          <span class="text-xs font-bold uppercase tracking-wider text-red-400">Racha Actual</span>
-          <div class="flex h-9 w-9 items-center justify-center rounded-lg bg-red-600/20 text-red-500">
-            ⚡
-          </div>
-        </div>
-        <div class="mt-4 flex items-baseline gap-2">
-          <span class="text-3xl font-black text-white">{{ auth.currentUser()?.stats?.streak ?? 0 }} Días</span>
-          <span class="text-xs font-bold text-red-400">
-            @if ((auth.currentUser()?.stats?.streak ?? 0) > 0) {
-              ¡Imparable!
+          <p class="mt-3 text-xs text-red-400 font-semibold">
+            @if ((auth.currentUser()?.stats?.calories ?? 0) > 0) {
+              🔥 ¡Quemando grasa y ganando músculo!
             } @else {
-              ¡Día 1 te espera!
+              Completa tu primera rutina hoy
             }
-          </span>
-        </div>
-        <p class="mt-3 text-xs text-gray-400">
-          @if ((auth.currentUser()?.stats?.streak ?? 0) > 0) {
-            ¡Sigue así para mantener tu récord!
-          } @else {
-            Entrena hoy para empezar tu racha
-          }
-        </p>
-      </div>
-
-    </div>
-
-    <!-- CONTENIDO PRINCIPAL: RUTINA Y CLASES -->
-    <div class="mt-8 grid gap-8 lg:grid-cols-3">
-
-      <!-- COLUMNA IZQUIERDA: RUTINA DEL DÍA -->
-      <div class="lg:col-span-2 space-y-8">
-        
-        <div class="rounded-2xl border border-white/10 bg-zinc-950 p-6 sm:p-8">
-          <div class="flex flex-col justify-between gap-4 border-b border-white/10 pb-6 sm:flex-row sm:items-center">
-            <div>
-              <span class="text-xs font-black uppercase tracking-[0.2em] text-red-600">Entrenamiento de Hoy</span>
-              <h2 class="mt-1 text-2xl font-black text-white">Día 3: Pecho & Tríceps (Hipertrofia)</h2>
-            </div>
-            <button
-              type="button"
-              (click)="toggleWorkoutModal()"
-              class="w-fit rounded-lg bg-red-600 px-5 py-3 text-xs font-black uppercase tracking-wider text-white shadow-[0_0_20px_rgba(220,38,38,0.3)] transition hover:bg-red-500 hover:shadow-[0_0_30px_rgba(220,38,38,0.5)]"
-            >
-              INICIAR RUTINA ▶
-            </button>
-          </div>
-
-          <!-- Lista de Ejercicios -->
-          <div class="mt-6 space-y-4">
-            <div class="flex items-center justify-between rounded-xl border border-white/5 bg-black/60 p-4">
-              <div class="flex items-center gap-4">
-                <div class="flex h-10 w-10 items-center justify-center rounded-lg border border-red-600/30 bg-red-600/10 font-black text-red-500">1</div>
-                <div>
-                  <h4 class="font-bold text-white">Press de Banca Plano con Barra</h4>
-                  <p class="text-xs text-gray-400">4 Series × 10 Repeticiones · Descanso: 90s</p>
-                </div>
-              </div>
-              <span class="rounded-full bg-white/5 px-3 py-1 text-xs font-bold text-gray-300">80 kg</span>
-            </div>
-
-            <div class="flex items-center justify-between rounded-xl border border-white/5 bg-black/60 p-4">
-              <div class="flex items-center gap-4">
-                <div class="flex h-10 w-10 items-center justify-center rounded-lg border border-red-600/30 bg-red-600/10 font-black text-red-500">2</div>
-                <div>
-                  <h4 class="font-bold text-white">Press Inclinado con Mancuernas</h4>
-                  <p class="text-xs text-gray-400">4 Series × 12 Repeticiones · Descanso: 60s</p>
-                </div>
-              </div>
-              <span class="rounded-full bg-white/5 px-3 py-1 text-xs font-bold text-gray-300">26 kg c/u</span>
-            </div>
-
-            <div class="flex items-center justify-between rounded-xl border border-white/5 bg-black/60 p-4">
-              <div class="flex items-center gap-4">
-                <div class="flex h-10 w-10 items-center justify-center rounded-lg border border-red-600/30 bg-red-600/10 font-black text-red-500">3</div>
-                <div>
-                  <h4 class="font-bold text-white">Fondos en Paralelas (Dips)</h4>
-                  <p class="text-xs text-gray-400">3 Series al Fallo Técnico · Descanso: 60s</p>
-                </div>
-              </div>
-              <span class="rounded-full bg-white/5 px-3 py-1 text-xs font-bold text-gray-300">Peso Corporal</span>
-            </div>
-
-            <div class="flex items-center justify-between rounded-xl border border-white/5 bg-black/60 p-4">
-              <div class="flex items-center gap-4">
-                <div class="flex h-10 w-10 items-center justify-center rounded-lg border border-red-600/30 bg-red-600/10 font-black text-red-500">4</div>
-                <div>
-                  <h4 class="font-bold text-white">Extensión de Tríceps en Polea Alta</h4>
-                  <p class="text-xs text-gray-400">4 Series × 12 Repeticiones · Descanso: 45s</p>
-                </div>
-              </div>
-              <span class="rounded-full bg-white/5 px-3 py-1 text-xs font-bold text-gray-300">35 kg</span>
-            </div>
-          </div>
+          </p>
         </div>
 
-        <!-- Banner Promocional Tienda -->
-        <div class="flex flex-col items-center justify-between gap-6 rounded-2xl border border-red-600/30 bg-gradient-to-r from-red-950/40 via-zinc-950 to-black p-6 sm:flex-row sm:p-8">
-          <div>
-            <span class="rounded-full bg-red-600 px-3 py-1 text-[10px] font-black uppercase text-white">Descuento VIP 15%</span>
-            <h3 class="mt-2 text-xl font-black uppercase text-white">Suplementos & Proteínas ROCA</h3>
-            <p class="mt-1 text-xs text-gray-400">Por ser miembro activo tienes 15% de descuento en creatina y proteína whey.</p>
+        <!-- Horas Entrenadas -->
+        <div class="rounded-2xl border border-white/10 bg-zinc-950 p-6 transition hover:border-red-600/40">
+          <div class="flex items-center justify-between">
+            <span class="text-xs font-bold uppercase tracking-wider text-gray-400">Tiempo de Entreno</span>
+            <div class="flex h-9 w-9 items-center justify-center rounded-lg bg-red-600/10 text-red-500">⏱️</div>
           </div>
-          <a
-            href="#tienda"
-            class="whitespace-nowrap rounded-lg border border-red-600 bg-red-600/20 px-5 py-3 text-xs font-black uppercase tracking-wider text-red-400 transition hover:bg-red-600 hover:text-white"
-          >
-            Ver Tienda
-          </a>
+          <div class="mt-4 flex items-baseline gap-2">
+            <span class="text-3xl font-black text-white">{{ auth.currentUser()?.stats?.workoutHours ?? 0 }}h</span>
+            <span class="text-xs font-bold text-gray-500">Acumuladas</span>
+          </div>
+          <p class="mt-3 text-xs text-gray-500">
+            @if ((auth.currentUser()?.stats?.workoutHours ?? 0) > 0) {
+              Tiempo registrado en sala
+            } @else {
+              Inicia una rutina con el botón abajo
+            }
+          </p>
+        </div>
+
+        <!-- Racha & XP -->
+        <div class="rounded-2xl border border-red-600/30 bg-red-950/20 p-6 transition hover:border-red-600/60">
+          <div class="flex items-center justify-between">
+            <span class="text-xs font-bold uppercase tracking-wider text-red-400">Racha Actual</span>
+            <div class="flex h-9 w-9 items-center justify-center rounded-lg bg-red-600/20 text-red-500">⚡</div>
+          </div>
+          <div class="mt-4 flex items-baseline gap-2">
+            <span class="text-3xl font-black text-white">{{ auth.currentUser()?.stats?.streak ?? 0 }} Días</span>
+            <span class="text-xs font-bold text-red-400">
+              @if ((auth.currentUser()?.stats?.streak ?? 0) > 0) {
+                ¡Imparable!
+              } @else {
+                ¡Día 1 te espera!
+              }
+            </span>
+          </div>
+          <p class="mt-3 text-xs text-gray-400">
+            XP Ganado: <strong class="text-yellow-400">{{ gamification.userXp() }} pts</strong>
+          </p>
         </div>
 
       </div>
 
-      <!-- COLUMNA DERECHA: CLASES GRUPALES -->
-      <div class="space-y-8">
-        
-        <div class="rounded-2xl border border-white/10 bg-zinc-950 p-6">
-          <div class="flex items-center justify-between border-b border-white/10 pb-4">
-            <h3 class="text-lg font-black uppercase text-white">Clases de Hoy</h3>
-            <span class="text-xs text-gray-500">Sede Central</span>
-          </div>
+      <!-- CONTENIDO PRINCIPAL: RUTINA DEL DÍA Y CLASES -->
+      <div class="mt-8 grid gap-8 lg:grid-cols-3">
 
-          <div class="mt-4 space-y-4">
-            @for (c of classes(); track c.id) {
-              <div class="rounded-xl border border-white/10 bg-black/60 p-4">
-                <div class="flex items-start justify-between">
-                  <div>
-                    <span class="text-[10px] font-bold uppercase tracking-wider text-red-500">{{ c.category }}</span>
-                    <h4 class="font-black text-white">{{ c.name }}</h4>
-                  </div>
-                  <span
-                    class="text-[10px] font-black uppercase px-2 py-0.5 rounded"
-                    [class]="c.isFull ? 'bg-zinc-800 text-gray-500' : 'bg-red-600/20 text-red-400'"
-                  >
-                    {{ c.capacity }}
-                  </span>
+        <!-- COLUMNA IZQUIERDA: RUTINA ACTIVA -->
+        <div class="lg:col-span-2 space-y-8">
+          
+          <div class="rounded-2xl border border-white/10 bg-zinc-950 p-6 sm:p-8">
+            <div class="flex flex-col justify-between gap-4 border-b border-white/10 pb-6 sm:flex-row sm:items-center">
+              <div>
+                <div class="flex items-center gap-2">
+                  <span class="text-xs font-black uppercase tracking-[0.2em] text-red-600">Entrenamiento Activo</span>
+                  <span class="rounded bg-white/5 px-2 py-0.5 text-[10px] font-bold text-gray-400">{{ routineService.activeRoutine().tag }}</span>
                 </div>
+                <h2 class="mt-1 text-2xl font-black text-white">{{ routineService.activeRoutine().name }}</h2>
+                <p class="mt-1 text-xs text-gray-400">{{ routineService.activeRoutine().focus }}</p>
+              </div>
 
-                <div class="mt-3 flex items-center justify-between text-xs text-gray-400">
-                  <span>⏰ {{ c.time }}</span>
-                  <span>👨‍🏫 {{ c.trainer }}</span>
-                </div>
+              <div class="flex flex-wrap items-center gap-2">
+                <button
+                  type="button"
+                  (click)="activeTab.set('routines')"
+                  class="rounded-lg border border-white/10 bg-white/5 px-3.5 py-3 text-xs font-bold uppercase text-gray-300 transition hover:border-white/20 hover:text-white"
+                >
+                  Cambiar Rutina 🔄
+                </button>
 
                 <button
                   type="button"
-                  (click)="toggleBooking(c.id)"
-                  [disabled]="c.isFull"
-                  class="mt-4 w-full rounded-lg border py-2 text-xs font-black uppercase tracking-wider transition"
-                  [class]="
-                    c.booked
-                      ? 'border-green-600/50 bg-green-950/40 text-green-400'
-                      : c.isFull
-                      ? 'border-white/10 bg-zinc-900 text-gray-600 cursor-not-allowed'
-                      : 'border-red-600/50 bg-red-600/10 text-red-500 hover:bg-red-600 hover:text-white'
-                  "
+                  (click)="toggleWorkoutModal()"
+                  class="rounded-lg bg-red-600 px-5 py-3 text-xs font-black uppercase tracking-wider text-white shadow-[0_0_20px_rgba(220,38,38,0.3)] transition hover:bg-red-500 hover:shadow-[0_0_30px_rgba(220,38,38,0.5)]"
                 >
-                  @if (c.booked) {
-                    ✓ Clase Reservada
-                  } @else if (c.isFull) {
-                    Cupos Agotados
-                  } @else {
-                    Reservar Cupo
-                  }
+                  INICIAR RUTINA ▶
                 </button>
+              </div>
+            </div>
+
+            <!-- Lista de Ejercicios -->
+            <div class="mt-6 space-y-4">
+              @for (ex of routineService.activeRoutine().exercises; track ex.id; let i = $index) {
+                <div class="flex items-center justify-between rounded-xl border border-white/5 bg-black/60 p-4 transition hover:border-white/10">
+                  <div class="flex items-center gap-4">
+                    <div class="flex h-10 w-10 items-center justify-center rounded-lg border border-red-600/30 bg-red-600/10 font-black text-red-500">
+                      {{ i + 1 }}
+                    </div>
+                    <div>
+                      <h4 class="font-bold text-white">{{ ex.name }}</h4>
+                      <p class="text-xs text-gray-400">{{ ex.targetSeries }} Series × {{ ex.targetReps }} · Descanso: {{ ex.restSeconds }}s</p>
+                    </div>
+                  </div>
+                  <span class="rounded-full bg-white/5 px-3 py-1 text-xs font-bold text-gray-300">{{ ex.defaultWeight }}</span>
+                </div>
+              }
+            </div>
+          </div>
+
+          <!-- Banner Promocional Tienda -->
+          <div class="flex flex-col items-center justify-between gap-6 rounded-2xl border border-red-600/30 bg-gradient-to-r from-red-950/40 via-zinc-950 to-black p-6 sm:flex-row sm:p-8">
+            <div>
+              <span class="rounded-full bg-red-600 px-3 py-1 text-[10px] font-black uppercase text-white">Descuento VIP 15%</span>
+              <h3 class="mt-2 text-xl font-black uppercase text-white">Suplementos & Proteínas ROCA</h3>
+              <p class="mt-1 text-xs text-gray-400">Por ser miembro activo tienes 15% de descuento automático en creatina, proteína whey y ropa.</p>
+            </div>
+            <a
+              href="#tienda"
+              class="whitespace-nowrap rounded-lg border border-red-600 bg-red-600/20 px-5 py-3 text-xs font-black uppercase tracking-wider text-red-400 transition hover:bg-red-600 hover:text-white"
+            >
+              Ver Tienda
+            </a>
+          </div>
+
+        </div>
+
+        <!-- COLUMNA DERECHA: CLASES GRUPALES -->
+        <div class="space-y-8">
+          
+          <div class="rounded-2xl border border-white/10 bg-zinc-950 p-6">
+            <div class="flex items-center justify-between border-b border-white/10 pb-4">
+              <h3 class="text-lg font-black uppercase text-white">Clases de Hoy</h3>
+              <span class="text-xs text-gray-500">Sede Central</span>
+            </div>
+
+            <div class="mt-4 space-y-4">
+              @for (c of classes(); track c.id) {
+                <div class="rounded-xl border border-white/10 bg-black/60 p-4">
+                  <div class="flex items-start justify-between">
+                    <div>
+                      <span class="text-[10px] font-bold uppercase tracking-wider text-red-500">{{ c.category }}</span>
+                      <h4 class="font-black text-white">{{ c.name }}</h4>
+                    </div>
+                    <span
+                      class="text-[10px] font-black uppercase px-2 py-0.5 rounded"
+                      [class]="c.isFull ? 'bg-zinc-800 text-gray-500' : 'bg-red-600/20 text-red-400'"
+                    >
+                      {{ c.capacity }}
+                    </span>
+                  </div>
+
+                  <div class="mt-3 flex items-center justify-between text-xs text-gray-400">
+                    <span>⏰ {{ c.time }}</span>
+                    <span>👨‍🏫 {{ c.trainer }}</span>
+                  </div>
+
+                  <button
+                    type="button"
+                    (click)="toggleBooking(c.id)"
+                    [disabled]="c.isFull"
+                    class="mt-4 w-full rounded-lg border py-2 text-xs font-black uppercase tracking-wider transition"
+                    [class]="
+                      c.booked
+                        ? 'border-green-600/50 bg-green-950/40 text-green-400'
+                        : c.isFull
+                        ? 'border-white/10 bg-zinc-900 text-gray-600 cursor-not-allowed'
+                        : 'border-red-600/50 bg-red-600/10 text-red-500 hover:bg-red-600 hover:text-white'
+                    "
+                  >
+                    @if (c.booked) {
+                      ✓ Clase Reservada
+                    } @else if (c.isFull) {
+                      Cupos Agotados
+                    } @else {
+                      Reservar Cupo
+                    }
+                  </button>
+                </div>
+              }
+            </div>
+          </div>
+
+          <!-- Estado de Membresía -->
+          <div class="rounded-2xl border border-white/10 bg-zinc-950 p-6">
+            <h3 class="text-lg font-black uppercase text-white border-b border-white/10 pb-4">Detalle de Membresía</h3>
+            
+            <div class="mt-4 space-y-3 text-sm">
+              <div class="flex justify-between">
+                <span class="text-gray-400">Plan contratado:</span>
+                <strong class="text-white font-bold">{{ auth.currentUser()?.plan }}</strong>
+              </div>
+              <div class="flex justify-between">
+                <span class="text-gray-400">Estado del pago:</span>
+                <span class="rounded-full bg-green-500/10 px-2.5 py-0.5 text-xs font-black text-green-400">Al día</span>
+              </div>
+              <div class="flex justify-between">
+                <span class="text-gray-400">Código de Miembro:</span>
+                <span class="font-mono text-xs text-red-400 font-black">{{ auth.currentUser()?.qrCode || 'RG-8829-4921' }}</span>
+              </div>
+            </div>
+
+            <div class="mt-6 border-t border-white/10 pt-4">
+              <p class="text-xs text-gray-500">Beneficios incluidos: Acceso a sala, evaluación física, pase de invitado y descuentos VIP en suplementación.</p>
+            </div>
+          </div>
+
+        </div>
+
+      </div>
+    }
+
+    <!-- ======================================================== -->
+    <!-- TAB 2: EXPLORADOR DE RUTINAS -->
+    <!-- ======================================================== -->
+    @if (activeTab() === 'routines') {
+      <div class="mt-8 space-y-8">
+        
+        <div class="flex flex-col justify-between gap-4 md:flex-row md:items-center">
+          <div>
+            <span class="text-xs font-black uppercase tracking-[0.3em] text-red-600">Catálogo de Entrenamiento</span>
+            <h2 class="mt-1 text-3xl font-black uppercase text-white">Elige tu Rutina de Hoy</h2>
+            <p class="mt-1 text-sm text-gray-400">Selecciona el grupo muscular que deseas trabajar para cargar sus ejercicios y series.</p>
+          </div>
+        </div>
+
+        <div class="grid gap-6 md:grid-cols-2">
+          @for (r of routineService.routines; track r.id) {
+            <div
+              class="relative flex flex-col justify-between overflow-hidden rounded-2xl border bg-zinc-950 p-6 transition duration-300 hover:border-red-600/60 hover:shadow-[0_0_30px_rgba(220,38,38,0.2)]"
+              [class]="routineService.activeRoutineId() === r.id ? 'border-red-600 bg-red-950/10 shadow-[0_0_25px_rgba(220,38,38,0.25)]' : 'border-white/10'"
+            >
+              <div>
+                <div class="flex items-center justify-between">
+                  <span class="text-3xl">{{ r.icon }}</span>
+                  <div class="flex items-center gap-2">
+                    <span class="rounded-full border border-white/10 bg-white/5 px-2.5 py-1 text-[10px] font-black uppercase text-gray-300">{{ r.level }}</span>
+                    <span class="rounded-full border border-red-600/30 bg-red-600/10 px-2.5 py-1 text-[10px] font-black uppercase text-red-400">{{ r.durationMinutes }} min</span>
+                  </div>
+                </div>
+
+                <h3 class="mt-4 text-xl font-black uppercase text-white">{{ r.name }}</h3>
+                <p class="mt-1 text-xs font-bold text-red-500">{{ r.tag }}</p>
+                <p class="mt-2 text-xs leading-relaxed text-gray-400">{{ r.focus }}</p>
+
+                <!-- Ejercicios incluidos -->
+                <div class="mt-5 border-t border-white/10 pt-4">
+                  <p class="text-[10px] font-black uppercase tracking-wider text-gray-400">Ejercicios incluidos ({{ r.exercises.length }}):</p>
+                  <ul class="mt-2 space-y-1.5 text-xs text-gray-300">
+                    @for (ex of r.exercises; track ex.id) {
+                      <li class="flex items-center justify-between">
+                        <span class="text-gray-300">· {{ ex.name }}</span>
+                        <span class="text-[11px] font-bold text-gray-500">{{ ex.targetSeries }} × {{ ex.targetReps }}</span>
+                      </li>
+                    }
+                  </ul>
+                </div>
+              </div>
+
+              <div class="mt-6 flex items-center gap-3 border-t border-white/10 pt-4">
+                <button
+                  type="button"
+                  (click)="startSpecificRoutine(r.id)"
+                  class="w-full rounded-xl bg-red-600 py-3 text-xs font-black uppercase tracking-wider text-white shadow-[0_0_20px_rgba(220,38,38,0.3)] transition hover:bg-red-500"
+                >
+                  Entrenar Esta Rutina ▶
+                </button>
+              </div>
+            </div>
+          }
+        </div>
+
+      </div>
+    }
+
+    <!-- ======================================================== -->
+    <!-- TAB 3: GAMIFICACIÓN & LEADERBOARD -->
+    <!-- ======================================================== -->
+    @if (activeTab() === 'gamification') {
+      <div class="mt-8 space-y-8">
+        
+        <!-- Tarjeta de Nivel y Liga del Usuario -->
+        <div class="rounded-2xl border border-red-600/40 bg-gradient-to-r from-red-950/40 via-zinc-950 to-black p-6 sm:p-8">
+          <div class="flex flex-col justify-between gap-6 md:flex-row md:items-center">
+            <div>
+              <div class="inline-flex items-center gap-2 rounded-full border px-3.5 py-1 text-xs font-black uppercase tracking-wider" [class]="gamification.currentLeague().color">
+                <span>{{ gamification.currentLeague().icon }}</span>
+                <span>{{ gamification.currentLeague().name }}</span>
+                <span>· Rango: {{ gamification.currentLeague().badge }}</span>
+              </div>
+              <h2 class="mt-3 text-3xl font-black uppercase text-white sm:text-4xl">
+                Nivel Atleta ROCA
+              </h2>
+              <p class="mt-1 text-sm text-gray-400">
+                Gana puntos de experiencia (XP) completando rutinas, registrando PRs y manteniendo tu racha de asistencia.
+              </p>
+            </div>
+
+            <div class="flex items-baseline gap-3 rounded-2xl border border-white/10 bg-black/60 px-6 py-4">
+              <span class="text-4xl font-black text-yellow-400">{{ gamification.userXp() }}</span>
+              <span class="text-xs font-bold uppercase text-gray-400">XP Acumulados</span>
+            </div>
+          </div>
+
+          <!-- Barra de Progreso hacia la Siguiente Liga -->
+          <div class="mt-6 border-t border-white/10 pt-4">
+            <div class="flex justify-between text-xs font-bold text-gray-400 mb-2">
+              <span>{{ gamification.currentLeague().name }} ({{ gamification.currentLeague().minXp }} XP)</span>
+              @if (gamification.nextLeague(); as nextL) {
+                <span class="text-yellow-400">Próxima meta: {{ nextL.name }} ({{ nextL.minXp }} XP)</span>
+              } @else {
+                <span class="text-red-400">¡Rango Máximo Alcanzado!</span>
+              }
+            </div>
+
+            <div class="h-3 w-full overflow-hidden rounded-full bg-white/10">
+              <div
+                class="h-full rounded-full bg-gradient-to-r from-red-600 to-yellow-500 transition-all duration-700"
+                [style.width.%]="gamification.leagueProgressPercent()"
+              ></div>
+            </div>
+          </div>
+        </div>
+
+        <!-- INSIGNIAS Y LOGROS -->
+        <div>
+          <div class="flex items-center justify-between border-b border-white/10 pb-4">
+            <div>
+              <span class="text-xs font-black uppercase tracking-[0.2em] text-red-600">Recompensas</span>
+              <h3 class="mt-1 text-2xl font-black uppercase text-white">Insignias Desbloqueables</h3>
+            </div>
+            <span class="text-xs font-bold text-gray-400">
+              Desbloqueadas: <strong class="text-white">{{ gamification.unlockedCount() }} / {{ gamification.badges().length }}</strong>
+            </span>
+          </div>
+
+          <div class="mt-6 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+            @for (b of gamification.badges(); track b.id) {
+              <div
+                class="relative flex flex-col justify-between overflow-hidden rounded-2xl border p-5 transition duration-300"
+                [class]="
+                  b.unlocked
+                    ? 'border-red-600/60 bg-gradient-to-b from-red-950/30 to-zinc-950 shadow-[0_0_20px_rgba(220,38,38,0.2)]'
+                    : 'border-white/5 bg-zinc-950/60 opacity-60'
+                "
+              >
+                <div>
+                  <div class="flex items-center justify-between">
+                    <span class="text-4xl">{{ b.icon }}</span>
+                    <span
+                      class="rounded-full px-2.5 py-0.5 text-[9px] font-black uppercase tracking-wider"
+                      [class]="b.unlocked ? 'bg-green-500/20 text-green-400 border border-green-500/30' : 'bg-white/5 text-gray-500'"
+                    >
+                      {{ b.unlocked ? '✓ Desbloqueada' : 'Bloqueada' }}
+                    </span>
+                  </div>
+
+                  <h4 class="mt-3 font-black uppercase text-white text-base">{{ b.title }}</h4>
+                  <p class="mt-1 text-xs leading-relaxed text-gray-400">{{ b.description }}</p>
+                </div>
+
+                <div class="mt-4 flex items-center justify-between border-t border-white/10 pt-3">
+                  <span class="text-[10px] font-bold uppercase text-yellow-400">+{{ b.xpReward }} XP</span>
+                  @if (b.unlockedAt) {
+                    <span class="text-[10px] text-gray-500">{{ b.unlockedAt }}</span>
+                  }
+                </div>
               </div>
             }
           </div>
         </div>
 
-        <!-- Estado de Membresía -->
-        <div class="rounded-2xl border border-white/10 bg-zinc-950 p-6">
-          <h3 class="text-lg font-black uppercase text-white border-b border-white/10 pb-4">Detalle de Membresía</h3>
-          
-          <div class="mt-4 space-y-3 text-sm">
-            <div class="flex justify-between">
-              <span class="text-gray-400">Plan contratado:</span>
-              <strong class="text-white font-bold">{{ auth.currentUser()?.plan }}</strong>
+        <!-- TABLA DE CLASIFICACIÓN (LEADERBOARD) -->
+        <div class="rounded-2xl border border-white/10 bg-zinc-950 p-6 sm:p-8">
+          <div class="flex flex-col justify-between gap-2 border-b border-white/10 pb-4 sm:flex-row sm:items-center">
+            <div>
+              <span class="text-xs font-black uppercase tracking-[0.2em] text-red-600">Comunidad ROCA</span>
+              <h3 class="mt-1 text-2xl font-black uppercase text-white">Tabla de Clasificación General</h3>
             </div>
-            <div class="flex justify-between">
-              <span class="text-gray-400">Estado del pago:</span>
-              <span class="rounded-full bg-green-500/10 px-2.5 py-0.5 text-xs font-black text-green-400">Al día</span>
-            </div>
-            <div class="flex justify-between">
-              <span class="text-gray-400">Código de Miembro:</span>
-              <span class="font-mono text-xs text-red-400 font-black">{{ auth.currentUser()?.qrCode || 'RG-8829-4921' }}</span>
-            </div>
+            <span class="text-xs text-gray-400">Actualizado en tiempo real</span>
           </div>
 
-          <div class="mt-6 border-t border-white/10 pt-4">
-            <p class="text-xs text-gray-500">Beneficios incluidos: Acceso a sala, evaluación física, pase de invitado y descuentos VIP en suplementación.</p>
+          <div class="mt-6 overflow-x-auto">
+            <table class="w-full text-left text-sm">
+              <thead class="border-b border-white/10 text-[10px] font-black uppercase tracking-wider text-gray-400">
+                <tr>
+                  <th class="py-3 px-3">Posición</th>
+                  <th class="py-3 px-3">Atleta</th>
+                  <th class="py-3 px-3">Liga</th>
+                  <th class="py-3 px-3 text-center">Racha</th>
+                  <th class="py-3 px-3 text-right">Puntos XP</th>
+                </tr>
+              </thead>
+              <tbody class="divide-y divide-white/5">
+                @for (member of gamification.leaderboard(); track member.rank) {
+                  <tr
+                    class="transition"
+                    [class]="member.isCurrentUser ? 'bg-red-600/15 font-bold border-l-4 border-red-600' : 'hover:bg-white/[0.02]'"
+                  >
+                    <td class="py-4 px-3">
+                      @if (member.rank === 1) {
+                        <span class="text-xl">🥇</span>
+                      } @else if (member.rank === 2) {
+                        <span class="text-xl">🥈</span>
+                      } @else if (member.rank === 3) {
+                        <span class="text-xl">🥉</span>
+                      } @else {
+                        <span class="font-mono text-gray-400 font-bold">#{{ member.rank }}</span>
+                      }
+                    </td>
+
+                    <td class="py-4 px-3">
+                      <div class="flex items-center gap-3">
+                        <span class="text-2xl">{{ member.avatar }}</span>
+                        <div>
+                          <p class="font-black text-white" [class.text-red-400]="member.isCurrentUser">
+                            {{ member.name }}
+                          </p>
+                          <p class="text-xs text-gray-500">{{ member.plan }}</p>
+                        </div>
+                      </div>
+                    </td>
+
+                    <td class="py-4 px-3">
+                      <span class="rounded-full border border-white/10 bg-white/5 px-2.5 py-1 text-[10px] font-bold uppercase text-gray-300">
+                        {{ member.league }}
+                      </span>
+                    </td>
+
+                    <td class="py-4 px-3 text-center">
+                      <span class="text-xs font-bold text-red-400">🔥 {{ member.streak }}d</span>
+                    </td>
+
+                    <td class="py-4 px-3 text-right">
+                      <span class="font-black text-yellow-400 text-base">{{ member.xp }}</span>
+                      <span class="text-[10px] text-gray-500"> XP</span>
+                    </td>
+                  </tr>
+                }
+              </tbody>
+            </table>
           </div>
         </div>
 
       </div>
+    }
 
-    </div>
-
-    } @else if (activeTab() === 'orders') {
-    <!-- MIS COMPRAS -->
-    <div class="mt-8">
-      @if (myOrders().length === 0) {
-        <div class="flex flex-col items-center justify-center rounded-2xl border border-white/10 bg-zinc-950/80 py-20 text-center">
-          <span class="text-5xl">🛍️</span>
-          <h3 class="mt-4 text-xl font-black text-white">Aún no tienes compras</h3>
-          <p class="mt-2 text-sm text-gray-400">Explora la tienda y añade suplementos a tu carrito.</p>
+    <!-- ======================================================== -->
+    <!-- TAB 4: RÉCORDS PERSONALES (PRS) & CALCULADORA 1RM -->
+    <!-- ======================================================== -->
+    @if (activeTab() === 'prs') {
+      <div class="mt-8 space-y-8">
+        
+        <!-- Header -->
+        <div class="flex flex-col justify-between gap-4 md:flex-row md:items-center">
+          <div>
+            <span class="text-xs font-black uppercase tracking-[0.3em] text-red-600">Progreso de Fuerza</span>
+            <h2 class="mt-1 text-3xl font-black uppercase text-white">Tus Récords Personales (1RM)</h2>
+            <p class="mt-1 text-sm text-gray-400">Monitorea tus marcas de fuerza máxima y calcula tus cargas ideales de entrenamiento.</p>
+          </div>
         </div>
-      } @else {
-        <div class="space-y-4">
-          @for (order of myOrders(); track order.id) {
-            <article class="rounded-2xl border border-white/10 bg-zinc-950/80 p-5">
-              <div class="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
-                <div>
-                  <div class="flex items-center gap-3">
-                    <p class="font-mono text-xs font-bold text-red-400">{{ order.id }}</p>
-                    <span
-                      class="rounded-full px-2.5 py-0.5 text-[10px] font-black uppercase tracking-wider"
-                      [class]="order.status === 'Entregado' ? 'bg-green-500/15 text-green-400' : order.status === 'Cancelado' ? 'bg-red-500/15 text-red-400' : 'bg-amber-500/15 text-amber-400'"
-                    >{{ order.status }}</span>
-                  </div>
-                  <div class="mt-3 space-y-1">
-                    @for (item of order.items; track item.id) {
-                      <p class="text-sm text-gray-300">{{ item.icon }} {{ item.name }} <span class="text-gray-500">×{{ item.quantity }}</span></p>
-                    }
-                  </div>
-                </div>
-                <div class="flex flex-col items-start gap-2 sm:items-end">
-                  <p class="text-xl font-black text-white">${{ order.total.toFixed(2) }} <span class="text-xs font-bold text-gray-500">USD</span></p>
-                  <div class="rounded-lg border border-white/10 bg-black/40 px-3 py-1.5 text-center">
-                    <p class="text-[9px] font-bold uppercase tracking-widest text-gray-500">Código de Retiro</p>
-                    <p class="font-mono text-sm font-black text-red-300">{{ order.pickupCode }}</p>
-                  </div>
-                </div>
+
+        <!-- Tarjetas de PRs Actuales -->
+        <div class="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+          @for (pr of routineService.personalRecords(); track pr.id) {
+            <div class="rounded-2xl border border-white/10 bg-zinc-950 p-6 transition hover:border-red-600/50 hover:shadow-[0_0_25px_rgba(220,38,38,0.2)]">
+              <div class="flex items-center justify-between">
+                <span class="text-[10px] font-black uppercase tracking-wider text-red-500">1RM Máximo</span>
+                <span class="text-xs text-gray-500">{{ pr.date }}</span>
               </div>
-            </article>
+
+              <h3 class="mt-3 text-lg font-black uppercase text-white">{{ pr.exercise }}</h3>
+
+              <div class="mt-4 flex items-baseline gap-2">
+                <span class="text-4xl font-black text-red-500">{{ pr.oneRepMax }}</span>
+                <span class="text-sm font-bold text-gray-400">kg (1RM)</span>
+              </div>
+
+              <div class="mt-4 border-t border-white/10 pt-3 text-xs text-gray-400">
+                <p>Último levantamiento: <strong class="text-white">{{ pr.weightUsed }} kg × {{ pr.reps }} reps</strong></p>
+                @if (pr.notes) {
+                  <p class="mt-1 text-[11px] text-gray-500 italic">"{{ pr.notes }}"</p>
+                }
+              </div>
+            </div>
           }
         </div>
-      }
-    </div>
+
+        <!-- CALCULADORA INTELIGENTE DE 1RM -->
+        <div class="rounded-2xl border border-red-600/30 bg-zinc-950 p-6 sm:p-8">
+          <div class="border-b border-white/10 pb-4">
+            <span class="text-xs font-black uppercase tracking-[0.2em] text-red-600">Herramienta Biomecánica</span>
+            <h3 class="mt-1 text-2xl font-black uppercase text-white">Calculadora de 1RM & Porcentajes de Carga</h3>
+            <p class="mt-1 text-xs text-gray-400">Ingresa el peso y las repeticiones que lograste para estimar tu fuerza máxima y guardar tu récord.</p>
+          </div>
+
+          <div class="mt-6 grid gap-8 lg:grid-cols-2">
+            
+            <!-- Formulario de Entrada -->
+            <div class="space-y-4">
+              <div>
+                <label for="pr-exercise-select" class="block text-xs font-bold uppercase tracking-wider text-gray-300">Ejercicio</label>
+                <select
+                  id="pr-exercise-select"
+                  [ngModel]="calcExercise()"
+                  (ngModelChange)="calcExercise.set($event)"
+                  class="mt-2 w-full rounded-xl border border-white/10 bg-black px-4 py-3 text-sm text-white outline-none focus:border-red-500"
+                >
+                  <option>Press de Banca Plano</option>
+                  <option>Sentadilla Trasera con Barra</option>
+                  <option>Peso Muerto Convencional</option>
+                  <option>Press Militar de Pie</option>
+                  <option>Dominadas Lastradas</option>
+                  <option>Remo con Barra</option>
+                </select>
+              </div>
+
+              <div class="grid grid-cols-2 gap-4">
+                <div>
+                  <label for="pr-weight-input" class="block text-xs font-bold uppercase tracking-wider text-gray-300">Peso Usado (kg)</label>
+                  <input
+                    id="pr-weight-input"
+                    type="number"
+                    min="1"
+                    max="500"
+                    [ngModel]="calcWeight()"
+                    (ngModelChange)="calcWeight.set($event)"
+                    class="mt-2 w-full rounded-xl border border-white/10 bg-black px-4 py-3 font-mono text-sm text-white outline-none focus:border-red-500"
+                  />
+                </div>
+
+                <div>
+                  <label for="pr-reps-input" class="block text-xs font-bold uppercase tracking-wider text-gray-300">Repeticiones (1-15)</label>
+                  <input
+                    id="pr-reps-input"
+                    type="number"
+                    min="1"
+                    max="15"
+                    [ngModel]="calcReps()"
+                    (ngModelChange)="calcReps.set($event)"
+                    class="mt-2 w-full rounded-xl border border-white/10 bg-black px-4 py-3 font-mono text-sm text-white outline-none focus:border-red-500"
+                  />
+                </div>
+              </div>
+
+              <!-- Resultado del Cálculo -->
+              <div class="rounded-xl border border-red-600/40 bg-red-950/30 p-5">
+                <span class="text-[10px] font-black uppercase tracking-wider text-red-400">1RM Estimado (Fórmula Brzycki)</span>
+                <div class="mt-2 flex items-baseline gap-2">
+                  <span class="text-4xl font-black text-white">{{ calculated1RM() }}</span>
+                  <span class="text-sm font-bold text-gray-400">kg</span>
+                </div>
+                <p class="mt-2 text-xs text-gray-400">
+                  Levantar {{ calcWeight() }} kg a {{ calcReps() }} reps equivale a un levantamiento máximo de {{ calculated1RM() }} kg.
+                </p>
+              </div>
+
+              <button
+                type="button"
+                (click)="saveCalculatedPR()"
+                class="w-full rounded-xl bg-red-600 py-3.5 text-xs font-black uppercase tracking-wider text-white shadow-[0_0_20px_rgba(220,38,38,0.3)] transition hover:bg-red-500"
+              >
+                Guardar este Récord Personal (+120 XP) 🏆
+              </button>
+
+              @if (prSuccessMsg()) {
+                <div class="rounded-xl border border-green-500/40 bg-green-950/40 p-3.5 text-center text-xs font-bold text-green-400 animate-bounce">
+                  {{ prSuccessMsg() }}
+                </div>
+              }
+            </div>
+
+            <!-- Tabla de Porcentajes de Trabajo -->
+            <div class="rounded-xl border border-white/10 bg-black/60 p-5">
+              <h4 class="font-black uppercase text-white text-sm">Zonas de Intensidad para Rutina</h4>
+              <p class="text-xs text-gray-400 mt-1">Pesos exactos sugeridos según tu 1RM estimado:</p>
+
+              <div class="mt-4 space-y-2">
+                @for (row of calculatedPercentages(); track row.percent) {
+                  <div class="flex items-center justify-between rounded-lg border border-white/5 bg-zinc-900/60 px-3.5 py-2 text-xs">
+                    <div class="flex items-center gap-3">
+                      <span class="w-12 font-black text-red-500">{{ row.percent }}%</span>
+                      <span class="text-gray-400">Objetivo: {{ row.repsEstimated }}</span>
+                    </div>
+                    <span class="font-mono font-black text-white">{{ row.weight }} kg</span>
+                  </div>
+                }
+              </div>
+            </div>
+
+          </div>
+        </div>
+
+      </div>
+    }
+
+    <!-- ======================================================== -->
+    <!-- TAB 5: MIS COMPRAS -->
+    <!-- ======================================================== -->
+    @if (activeTab() === 'orders') {
+      <div class="mt-8">
+        @if (myOrders().length === 0) {
+          <div class="flex flex-col items-center justify-center rounded-2xl border border-white/10 bg-zinc-950/80 py-20 text-center">
+            <span class="text-5xl">🛍️</span>
+            <h3 class="mt-4 text-xl font-black text-white">Aún no tienes compras</h3>
+            <p class="mt-2 text-sm text-gray-400">Explora la tienda y añade suplementos a tu carrito con tu 15% OFF VIP.</p>
+          </div>
+        } @else {
+          <div class="space-y-4">
+            @for (order of myOrders(); track order.id) {
+              <article class="rounded-2xl border border-white/10 bg-zinc-950/80 p-5">
+                <div class="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
+                  <div>
+                    <div class="flex items-center gap-3">
+                      <p class="font-mono text-xs font-bold text-red-400">{{ order.id }}</p>
+                      <span
+                        class="rounded-full px-2.5 py-0.5 text-[10px] font-black uppercase tracking-wider"
+                        [class]="order.status === 'Entregado' ? 'bg-green-500/15 text-green-400' : order.status === 'Cancelado' ? 'bg-red-500/15 text-red-400' : 'bg-amber-500/15 text-amber-400'"
+                      >{{ order.status }}</span>
+                    </div>
+                    <div class="mt-3 space-y-1">
+                      @for (item of order.items; track item.id) {
+                        <p class="text-sm text-gray-300">{{ item.icon }} {{ item.name }} <span class="text-gray-500">×{{ item.quantity }}</span></p>
+                      }
+                    </div>
+                  </div>
+                  <div class="flex flex-col items-start gap-2 sm:items-end">
+                    <p class="text-xl font-black text-white">${{ order.total.toFixed(2) }} <span class="text-xs font-bold text-gray-500">USD</span></p>
+                    <div class="rounded-lg border border-white/10 bg-black/40 px-3 py-1.5 text-center">
+                      <p class="text-[9px] font-bold uppercase tracking-widest text-gray-500">Código de Retiro</p>
+                      <p class="font-mono text-sm font-black text-red-300">{{ order.pickupCode }}</p>
+                    </div>
+                  </div>
+                </div>
+              </article>
+            }
+          </div>
+        }
+      </div>
     }
 
   </div>
@@ -371,6 +775,18 @@
 <!-- MODAL DE ENTRENAMIENTO ACTIVO -->
 @if (showWorkoutModal()) {
   <app-workout-modal (close)="toggleWorkoutModal()" />
+}
+
+<!-- TOAST DE LOGRO DESBLOQUEADO -->
+@if (gamification.recentUnlockedBadge(); as badge) {
+  <div class="fixed top-24 right-6 z-50 flex items-center gap-4 rounded-2xl border border-yellow-500/50 bg-zinc-950 p-4 shadow-[0_0_40px_rgba(234,179,8,0.35)] backdrop-blur-xl animate-bounce">
+    <span class="text-4xl">{{ badge.icon }}</span>
+    <div>
+      <p class="text-[10px] font-black uppercase tracking-wider text-yellow-400">¡Logro Desbloqueado! (+{{ badge.xpReward }} XP)</p>
+      <h4 class="font-black uppercase text-white text-sm">{{ badge.title }}</h4>
+      <p class="text-xs text-gray-400">{{ badge.description }}</p>
+    </div>
+  </div>
 }
 
 <!-- MODAL DE CÓDIGO QR -->
