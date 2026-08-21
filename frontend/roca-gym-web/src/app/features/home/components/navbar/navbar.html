@@ -26,7 +26,7 @@
     </a>
 
     <!-- DESKTOP MENU -->
-    <div class="hidden items-center gap-8 lg:flex">
+    <div class="hidden items-center gap-7 lg:flex">
 
       <a
         href="#inicio"
@@ -54,6 +54,14 @@
         class="text-sm font-semibold uppercase tracking-wider text-gray-300 transition hover:text-red-500"
       >
         Planes
+      </a>
+
+      <a
+        href="#ubicacion"
+        class="flex items-center gap-1.5 text-sm font-semibold uppercase tracking-wider text-gray-300 transition hover:text-red-500"
+      >
+        <span>📍</span>
+        <span>Horarios & Sede</span>
       </a>
 
       <a
@@ -210,6 +218,15 @@
           class="rounded-lg px-4 py-3 text-sm font-bold uppercase tracking-wider text-white transition hover:bg-red-600/10 hover:text-red-500"
         >
           Planes
+        </a>
+
+        <a
+          href="#ubicacion"
+          (click)="closeMenu()"
+          class="flex items-center gap-2 rounded-lg px-4 py-3 text-sm font-bold uppercase tracking-wider text-white transition hover:bg-red-600/10 hover:text-red-500"
+        >
+          <span>📍</span>
+          <span>Horarios & Sede</span>
         </a>
 
         <a

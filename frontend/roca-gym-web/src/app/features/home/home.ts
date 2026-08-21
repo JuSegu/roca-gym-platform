@@ -4,6 +4,7 @@ import { Hero } from './components/hero/hero';
 import { About } from './components/about/about';
 import { Facilities } from './components/facilities/facilities';
 import { Plans } from './components/plans/plans';
+import { Location } from './components/location/location';
 import { Store } from './components/store/store';
 import { Dashboard } from './components/dashboard/dashboard';
 import { CartModal } from './components/cart-modal/cart-modal';
@@ -21,6 +22,7 @@ import { CartService } from '../../core/services/cart';
     About,
     Facilities,
     Plans,
+    Location,
     Store,
     Dashboard,
     CartModal,

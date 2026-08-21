@@ -2,7 +2,7 @@
   id="inicio"
   class="relative flex min-h-screen items-center overflow-hidden bg-black px-6 pt-24"
 >
-  <!-- Video de fondo. Agrega el archivo en public/videos/roca-gym-hero.mp4 -->
+  <!-- Video de fondo -->
   <video
     class="absolute inset-0 h-full w-full object-cover"
     autoplay
@@ -14,19 +14,19 @@
   >
     <source src="/videos/roca-gym-hero.mp4" type="video/mp4" />
   </video>
-  <div class="absolute inset-0 bg-black/60"></div>
+  <div class="absolute inset-0 bg-black/65"></div>
 
-  <!-- FONDO -->
+  <!-- FONDO CON EFECTOS -->
   <div
-    class="absolute inset-0 bg-[radial-gradient(circle_at_70%_40%,rgba(220,38,38,0.18),transparent_45%)]"
+    class="absolute inset-0 bg-[radial-gradient(circle_at_70%_40%,rgba(220,38,38,0.2),transparent_45%)]"
   ></div>
 
   <div
-    class="absolute -right-40 top-1/4 h-96 w-96 rounded-full bg-red-600/10 blur-3xl"
+    class="absolute -right-40 top-1/4 h-96 w-96 rounded-full bg-red-600/10 blur-3xl pointer-events-none"
   ></div>
 
   <div
-    class="absolute -left-40 bottom-0 h-96 w-96 rounded-full bg-red-900/10 blur-3xl"
+    class="absolute -left-40 bottom-0 h-96 w-96 rounded-full bg-red-900/10 blur-3xl pointer-events-none"
   ></div>
 
   <!-- CONTENIDO -->
@@ -35,14 +35,14 @@
 
       <!-- BADGE -->
       <div
-        class="mb-8 inline-flex items-center gap-3 rounded-full border border-red-600/30 bg-red-600/10 px-4 py-2"
+        class="mb-6 inline-flex items-center gap-3 rounded-full border border-red-600/30 bg-red-600/10 px-4 py-2"
       >
         <span class="h-2 w-2 animate-pulse rounded-full bg-red-500"></span>
 
         <span
           class="text-xs font-bold uppercase tracking-[0.25em] text-red-500"
         >
-          Tu mejor versión comienza aquí
+          Sede Central Calle 80 · Abierto Hoy
         </span>
       </div>
 
@@ -58,20 +58,19 @@
 
       <!-- DESCRIPTION -->
       <p
-        class="mt-8 max-w-2xl text-lg leading-relaxed text-gray-300 sm:text-xl"
+        class="mt-6 max-w-2xl text-lg leading-relaxed text-gray-300 sm:text-xl"
       >
-        Entrena más fuerte. Supera tus límites.
-        Construye la mejor versión de ti.
+        Entrena más fuerte. Supera tus límites. Maquinaria de alto impacto, la mejor comunidad y resultados reales.
       </p>
 
       <!-- BUTTONS -->
-      <div class="mt-10 flex flex-col gap-4 sm:flex-row">
+      <div class="mt-8 flex flex-col gap-4 sm:flex-row">
 
         <a
           href="#planes"
-          class="group inline-flex items-center justify-center gap-3 rounded-lg bg-red-600 px-7 py-4 text-sm font-black uppercase tracking-wider text-white shadow-[0_0_30px_rgba(220,38,38,0.25)] transition hover:bg-red-500 hover:shadow-[0_0_40px_rgba(220,38,38,0.45)]"
+          class="group inline-flex items-center justify-center gap-3 rounded-xl bg-red-600 px-7 py-4 text-sm font-black uppercase tracking-wider text-white shadow-[0_0_30px_rgba(220,38,38,0.3)] transition hover:bg-red-500 hover:shadow-[0_0_40px_rgba(220,38,38,0.5)]"
         >
-          Ver planes
+          Ver planes & Membresías
 
           <span
             class="transition-transform group-hover:translate-x-1"
@@ -81,64 +80,77 @@
         </a>
 
         <a
-          href="#instalaciones"
-          class="inline-flex items-center justify-center rounded-lg border border-white/20 bg-white/5 px-7 py-4 text-sm font-black uppercase tracking-wider text-white backdrop-blur transition hover:border-red-600/50 hover:bg-red-600/10"
+          href="#ubicacion"
+          class="inline-flex items-center justify-center gap-2 rounded-xl border border-white/20 bg-white/5 px-7 py-4 text-sm font-black uppercase tracking-wider text-white backdrop-blur transition hover:border-red-600/50 hover:bg-red-600/10"
         >
-          Conoce el gimnasio
+          <span>📍</span>
+          <span>Sede, Horarios & Cómo Llegar</span>
         </a>
 
       </div>
 
-      <!-- STATS -->
+      <!-- STATS & HORARIOS COMPLETOS -->
       <div
-        class="mt-20 grid max-w-3xl grid-cols-2 gap-6 border-t border-white/10 pt-8 sm:grid-cols-4"
+        class="mt-14 grid max-w-3xl grid-cols-2 gap-4 border-t border-white/10 pt-6 sm:grid-cols-4"
       >
 
-        <div>
-          <p class="text-3xl font-black text-white">
-            5:00
+        <!-- Horario Completo -->
+        <div class="rounded-xl border border-white/5 bg-black/40 p-3">
+          <p class="text-xl font-black text-white sm:text-2xl">
+            5:00 AM
           </p>
-
+          <p class="text-xs font-bold text-red-500">
+            a 10:00 PM
+          </p>
           <p
-            class="mt-1 text-xs font-bold uppercase tracking-wider text-gray-500"
+            class="mt-1 text-[10px] font-bold uppercase tracking-wider text-gray-400"
           >
-            Apertura
+            Horario L-V
           </p>
         </div>
 
-        <div>
-          <p class="text-3xl font-black text-red-600">
-            7
+        <!-- 7 Días a la Semana -->
+        <div class="rounded-xl border border-white/5 bg-black/40 p-3">
+          <p class="text-xl font-black text-red-500 sm:text-2xl">
+            7 Días
           </p>
-
+          <p class="text-xs font-bold text-gray-300">
+            Lunes a Domingo
+          </p>
           <p
-            class="mt-1 text-xs font-bold uppercase tracking-wider text-gray-500"
+            class="mt-1 text-[10px] font-bold uppercase tracking-wider text-gray-400"
           >
-            Días
+            Abierto Toda la Semana
           </p>
         </div>
 
-        <div>
-          <p class="text-3xl font-black text-white">
-            80
+        <!-- Dirección Exacta -->
+        <div class="rounded-xl border border-white/5 bg-black/40 p-3">
+          <p class="text-xl font-black text-white sm:text-2xl">
+            Calle 80
           </p>
-
+          <p class="text-xs font-bold text-red-500">
+            #68D-20
+          </p>
           <p
-            class="mt-1 text-xs font-bold uppercase tracking-wider text-gray-500"
+            class="mt-1 text-[10px] font-bold uppercase tracking-wider text-gray-400"
           >
-            Calle
+            Sede Principal
           </p>
         </div>
 
-        <div>
-          <p class="text-3xl font-black text-red-600">
-            ∞
+        <!-- Acceso -->
+        <div class="rounded-xl border border-white/5 bg-black/40 p-3">
+          <p class="text-xl font-black text-red-500 sm:text-2xl">
+            24/7
           </p>
-
+          <p class="text-xs font-bold text-gray-300">
+            Pase VIP
+          </p>
           <p
-            class="mt-1 text-xs font-bold uppercase tracking-wider text-gray-500"
+            class="mt-1 text-[10px] font-bold uppercase tracking-wider text-gray-400"
           >
-            Potencial
+            Acceso Ilimitado
           </p>
         </div>
 
