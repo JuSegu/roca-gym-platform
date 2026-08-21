@@ -36,15 +36,15 @@ export class Facilities implements OnInit, OnDestroy {
       currentSlide: 0,
       slides: [
         {
-          image: '/images/tour/tour-02-machines.jpg',
+          image: '/images/tour/tour-02-machines.webp',
           caption: 'Circuito de Máquinas de Alto Impacto',
         },
         {
-          image: '/images/tour/tour-04-powerzone.jpg',
+          image: '/images/tour/tour-04-powerzone.webp',
           caption: 'Jaulas de Potencia & Sentadilla',
         },
         {
-          image: '/images/facilities/community.jpg',
+          image: '/images/facilities/community.webp',
           caption: 'Entrenamiento Funcional & Peso Muerto',
         },
       ],
@@ -58,11 +58,11 @@ export class Facilities implements OnInit, OnDestroy {
       currentSlide: 0,
       slides: [
         {
-          image: '/images/tour/tour-03-freeweights.jpg',
+          image: '/images/tour/tour-03-freeweights.webp',
           caption: 'Racks de Mancuernas & Peso Libre',
         },
         {
-          image: '/images/facilities/pesas.JPG',
+          image: '/images/facilities/pesas.webp',
           caption: 'Bancas de Competición Planas e Inclinadas',
         },
       ],
@@ -76,11 +76,11 @@ export class Facilities implements OnInit, OnDestroy {
       currentSlide: 0,
       slides: [
         {
-          image: '/images/facilities/cardio-zone.jpg',
+          image: '/images/facilities/cardio-zone.webp',
           caption: 'Cintas Curvas, Air Bikes & Remos',
         },
         {
-          image: '/images/facilities/cardio.JPG',
+          image: '/images/facilities/cardio.webp',
           caption: 'Resistencia & Quema Calórica',
         },
       ],
@@ -94,15 +94,15 @@ export class Facilities implements OnInit, OnDestroy {
       currentSlide: 0,
       slides: [
         {
-          image: '/images/facilities/community.jpg',
+          image: '/images/facilities/community.webp',
           caption: 'Comunidad Activa & Levantamientos en Equipo',
         },
         {
-          image: '/images/tour/tour-01-entrance.jpg',
+          image: '/images/tour/tour-01-entrance.webp',
           caption: 'Recepción & Entrada Biométrica Moderna',
         },
         {
-          image: '/images/facilities/ambiente.JPG',
+          image: '/images/facilities/ambiente.webp',
           caption: 'Ambiente Exclusivo y Sonido Envolvente',
         },
       ],

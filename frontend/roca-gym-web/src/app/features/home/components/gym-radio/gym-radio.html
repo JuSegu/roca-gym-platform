@@ -42,7 +42,7 @@
 
           <div class="flex-1 overflow-hidden">
             <span class="rounded bg-red-600/20 px-1.5 py-0.5 text-[9px] font-black uppercase text-red-400">
-              {{ audio.currentTrack().bpm }} BPM · {{ audio.currentTrack().genre }}
+              ⚡ {{ audio.customBpm() }} BPM · {{ audio.currentTrack().genre }}
             </span>
             <h4 class="mt-1 truncate text-sm font-black uppercase text-white">{{ audio.currentTrack().title }}</h4>
             <p class="truncate text-xs text-gray-400">{{ audio.currentTrack().artist }}</p>
@@ -89,9 +89,64 @@
           </button>
         </div>
 
+        <!-- CONTROL INTERACTIVO DE BPM / TEMPO DINÁMICO -->
+        <div class="mt-4 border-t border-white/10 pt-3">
+          <div class="flex items-center justify-between">
+            <span class="text-[10px] font-black uppercase tracking-wider text-gray-400">Tempo / Velocidad (BPM)</span>
+            <span class="font-mono text-xs font-black text-red-500">{{ audio.customBpm() }} BPM</span>
+          </div>
+          
+          <input
+            type="range"
+            min="115"
+            max="165"
+            step="1"
+            [value]="audio.customBpm()"
+            (input)="onBpmChange($event)"
+            class="mt-2 h-1.5 w-full accent-red-600 cursor-pointer rounded-lg bg-zinc-800"
+            aria-label="Ajustar velocidad BPM"
+          />
+
+          <!-- Presets de BPM -->
+          <div class="mt-2 grid grid-cols-4 gap-1">
+            <button
+              type="button"
+              (click)="setBpmPreset(124)"
+              class="rounded border border-white/10 py-1 text-[9px] font-bold text-gray-400 hover:border-red-600/50 hover:text-white transition"
+              [class.bg-red-600_text-white]="audio.customBpm() === 124"
+            >
+              124 Calent
+            </button>
+            <button
+              type="button"
+              (click)="setBpmPreset(136)"
+              class="rounded border border-white/10 py-1 text-[9px] font-bold text-gray-400 hover:border-red-600/50 hover:text-white transition"
+              [class.bg-red-600_text-white]="audio.customBpm() === 136"
+            >
+              136 Fuerza
+            </button>
+            <button
+              type="button"
+              (click)="setBpmPreset(144)"
+              class="rounded border border-white/10 py-1 text-[9px] font-bold text-gray-400 hover:border-red-600/50 hover:text-white transition"
+              [class.bg-red-600_text-white]="audio.customBpm() === 144"
+            >
+              144 Beast
+            </button>
+            <button
+              type="button"
+              (click)="setBpmPreset(158)"
+              class="rounded border border-white/10 py-1 text-[9px] font-bold text-gray-400 hover:border-red-600/50 hover:text-white transition"
+              [class.bg-red-600_text-white]="audio.customBpm() === 158"
+            >
+              158 PR 🔥
+            </button>
+          </div>
+        </div>
+
         <!-- Selector de Estaciones -->
         <div class="mt-4 border-t border-white/10 pt-3">
-          <p class="text-[10px] font-black uppercase tracking-wider text-gray-400">Canales de Motivación</p>
+          <p class="text-[10px] font-black uppercase tracking-wider text-gray-400">Canales Beast Mode</p>
           <div class="mt-2 grid grid-cols-2 gap-1.5">
             @for (t of audio.tracks; track t.id; let i = $index) {
               <button
@@ -101,7 +156,7 @@
                 [class]="audio.currentTrackIndex() === i ? 'border-red-600 bg-red-600/20 text-white font-bold' : 'border-white/5 bg-white/[0.02] text-gray-400 hover:border-white/10 hover:text-gray-200'"
               >
                 <span>{{ t.icon }}</span>
-                <span class="truncate text-[11px]">{{ t.title.split(' ')[0] }}</span>
+                <span class="truncate text-[11px]">{{ t.title.split(' ')[0] }} {{ t.title.split(' ')[1] }}</span>
               </button>
             }
           </div>
@@ -150,7 +205,7 @@
             {{ audio.currentTrack().title }}
           </p>
           <p class="text-[9px] font-bold text-red-500 uppercase tracking-wider">
-            ROCA Radio
+            {{ audio.customBpm() }} BPM · ROCA Radio
           </p>
         </div>
       </button>
@@ -198,7 +253,7 @@
       title="Encender Gym Radio"
     >
       <span>📻</span>
-      <span>Gym Radio</span>
+      <span>Gym Radio ({{ audio.customBpm() }} BPM)</span>
     </button>
   </div>
 }

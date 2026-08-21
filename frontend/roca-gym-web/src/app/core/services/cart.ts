@@ -1,6 +1,6 @@
 import { Injectable, signal, computed, inject } from '@angular/core';
 import { Auth } from './auth';
-import { DatabaseService, StoreOrder } from './database';
+import { DatabaseService, StoreOrder, PaymentMethod } from './database';
 import { GamificationService } from './gamification.service';
 
 export interface CartItem {
@@ -102,13 +102,13 @@ export class CartService {
     this.cartItemsSignal.update((current) => current.filter((item) => item.id !== productId));
   }
 
-  checkout(): StoreOrder | null {
+  checkout(paymentMethod: PaymentMethod = 'Nequi / Daviplata', transactionRef?: string): StoreOrder | null {
     if (this.cartItemsSignal().length === 0) return null;
 
     const user = this.auth.currentUser();
     const order = this.db.createOrder({
-      userEmail: user ? user.email : 'invitado@rocagym.com',
-      userName: user ? user.name : 'Cliente Invitado',
+      userEmail: user ? user.email : 'cliente@rocagym.com',
+      userName: user ? user.name : 'Cliente ROCA',
       items: this.cartItemsSignal().map((i) => ({
         id: i.id,
         name: i.name,
@@ -119,6 +119,8 @@ export class CartService {
       subtotal: this.subtotal(),
       discount: this.discountAmount(),
       total: this.total(),
+      paymentMethod,
+      transactionRef: transactionRef || (paymentMethod === 'Efectivo o Datáfono en Recepción' ? 'PAGO-RECEPCION' : 'APROB-' + Math.floor(100000 + Math.random() * 900000)),
     });
 
     this.lastOrderSignal.set(order);

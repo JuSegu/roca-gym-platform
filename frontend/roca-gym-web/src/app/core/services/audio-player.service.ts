@@ -67,6 +67,9 @@ export class AudioPlayerService {
   readonly volume = signal<number>(0.5); // 0 to 1
   readonly visualizerBars = signal<number[]>([30, 60, 95, 45, 80, 65, 90, 50]);
 
+  // Dynamic BPM Control
+  readonly customBpm = signal<number>(140);
+
   readonly currentTrack = computed(() => this.tracks[this.currentTrackIndex()]);
 
   constructor() {
@@ -112,24 +115,26 @@ export class AudioPlayerService {
 
   nextTrack(): void {
     const next = (this.currentTrackIndex() + 1) % this.tracks.length;
-    this.currentTrackIndex.set(next);
-    if (this.isPlaying()) {
-      this.stopProceduralBeats();
-      this.startProceduralBeats();
-    }
+    this.selectTrack(next);
   }
 
   prevTrack(): void {
     const prev = (this.currentTrackIndex() - 1 + this.tracks.length) % this.tracks.length;
-    this.currentTrackIndex.set(prev);
+    this.selectTrack(prev);
+  }
+
+  selectTrack(index: number): void {
+    this.currentTrackIndex.set(index);
+    this.customBpm.set(this.tracks[index].bpm);
     if (this.isPlaying()) {
       this.stopProceduralBeats();
       this.startProceduralBeats();
     }
   }
 
-  selectTrack(index: number): void {
-    this.currentTrackIndex.set(index);
+  setBpm(bpm: number): void {
+    const clamped = Math.max(110, Math.min(170, Math.round(bpm)));
+    this.customBpm.set(clamped);
     if (this.isPlaying()) {
       this.stopProceduralBeats();
       this.startProceduralBeats();
@@ -163,7 +168,8 @@ export class AudioPlayerService {
     this.isGenerating = true;
 
     const track = this.currentTrack();
-    const intervalMs = (60 / track.bpm) * 1000;
+    const bpm = this.customBpm();
+    const intervalMs = (60 / bpm) * 1000;
     let step = 0;
 
     this.intervalId = setInterval(() => {
@@ -189,14 +195,13 @@ export class AudioPlayerService {
         }
 
       } else if (track.id === 'beast_turbo') {
-        // --- 2. BEAST MODE TURBO PUSH (Mismo ritmo Beast a 148 BPM más rápido) ---
+        // --- 2. BEAST MODE TURBO PUSH (Mismo ritmo Beast a tempo turbo) ---
         if (beat % 4 === 0 || (step % 32 >= 24 && beat === 14)) {
           this.triggerKick(now);
         }
         if (beat === 4 || beat === 12) {
           this.triggerSnare(now);
         }
-        // Hi-hats continuos con acento
         this.triggerHiHat(now, beat % 2 === 0 ? 0.045 : 0.025);
         if (beat === 0 || beat === 3 || beat === 6 || beat === 10 || beat === 14) {
           const freqs = [65.41, 73.42, 55.0, 82.41];

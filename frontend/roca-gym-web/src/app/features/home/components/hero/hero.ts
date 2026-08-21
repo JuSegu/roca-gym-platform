@@ -27,28 +27,28 @@ export class Hero implements OnInit, OnDestroy {
       step: '01 / 04',
       title: 'Entrada & Recepción Principal',
       tagline: 'Acceso digital biométrico y ambiente de alto rendimiento',
-      image: '/images/tour/tour-01-entrance.jpg',
+      image: '/images/tour/tour-01-entrance.webp',
     },
     {
       id: 'machines',
       step: '02 / 04',
       title: 'Circuito de Máquinas de Fuerza',
       tagline: 'Maquinaria pesada biomecánica para aislamiento muscular',
-      image: '/images/tour/tour-02-machines.jpg',
+      image: '/images/tour/tour-02-machines.webp',
     },
     {
       id: 'freeweights',
       step: '03 / 04',
       title: 'Zona de Peso Libre & Mancuernas',
       tagline: 'Racks completos de mancuernas y bancas olímpicas',
-      image: '/images/tour/tour-03-freeweights.jpg',
+      image: '/images/tour/tour-03-freeweights.webp',
     },
     {
       id: 'powerzone',
       step: '04 / 04',
       title: 'Jaulas de Potencia & Sentadillas',
       tagline: 'Plataformas de levantamiento olímpico y barras calibradas',
-      image: '/images/tour/tour-04-powerzone.jpg',
+      image: '/images/tour/tour-04-powerzone.webp',
     },
   ];
 

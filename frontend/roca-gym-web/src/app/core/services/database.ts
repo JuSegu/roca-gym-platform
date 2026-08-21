@@ -9,6 +9,12 @@ export interface OrderItem {
   icon: string;
 }
 
+export type PaymentMethod =
+  | 'Nequi / Daviplata'
+  | 'PSE / Bancolombia'
+  | 'Tarjeta de Crédito / Débito'
+  | 'Efectivo o Datáfono en Recepción';
+
 export interface StoreOrder {
   id: string;
   userEmail: string;
@@ -20,6 +26,8 @@ export interface StoreOrder {
   date: string;
   status: 'Pendiente en recepción' | 'Entregado' | 'Cancelado';
   pickupCode: string;
+  paymentMethod: PaymentMethod;
+  transactionRef?: string;
 }
 
 export interface AttendanceRecord {
@@ -35,27 +43,16 @@ export interface AttendanceRecord {
   providedIn: 'root',
 })
 export class DatabaseService {
-  // This keeps the demo working today and is the single switch for Firestore migration.
   readonly firebase = inject(FirebaseService);
   private readonly ORDERS_KEY = 'roca_gym_orders_db';
   private readonly ATTENDANCES_KEY = 'roca_gym_attendances_db';
   private readonly GYM_CAPACITY_KEY = 'roca_gym_current_capacity';
 
-  // Configuración de Firebase preparada para cuando se ingresen las API Keys de producción
-  readonly firebaseConfig = {
-    apiKey: "YOUR_FIREBASE_API_KEY",
-    authDomain: "roca-gym-platform.firebaseapp.com",
-    projectId: "roca-gym-platform",
-    storageBucket: "roca-gym-platform.appspot.com",
-    messagingSenderId: "1234567890",
-    appId: "1:1234567890:web:abcdef123456"
-  };
-
   private isBrowser(): boolean {
     return typeof window !== 'undefined' && typeof localStorage !== 'undefined';
   }
 
-  // Signals reactivos para almacenamiento en vivo
+  // Signals reactivos para almacenamiento en vivo sincronizado
   private readonly ordersSignal = signal<StoreOrder[]>(this.loadOrders());
   readonly orders = this.ordersSignal.asReadonly();
 
@@ -174,18 +171,20 @@ export class DatabaseService {
     return [
       {
         id: 'ORD-9842',
-        userEmail: 'admin@rocagym.com',
-        userName: 'Julián Roca',
+        userEmail: 'socio@rocagym.com',
+        userName: 'Camilo Rodríguez',
         items: [
-          { id: 1, name: 'Proteína Whey Isolate', price: 55, quantity: 1, icon: '🥤' },
-          { id: 2, name: 'Creatina Monohidratada 500g', price: 35, quantity: 1, icon: '⚡' },
+          { id: 1, name: 'Proteína Whey Isolate 2lb', price: 165000, quantity: 1, icon: '🥤' },
+          { id: 2, name: 'Creatina Monohidratada 300g', price: 110000, quantity: 1, icon: '⚡' },
         ],
-        subtotal: 90,
-        discount: 13.5,
-        total: 76.5,
+        subtotal: 275000,
+        discount: 13750,
+        total: 261250,
         date: 'Hoy, 10:30 AM',
         status: 'Pendiente en recepción',
         pickupCode: 'REC-884',
+        paymentMethod: 'Nequi / Daviplata',
+        transactionRef: 'NEQ-9284183',
       },
     ];
   }
@@ -194,18 +193,18 @@ export class DatabaseService {
     return [
       {
         id: 'ATT-101',
-        userEmail: 'admin@rocagym.com',
-        userName: 'Julián Roca',
-        userPlan: 'Plan Anual Premium',
-        timestamp: '07:15 AM',
+        userEmail: 'camilo@email.com',
+        userName: 'Camilo Rodríguez',
+        userPlan: 'Plan Anual',
+        timestamp: '06:15 AM',
         status: 'Concedido',
       },
       {
         id: 'ATT-102',
         userEmail: 'maria@email.com',
         userName: 'María López',
-        userPlan: 'Plan Trimestral Pro',
-        timestamp: '08:00 AM',
+        userPlan: 'Plan 3 Meses',
+        timestamp: '07:00 AM',
         status: 'Concedido',
       },
     ];

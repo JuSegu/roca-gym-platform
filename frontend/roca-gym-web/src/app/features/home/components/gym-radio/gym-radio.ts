@@ -16,4 +16,13 @@ export class GymRadio {
     const input = event.target as HTMLInputElement;
     this.audio.setVolume(parseFloat(input.value));
   }
+
+  onBpmChange(event: Event): void {
+    const input = event.target as HTMLInputElement;
+    this.audio.setBpm(parseInt(input.value, 10));
+  }
+
+  setBpmPreset(bpm: number): void {
+    this.audio.setBpm(bpm);
+  }
 }

@@ -1,7 +1,7 @@
 {
   "name": "ROCA GYM - Plataforma Oficial",
   "short_name": "ROCA GYM",
-  "description": "Plataforma de entrenamiento, membresías, tienda y control de acceso de ROCA GYM.",
+  "description": "Plataforma oficial de entrenamiento, planes, tienda y acceso digital de ROCA GYM Calle 80 #92-49 Bogotá.",
   "start_url": "/",
   "display": "standalone",
   "background_color": "#000000",
