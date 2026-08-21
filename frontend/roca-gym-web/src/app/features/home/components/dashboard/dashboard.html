@@ -25,7 +25,7 @@
           ¡Hola de nuevo, <span class="text-red-600">{{ auth.currentUser()?.name }}</span>! 💪
         </h1>
         <p class="mt-1 text-sm text-gray-400">
-          Membresía: <strong class="text-gray-200">{{ auth.currentUser()?.plan }}</strong> · Activo desde {{ auth.currentUser()?.activeSince }}
+          Plan: <strong class="text-gray-200">{{ auth.currentUser()?.plan }}</strong> · Activo desde {{ auth.currentUser()?.activeSince }}
         </p>
       </div>
 
@@ -311,9 +311,9 @@
             </div>
           </div>
 
-          <!-- Estado de Membresía -->
+          <!-- Detalle de tu Plan -->
           <div class="rounded-2xl border border-white/10 bg-zinc-950 p-6">
-            <h3 class="text-lg font-black uppercase text-white border-b border-white/10 pb-4">Detalle de Membresía</h3>
+            <h3 class="text-lg font-black uppercase text-white border-b border-white/10 pb-4">Detalle de tu Plan</h3>
             
             <div class="mt-4 space-y-3 text-sm">
               <div class="flex justify-between">
