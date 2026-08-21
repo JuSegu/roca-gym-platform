@@ -18,43 +18,42 @@ export class AudioPlayerService {
   private isGenerating = false;
   private intervalId: any = null;
   private masterGain: GainNode | null = null;
-  private distortionCurve: Float32Array<ArrayBuffer> | null = null;
 
-  // Catálogo 100% Beast / Gym Phonk & Heavy 808
+  // Colección 100% Beast Mode centrada en el ritmo original
   readonly tracks: MusicTrack[] = [
     {
-      id: 'phonk_drift',
-      title: 'Beast Mode Phonk Drift',
+      id: 'phonk',
+      title: 'Beast Mode Original',
       artist: 'ROCA Beast Labs',
-      genre: 'Raw Drift Phonk & 808',
+      genre: 'Gym Phonk & 808 Original',
       bpm: 140,
       icon: '⚡',
       color: '#dc2626',
     },
     {
-      id: 'phonk_brazil',
-      title: 'Montagem Brazilian Beast',
-      artist: 'Favela Pump',
-      genre: 'Brazilian Gym Phonk',
-      bpm: 135,
-      icon: '🇧🇷',
+      id: 'beast_turbo',
+      title: 'Beast Mode Turbo Push',
+      artist: 'ROCA Beast Labs',
+      genre: 'Beast Phonk 148 BPM',
+      bpm: 148,
+      icon: '🔥',
       color: '#ef4444',
     },
     {
-      id: 'phonk_shadow',
-      title: 'Shadow Beast Aggressive',
-      artist: 'KSLV Dark Pulse',
-      genre: 'Dark Phonk / Hyper-Pump',
-      bpm: 145,
-      icon: '👹',
+      id: 'beast_deep',
+      title: 'Beast Mode Heavy Iron',
+      artist: 'ROCA Beast Labs',
+      genre: 'Beast Sub 808 Deep',
+      bpm: 134,
+      icon: '🦍',
       color: '#b91c1c',
     },
     {
-      id: 'phonk_titan',
-      title: 'Titan 808 Beast Trap',
-      artist: 'Iron Olympus',
-      genre: 'Heavy 808 Sub Trap',
-      bpm: 132,
+      id: 'beast_intense',
+      title: 'Beast Mode Relentless',
+      artist: 'ROCA Beast Labs',
+      genre: 'Beast Double Pulse',
+      bpm: 142,
       icon: '🔱',
       color: '#f87171',
     },
@@ -65,25 +64,13 @@ export class AudioPlayerService {
   readonly isPlaying = signal<boolean>(false);
   readonly isVisible = signal<boolean>(true);
   readonly isExpanded = signal<boolean>(false);
-  readonly volume = signal<number>(0.6); // 0 to 1
+  readonly volume = signal<number>(0.5); // 0 to 1
   readonly visualizerBars = signal<number[]>([30, 60, 95, 45, 80, 65, 90, 50]);
 
   readonly currentTrack = computed(() => this.tracks[this.currentTrackIndex()]);
 
   constructor() {
     this.startVisualizerLoop();
-  }
-
-  private makeDistortionCurve(amount = 20): Float32Array<ArrayBuffer> {
-    const k = amount;
-    const n_samples = 44100;
-    const curve = new Float32Array(n_samples);
-    const deg = Math.PI / 180;
-    for (let i = 0; i < n_samples; ++i) {
-      const x = (i * 2) / n_samples - 1;
-      curve[i] = ((3 + k) * x * 20 * deg) / (Math.PI + k * Math.abs(x));
-    }
-    return curve;
   }
 
   private initAudio(): AudioContext | null {
@@ -95,7 +82,6 @@ export class AudioPlayerService {
         this.masterGain = this.audioCtx.createGain();
         this.masterGain.gain.value = this.volume();
         this.masterGain.connect(this.audioCtx.destination);
-        this.distortionCurve = this.makeDistortionCurve(15);
       }
     }
     if (this.audioCtx && this.audioCtx.state === 'suspended') {
@@ -171,7 +157,7 @@ export class AudioPlayerService {
     this.isExpanded.update((v) => !v);
   }
 
-  // --- Web Audio Synthesizer: 100% BEAST / PHONK / HEAVY 808 ---
+  // --- Generador Procedural del Ritmo Beast Original ---
   private startProceduralBeats(): void {
     if (this.isGenerating) return;
     this.isGenerating = true;
@@ -185,100 +171,71 @@ export class AudioPlayerService {
       const now = this.audioCtx.currentTime;
       const beat = step % 16;
 
-      if (track.id === 'phonk_drift') {
-        // --- 1. BEAST MODE PHONK DRIFT (140 BPM) ---
-        // Heavy 808 Kick on beats 0, 4, 8, 12 + Cowbell melody
+      if (track.id === 'phonk') {
+        // --- 1. BEAST MODE ORIGINAL (El ritmo exacto que te encantó) ---
         if (beat % 4 === 0) {
-          this.trigger808Kick(now, 160, 40, 0.6);
+          this.triggerKick(now);
         }
         if (beat === 4 || beat === 12) {
-          this.triggerPhonkSnare(now);
+          this.triggerSnare(now);
         }
-        // Rolling fast Hi-hats
-        if (beat % 2 === 0 || (step % 32 >= 16 && beat % 1 === 0)) {
-          this.triggerHiHat(now, 0.04);
+        if (beat % 2 === 0) {
+          this.triggerHiHat(now, beat % 4 === 0 ? 0.05 : 0.03);
         }
-        // 808 Gliding Bassline
         if (beat === 0 || beat === 3 || beat === 6 || beat === 10 || beat === 14) {
-          const bassNotes = [43.65, 49.0, 55.0, 65.41]; // F1, G1, A1, C2
-          const note = bassNotes[Math.floor(step / 8) % bassNotes.length];
-          this.triggerDistorted808Bass(now, note, 0.32);
-        }
-        // Memphis Cowbell Melody
-        if (beat === 0 || beat === 2 || beat === 3 || beat === 6 || beat === 8 || beat === 11 || beat === 14) {
-          const cowbellNotes = [587.33, 659.25, 783.99, 880.0, 1046.5]; // D5, E5, G5, A5, C6
-          const note = cowbellNotes[(step + beat) % cowbellNotes.length];
-          this.triggerPhonkCowbell(now, note);
+          const freqs = [55, 65.41, 49, 73.42];
+          const freq = freqs[Math.floor(step / 16) % freqs.length];
+          this.triggerPhonkBass(now, freq);
         }
 
-      } else if (track.id === 'phonk_brazil') {
-        // --- 2. MONTAGEM BRAZILIAN BEAST (135 BPM) ---
-        // Syncopated Brazilian Baile/Phonk rhythm (0, 3, 6, 10, 12)
-        if (beat === 0 || beat === 3 || beat === 6 || beat === 10 || beat === 12) {
-          this.triggerPunchyKick(now, 0.55);
+      } else if (track.id === 'beast_turbo') {
+        // --- 2. BEAST MODE TURBO PUSH (Mismo ritmo Beast a 148 BPM más rápido) ---
+        if (beat % 4 === 0 || (step % 32 >= 24 && beat === 14)) {
+          this.triggerKick(now);
         }
-        if (beat === 4 || beat === 12 || beat === 15) {
-          this.triggerBrazilianClap(now);
+        if (beat === 4 || beat === 12) {
+          this.triggerSnare(now);
+        }
+        // Hi-hats continuos con acento
+        this.triggerHiHat(now, beat % 2 === 0 ? 0.045 : 0.025);
+        if (beat === 0 || beat === 3 || beat === 6 || beat === 10 || beat === 14) {
+          const freqs = [65.41, 73.42, 55.0, 82.41];
+          const freq = freqs[Math.floor(step / 16) % freqs.length];
+          this.triggerPhonkBass(now, freq);
+        }
+
+      } else if (track.id === 'beast_deep') {
+        // --- 3. BEAST MODE HEAVY IRON (Mismo ritmo Beast con bajo más profundo) ---
+        if (beat % 4 === 0) {
+          this.triggerKick(now);
+        }
+        if (beat === 4 || beat === 12) {
+          this.triggerSnare(now);
         }
         if (beat % 2 === 0) {
           this.triggerHiHat(now, 0.035);
         }
-        // Bouncing low-mid 808
-        if (beat === 0 || beat === 3 || beat === 8 || beat === 11) {
-          const notes = [65.41, 73.42, 65.41, 87.31];
-          this.triggerDistorted808Bass(now, notes[(step % 4)], 0.35);
-        }
-        // Resonant Vocal-like synth stab
-        if (beat === 2 || beat === 6 || beat === 10 || beat === 14) {
-          this.triggerPhonkCowbell(now, 440 * 1.5);
+        if (beat === 0 || beat === 3 || beat === 6 || beat === 10 || beat === 14) {
+          const freqs = [41.2, 49.0, 36.7, 55.0]; // Octava más profunda
+          const freq = freqs[Math.floor(step / 16) % freqs.length];
+          this.triggerPhonkBass(now, freq);
         }
 
-      } else if (track.id === 'phonk_shadow') {
-        // --- 3. SHADOW BEAST AGGRESSIVE (145 BPM) ---
-        // Fast aggressive pumping kicks
-        if (beat % 4 === 0 || beat === 14) {
-          this.trigger808Kick(now, 175, 45, 0.65);
+      } else if (track.id === 'beast_intense') {
+        // --- 4. BEAST MODE RELENTLESS (Mismo ritmo Beast con doble pulso de bajo) ---
+        if (beat % 4 === 0 || beat === 10) {
+          this.triggerKick(now);
         }
         if (beat === 4 || beat === 12) {
-          this.triggerPhonkSnare(now);
+          this.triggerSnare(now);
         }
-        // High speed triple-hats
-        this.triggerHiHat(now, beat % 4 === 0 ? 0.05 : 0.025);
-
-        // Aggressive Saw Glide Sub
         if (beat % 2 === 0) {
-          const notes = [49.0, 55.0, 58.27, 73.42];
-          const note = notes[Math.floor(step / 4) % notes.length];
-          this.triggerDistorted808Bass(now, note, 0.4);
+          this.triggerHiHat(now, beat % 4 === 0 ? 0.05 : 0.03);
         }
-        // High dark cowbell arpeggio
-        if (beat === 1 || beat === 3 || beat === 5 || beat === 7 || beat === 9 || beat === 11 || beat === 13) {
-          const arps = [783.99, 880.0, 1046.5, 1174.66];
-          this.triggerPhonkCowbell(now, arps[(step % arps.length)]);
-        }
-
-      } else if (track.id === 'phonk_titan') {
-        // --- 4. TITAN 808 BEAST TRAP (132 BPM) ---
-        // Half-time Heavy Trap Kick on beat 0 and beat 10
-        if (beat === 0 || beat === 8 || beat === 11) {
-          this.triggerDeepSubDrop(now);
-        }
-        if (beat === 8) {
-          this.triggerPhonkSnare(now);
-        }
-        // Rapid fire Trap Hats
-        if (beat % 2 === 0 || (beat >= 12)) {
-          this.triggerHiHat(now, 0.03);
-        }
-        // Deep warm 808 Sub Rumble
-        if (beat === 0 || beat === 6 || beat === 11) {
-          const lowNotes = [36.71, 41.2, 43.65, 48.99]; // D1, E1, F1, G1
-          this.triggerDistorted808Bass(now, lowNotes[Math.floor(step / 8) % lowNotes.length], 0.45);
-        }
-        // Slow melodic bell
-        if (beat === 0 || beat === 4 || beat === 8 || beat === 12) {
-          const melody = [587.33, 523.25, 440.0, 392.0];
-          this.triggerPhonkCowbell(now, melody[Math.floor(step / 4) % melody.length]);
+        if (beat === 0 || beat === 2 || beat === 6 || beat === 8 || beat === 10 || beat === 14) {
+          const freqs = [55, 58.27, 49, 65.41];
+          const freq = freqs[Math.floor(step / 16) % freqs.length];
+          this.triggerPhonkBass(now, freq);
         }
       }
 
@@ -294,209 +251,90 @@ export class AudioPlayerService {
     }
   }
 
-  // --- PHONK & BEAST DRUM SYNTHESIZERS ---
+  // --- SÍNTESIS DE INSTRUMENTOS ORIGINALES BEAST ---
 
-  private trigger808Kick(time: number, startFreq = 160, endFreq = 40, vol = 0.55): void {
+  private triggerKick(time: number): void {
     if (!this.audioCtx || !this.masterGain) return;
     const osc = this.audioCtx.createOscillator();
     const gain = this.audioCtx.createGain();
 
-    osc.frequency.setValueAtTime(startFreq, time);
-    osc.frequency.exponentialRampToValueAtTime(endFreq, time + 0.12);
+    osc.frequency.setValueAtTime(140, time);
+    osc.frequency.exponentialRampToValueAtTime(35, time + 0.12);
 
-    gain.gain.setValueAtTime(vol, time);
-    gain.gain.exponentialRampToValueAtTime(0.001, time + 0.28);
+    gain.gain.setValueAtTime(0.5, time);
+    gain.gain.exponentialRampToValueAtTime(0.001, time + 0.25);
 
     osc.connect(gain);
     gain.connect(this.masterGain);
 
     osc.start(time);
-    osc.stop(time + 0.28);
+    osc.stop(time + 0.25);
   }
 
-  private triggerPunchyKick(time: number, vol = 0.5): void {
+  private triggerSnare(time: number): void {
     if (!this.audioCtx || !this.masterGain) return;
-    const osc = this.audioCtx.createOscillator();
-    const gain = this.audioCtx.createGain();
-
-    osc.frequency.setValueAtTime(220, time);
-    osc.frequency.exponentialRampToValueAtTime(50, time + 0.08);
-
-    gain.gain.setValueAtTime(vol, time);
-    gain.gain.exponentialRampToValueAtTime(0.001, time + 0.18);
-
-    osc.connect(gain);
-    gain.connect(this.masterGain);
-
-    osc.start(time);
-    osc.stop(time + 0.18);
-  }
-
-  private triggerDeepSubDrop(time: number): void {
-    if (!this.audioCtx || !this.masterGain) return;
-    const osc = this.audioCtx.createOscillator();
-    const gain = this.audioCtx.createGain();
-
-    osc.frequency.setValueAtTime(120, time);
-    osc.frequency.exponentialRampToValueAtTime(32, time + 0.35);
-
-    gain.gain.setValueAtTime(0.65, time);
-    gain.gain.exponentialRampToValueAtTime(0.001, time + 0.45);
-
-    osc.connect(gain);
-    gain.connect(this.masterGain);
-
-    osc.start(time);
-    osc.stop(time + 0.45);
-  }
-
-  private triggerPhonkSnare(time: number): void {
-    if (!this.audioCtx || !this.masterGain) return;
-    // Tone component
-    const osc = this.audioCtx.createOscillator();
-    const oscGain = this.audioCtx.createGain();
-    osc.frequency.setValueAtTime(220, time);
-    osc.frequency.exponentialRampToValueAtTime(140, time + 0.08);
-    oscGain.gain.setValueAtTime(0.3, time);
-    oscGain.gain.exponentialRampToValueAtTime(0.001, time + 0.1);
-    osc.connect(oscGain);
-    oscGain.connect(this.masterGain);
-    osc.start(time);
-    osc.stop(time + 0.1);
-
-    // Noise component (crisp snap)
-    const bufferSize = this.audioCtx.sampleRate * 0.15;
+    const bufferSize = this.audioCtx.sampleRate * 0.1;
     const buffer = this.audioCtx.createBuffer(1, bufferSize, this.audioCtx.sampleRate);
     const output = buffer.getChannelData(0);
     for (let i = 0; i < bufferSize; i++) {
       output[i] = Math.random() * 2 - 1;
     }
 
-    const noise = this.audioCtx.createBufferSource();
-    noise.buffer = buffer;
-
-    const filter = this.audioCtx.createBiquadFilter();
-    filter.type = 'bandpass';
-    filter.frequency.value = 1800;
-    filter.Q.value = 1.8;
-
-    const noiseGain = this.audioCtx.createGain();
-    noiseGain.gain.setValueAtTime(0.28, time);
-    noiseGain.gain.exponentialRampToValueAtTime(0.01, time + 0.15);
-
-    noise.connect(filter);
-    filter.connect(noiseGain);
-    noiseGain.connect(this.masterGain);
-
-    noise.start(time);
-    noise.stop(time + 0.15);
-  }
-
-  private triggerBrazilianClap(time: number): void {
-    if (!this.audioCtx || !this.masterGain) return;
-    const bufferSize = this.audioCtx.sampleRate * 0.12;
-    const buffer = this.audioCtx.createBuffer(1, bufferSize, this.audioCtx.sampleRate);
-    const output = buffer.getChannelData(0);
-    for (let i = 0; i < bufferSize; i++) {
-      output[i] = Math.random() * 2 - 1;
-    }
-
-    const noise = this.audioCtx.createBufferSource();
-    noise.buffer = buffer;
+    const whiteNoise = this.audioCtx.createBufferSource();
+    whiteNoise.buffer = buffer;
 
     const filter = this.audioCtx.createBiquadFilter();
     filter.type = 'highpass';
-    filter.frequency.value = 1200;
+    filter.frequency.value = 1000;
 
-    const noiseGain = this.audioCtx.createGain();
-    noiseGain.gain.setValueAtTime(0.35, time);
-    noiseGain.gain.exponentialRampToValueAtTime(0.01, time + 0.1);
+    const gain = this.audioCtx.createGain();
+    gain.gain.setValueAtTime(0.2, time);
+    gain.gain.exponentialRampToValueAtTime(0.01, time + 0.12);
 
-    noise.connect(filter);
-    filter.connect(noiseGain);
-    noiseGain.connect(this.masterGain);
+    whiteNoise.connect(filter);
+    filter.connect(gain);
+    gain.connect(this.masterGain);
 
-    noise.start(time);
-    noise.stop(time + 0.1);
+    whiteNoise.start(time);
+    whiteNoise.stop(time + 0.12);
   }
 
-  private triggerHiHat(time: number, vol = 0.04): void {
+  private triggerHiHat(time: number, vol: number): void {
     if (!this.audioCtx || !this.masterGain) return;
     const osc = this.audioCtx.createOscillator();
     const gain = this.audioCtx.createGain();
     const filter = this.audioCtx.createBiquadFilter();
 
     osc.type = 'square';
-    osc.frequency.setValueAtTime(9000, time);
+    osc.frequency.setValueAtTime(8000, time);
 
     filter.type = 'highpass';
-    filter.frequency.value = 7500;
+    filter.frequency.value = 7000;
 
     gain.gain.setValueAtTime(vol, time);
-    gain.gain.exponentialRampToValueAtTime(0.001, time + 0.045);
+    gain.gain.exponentialRampToValueAtTime(0.001, time + 0.05);
 
     osc.connect(filter);
     filter.connect(gain);
     gain.connect(this.masterGain);
 
     osc.start(time);
-    osc.stop(time + 0.045);
+    osc.stop(time + 0.05);
   }
 
-  // --- MEMPHIS & DRIFT PHONK COWBELL SYNTH ---
-  private triggerPhonkCowbell(time: number, freq: number): void {
-    if (!this.audioCtx || !this.masterGain) return;
-
-    // Dual square wave with bandpass resonance (Authentic Phonk Cowbell recipe)
-    const osc1 = this.audioCtx.createOscillator();
-    const osc2 = this.audioCtx.createOscillator();
-    const gain = this.audioCtx.createGain();
-    const bandpass = this.audioCtx.createBiquadFilter();
-
-    osc1.type = 'square';
-    osc2.type = 'square';
-
-    osc1.frequency.setValueAtTime(freq, time);
-    osc2.frequency.setValueAtTime(freq * 1.505, time); // Ring modulation detune
-
-    bandpass.type = 'bandpass';
-    bandpass.frequency.setValueAtTime(freq * 1.2, time);
-    bandpass.Q.value = 4.0;
-
-    gain.gain.setValueAtTime(0.18, time);
-    gain.gain.exponentialRampToValueAtTime(0.001, time + 0.18);
-
-    osc1.connect(bandpass);
-    osc2.connect(bandpass);
-    bandpass.connect(gain);
-    gain.connect(this.masterGain);
-
-    osc1.start(time);
-    osc2.start(time);
-    osc1.stop(time + 0.18);
-    osc2.stop(time + 0.18);
-  }
-
-  // --- DISTORTED 808 GLIDE BASS ---
-  private triggerDistorted808Bass(time: number, freq: number, vol = 0.35): void {
+  private triggerPhonkBass(time: number, freq: number): void {
     if (!this.audioCtx || !this.masterGain) return;
     const osc = this.audioCtx.createOscillator();
     const gain = this.audioCtx.createGain();
-    const waveshaper = this.audioCtx.createWaveShaper();
-
-    if (this.distortionCurve) {
-      waveshaper.curve = this.distortionCurve;
-    }
 
     osc.type = 'triangle';
     osc.frequency.setValueAtTime(freq, time);
-    osc.frequency.exponentialRampToValueAtTime(freq * 0.9, time + 0.25);
+    osc.frequency.exponentialRampToValueAtTime(freq * 0.85, time + 0.2);
 
-    gain.gain.setValueAtTime(vol, time);
+    gain.gain.setValueAtTime(0.35, time);
     gain.gain.exponentialRampToValueAtTime(0.01, time + 0.28);
 
-    osc.connect(waveshaper);
-    waveshaper.connect(gain);
+    osc.connect(gain);
     gain.connect(this.masterGain);
 
     osc.start(time);
