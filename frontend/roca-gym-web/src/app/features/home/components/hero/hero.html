@@ -1,6 +1,6 @@
 <section
   id="inicio"
-  class="relative flex min-h-screen items-center overflow-hidden bg-black px-6 pt-24 pb-16"
+  class="relative flex min-h-[100dvh] items-center overflow-hidden bg-black px-4 pt-20 pb-20 sm:px-6 sm:pt-24 sm:pb-16"
 >
   <!-- MOTOR DEL RECORRIDO CINEMATOGRÁFICO EN VIVO (VIDEO TOUR EFFECT) -->
   <div class="absolute inset-0 overflow-hidden pointer-events-none">
@@ -32,20 +32,17 @@
 
       <!-- BADGE DE SEDE Y HORARIOS -->
       <div
-        class="mb-6 inline-flex flex-wrap items-center gap-3 rounded-full border border-red-600/40 bg-black/60 px-4 py-2 backdrop-blur-md"
+        class="mb-5 inline-flex flex-wrap items-center gap-2 rounded-full border border-red-600/40 bg-black/60 px-3.5 py-1.5 backdrop-blur-md sm:px-4 sm:py-2"
       >
-        <span class="h-2 w-2 animate-ping rounded-full bg-red-500"></span>
-
-        <span
-          class="text-xs font-bold uppercase tracking-[0.25em] text-red-500"
-        >
-          Sede Principal Cll 80 #92-49 · Abierto los 7 Días
+        <span class="h-2 w-2 animate-ping rounded-full bg-red-500 flex-shrink-0"></span>
+        <span class="text-[10px] font-bold uppercase tracking-[0.2em] text-red-500 sm:text-xs sm:tracking-[0.25em]">
+          Cll 80 #92-49 · Abierto 7 Días
         </span>
       </div>
 
       <!-- TITLE -->
       <h1
-        class="text-6xl font-black uppercase leading-[0.85] tracking-tight text-white sm:text-7xl lg:text-9xl drop-shadow-[0_10px_30px_rgba(0,0,0,0.9)]"
+        class="text-5xl font-black uppercase leading-[0.85] tracking-tight text-white sm:text-7xl lg:text-9xl drop-shadow-[0_10px_30px_rgba(0,0,0,0.9)]"
       >
         ROCA
         <span class="block text-red-600">
@@ -55,100 +52,54 @@
 
       <!-- DESCRIPTION -->
       <p
-        class="mt-6 max-w-2xl text-lg leading-relaxed text-gray-200 sm:text-xl drop-shadow-md"
+        class="mt-4 max-w-2xl text-sm leading-relaxed text-gray-200 sm:mt-6 sm:text-xl drop-shadow-md"
       >
         Entrena más fuerte. Supera tus límites. Maquinaria de alto impacto, la mejor comunidad y resultados reales.
       </p>
 
       <!-- BUTTONS -->
-      <div class="mt-8 flex flex-col gap-4 sm:flex-row">
-
+      <div class="mt-6 flex flex-col gap-3 sm:mt-8 sm:flex-row">
         <a
           href="#planes"
-          class="group inline-flex items-center justify-center gap-3 rounded-xl bg-red-600 px-7 py-4 text-sm font-black uppercase tracking-wider text-white shadow-[0_0_30px_rgba(220,38,38,0.4)] transition hover:bg-red-500 hover:shadow-[0_0_40px_rgba(220,38,38,0.6)]"
+          class="group inline-flex items-center justify-center gap-3 rounded-xl bg-red-600 px-6 py-3.5 text-sm font-black uppercase tracking-wider text-white shadow-[0_0_30px_rgba(220,38,38,0.4)] transition hover:bg-red-500 hover:shadow-[0_0_40px_rgba(220,38,38,0.6)] sm:px-7 sm:py-4"
         >
           Ver planes
-
-          <span
-            class="transition-transform group-hover:translate-x-1"
-          >
-            →
-          </span>
+          <span class="transition-transform group-hover:translate-x-1">→</span>
         </a>
-
         <a
           href="#ubicacion"
-          class="inline-flex items-center justify-center gap-2 rounded-xl border border-white/20 bg-black/50 px-7 py-4 text-sm font-black uppercase tracking-wider text-white backdrop-blur-md transition hover:border-red-600/50 hover:bg-red-600/15"
+          class="inline-flex items-center justify-center gap-2 rounded-xl border border-white/20 bg-black/50 px-6 py-3.5 text-sm font-black uppercase tracking-wider text-white backdrop-blur-md transition hover:border-red-600/50 hover:bg-red-600/15 sm:px-7 sm:py-4"
         >
           <span>📍</span>
-          <span>Sede, Horarios & Cómo Llegar</span>
+          <span>Horarios & Sede</span>
         </a>
-
       </div>
 
-      <!-- HORARIOS COMPLETOS PARA LOS 7 DÍAS -->
-      <div
-        class="mt-12 grid max-w-3xl grid-cols-2 gap-3.5 border-t border-white/10 pt-6 sm:grid-cols-4"
-      >
+      <!-- HORARIOS COMPACTOS -->
+      <div class="mt-6 grid max-w-3xl grid-cols-2 gap-2.5 border-t border-white/10 pt-5 sm:mt-12 sm:gap-3.5 sm:grid-cols-4">
 
-        <!-- Lunes a Viernes -->
-        <div class="rounded-xl border border-white/10 bg-black/65 p-3.5 backdrop-blur-md shadow-lg">
-          <p class="text-base font-black text-white sm:text-lg font-mono">
-            5:00 AM
-          </p>
-          <p class="text-xs font-bold text-red-500">
-            a 10:00 PM
-          </p>
-          <p
-            class="mt-1 text-[10px] font-bold uppercase tracking-wider text-gray-400"
-          >
-            Lunes a Viernes
-          </p>
+        <div class="rounded-xl border border-white/10 bg-black/65 p-3 backdrop-blur-md shadow-lg sm:p-3.5">
+          <p class="text-sm font-black text-white sm:text-lg font-mono">5:00 AM</p>
+          <p class="text-xs font-bold text-red-500">a 10:00 PM</p>
+          <p class="mt-1 text-[10px] font-bold uppercase tracking-wider text-gray-400">Lun – Vie</p>
         </div>
 
-        <!-- Sábados -->
-        <div class="rounded-xl border border-white/10 bg-black/65 p-3.5 backdrop-blur-md shadow-lg">
-          <p class="text-base font-black text-white sm:text-lg font-mono">
-            8:00 AM
-          </p>
-          <p class="text-xs font-bold text-red-500">
-            a 3:00 PM
-          </p>
-          <p
-            class="mt-1 text-[10px] font-bold uppercase tracking-wider text-gray-400"
-          >
-            Sábados
-          </p>
+        <div class="rounded-xl border border-white/10 bg-black/65 p-3 backdrop-blur-md shadow-lg sm:p-3.5">
+          <p class="text-sm font-black text-white sm:text-lg font-mono">8:00 AM</p>
+          <p class="text-xs font-bold text-red-500">a 3:00 PM</p>
+          <p class="mt-1 text-[10px] font-bold uppercase tracking-wider text-gray-400">Sábados</p>
         </div>
 
-        <!-- Domingos & Festivos -->
-        <div class="rounded-xl border border-white/10 bg-black/65 p-3.5 backdrop-blur-md shadow-lg">
-          <p class="text-base font-black text-white sm:text-lg font-mono">
-            8:00 AM
-          </p>
-          <p class="text-xs font-bold text-red-500">
-            a 1:00 PM
-          </p>
-          <p
-            class="mt-1 text-[10px] font-bold uppercase tracking-wider text-gray-400"
-          >
-            Dom (Festivos 8a-2p)
-          </p>
+        <div class="rounded-xl border border-white/10 bg-black/65 p-3 backdrop-blur-md shadow-lg sm:p-3.5">
+          <p class="text-sm font-black text-white sm:text-lg font-mono">8:00 AM</p>
+          <p class="text-xs font-bold text-red-500">a 1:00 PM</p>
+          <p class="mt-1 text-[10px] font-bold uppercase tracking-wider text-gray-400">Dom & Festivos</p>
         </div>
 
-        <!-- Dirección Exacta -->
-        <div class="rounded-xl border border-white/10 bg-black/65 p-3.5 backdrop-blur-md shadow-lg">
-          <p class="text-base font-black text-white sm:text-lg font-mono">
-            Cll 80
-          </p>
-          <p class="text-xs font-bold text-red-500">
-            #92-49
-          </p>
-          <p
-            class="mt-1 text-[10px] font-bold uppercase tracking-wider text-gray-400"
-          >
-            Sede Principal
-          </p>
+        <div class="rounded-xl border border-red-600/20 bg-red-950/20 p-3 backdrop-blur-md shadow-lg sm:p-3.5">
+          <p class="text-sm font-black text-red-500 sm:text-lg font-mono">Cll 80</p>
+          <p class="text-xs font-bold text-white">#92-49</p>
+          <p class="mt-1 text-[10px] font-bold uppercase tracking-wider text-gray-400">Sede Principal</p>
         </div>
 
       </div>
@@ -157,6 +108,19 @@
   </div>
 
   <!-- CONTROL Y CONTADOR FLOTANTE DEL RECORRIDO VIRTUAL (ESQUINA INFERIOR DERECHA DEL HERO) -->
+  <!-- Mobile: dots row at the bottom; Desktop: thumbnails + badge -->
+  <div class="absolute bottom-4 left-1/2 z-20 flex -translate-x-1/2 items-center gap-2 md:hidden">
+    @for (scene of scenes; track scene.id; let i = $index) {
+      <button
+        type="button"
+        (click)="selectScene(i)"
+        class="h-2 rounded-full transition-all duration-300"
+        [class]="currentSceneIndex() === i ? 'w-6 bg-red-500' : 'w-2 bg-white/30'"
+        [title]="scene.title"
+      ></button>
+    }
+  </div>
+
   <div class="absolute bottom-6 right-6 z-20 hidden md:flex flex-col items-end gap-2">
     
     <!-- Badge de Grabación en Vivo -->

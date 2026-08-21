@@ -1,6 +1,55 @@
 /* You can add global styles to this file, and also import other style files */
 @import "tailwindcss";
 
+/* ============================================================
+   MOBILE-FIRST GLOBAL ENHANCEMENTS
+   ============================================================ */
+
+/* Smooth momentum scroll on all touch devices */
+html {
+  scroll-behavior: smooth;
+  -webkit-text-size-adjust: 100%;
+  text-size-adjust: 100%;
+}
+
+body {
+  /* Prevents iOS rubber-band scroll from showing white bg */
+  overscroll-behavior-y: none;
+  /* Better font rendering on mobile */
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+/* iOS Safe Area - keeps content away from notch & home bar */
+.safe-top    { padding-top:    env(safe-area-inset-top); }
+.safe-bottom { padding-bottom: env(safe-area-inset-bottom); }
+
+/* Minimum touch target size (44x44 per Apple HIG) */
+button, a, [role="button"] {
+  min-height: 44px;
+}
+
+/* Make range inputs feel native on mobile */
+input[type="range"] {
+  -webkit-appearance: none;
+  appearance: none;
+  height: 6px;
+  border-radius: 9999px;
+  cursor: pointer;
+}
+
+input[type="range"]::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 18px;
+  height: 18px;
+  border-radius: 50%;
+  background: #dc2626;
+  border: 2px solid white;
+  box-shadow: 0 0 8px rgba(220, 38, 38, 0.5);
+  cursor: pointer;
+}
+
 /* Prevenir el fondo blanco feo de autofill en inputs oscuros */
 input:-webkit-autofill,
 input:-webkit-autofill:hover,
@@ -10,3 +59,12 @@ input:-webkit-autofill:active {
   -webkit-box-shadow: 0 0 0px 1000px #000000 inset !important;
   transition: background-color 5000s ease-in-out 0s;
 }
+
+/* Fade-in animation for expanded cards */
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(8px) scale(0.97); }
+  to   { opacity: 1; transform: translateY(0)  scale(1); }
+}
+.animate-fadeIn {
+  animation: fadeIn 0.25s ease-out forwards;
+}

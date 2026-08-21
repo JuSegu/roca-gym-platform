@@ -17,7 +17,16 @@ export class AudioPlayerService {
   private audioCtx: AudioContext | null = null;
   private isGenerating = false;
   private intervalId: any = null;
+  private cycleTimeoutId: any = null;
   private masterGain: GainNode | null = null;
+
+  /** How long the radio plays before pausing (ms) */
+  private readonly PLAY_DURATION_MS = 3 * 60 * 1000;  // 3 minutes
+  /** How long the radio stays paused before resuming (ms) */
+  private readonly PAUSE_DURATION_MS = 3 * 60 * 1000; // 3 minutes
+
+  /** True once the user has interacted with the page (needed for autoplay policy) */
+  private userInteracted = false;
 
   // Colección 100% Beast Mode centrada en el ritmo original
   readonly tracks: MusicTrack[] = [
@@ -74,6 +83,57 @@ export class AudioPlayerService {
 
   constructor() {
     this.startVisualizerLoop();
+    this.setupAutoPlay();
+  }
+
+  /**
+   * Attempts to autoplay immediately; if the browser blocks it (no prior interaction)
+   * we attach a one-time listener on the first click/touch and start then.
+   */
+  private setupAutoPlay(): void {
+    if (typeof window === 'undefined') return;
+
+    // Try immediate autoplay (works in some browsers / PWAs)
+    setTimeout(() => {
+      try {
+        this.play();
+        this.scheduleCycle();
+      } catch {
+        // If autoplay is blocked, start on first user interaction
+        const startOnInteraction = () => {
+          if (!this.userInteracted) {
+            this.userInteracted = true;
+            this.play();
+            this.scheduleCycle();
+            window.removeEventListener('click', startOnInteraction);
+            window.removeEventListener('touchstart', startOnInteraction);
+            window.removeEventListener('keydown', startOnInteraction);
+          }
+        };
+        window.addEventListener('click', startOnInteraction, { once: true });
+        window.addEventListener('touchstart', startOnInteraction, { once: true });
+        window.addEventListener('keydown', startOnInteraction, { once: true });
+      }
+    }, 800); // small delay to let Angular finish bootstrapping
+  }
+
+  /**
+   * Runs the 3-min PLAY → 3-min PAUSE → repeat cycle.
+   * Clears any previous cycle timer before scheduling a new one.
+   */
+  private scheduleCycle(): void {
+    if (this.cycleTimeoutId) {
+      clearTimeout(this.cycleTimeoutId);
+      this.cycleTimeoutId = null;
+    }
+    // After PLAY_DURATION_MS, pause and then schedule resume
+    this.cycleTimeoutId = setTimeout(() => {
+      this.pause();
+      this.cycleTimeoutId = setTimeout(() => {
+        this.play();
+        this.scheduleCycle(); // restart the whole cycle
+      }, this.PAUSE_DURATION_MS);
+    }, this.PLAY_DURATION_MS);
   }
 
   private initAudio(): AudioContext | null {
@@ -93,13 +153,6 @@ export class AudioPlayerService {
     return this.audioCtx;
   }
 
-  togglePlay(): void {
-    if (this.isPlaying()) {
-      this.pause();
-    } else {
-      this.play();
-    }
-  }
 
   play(): void {
     const ctx = this.initAudio();
@@ -111,6 +164,24 @@ export class AudioPlayerService {
   pause(): void {
     this.isPlaying.set(false);
     this.stopProceduralBeats();
+  }
+
+  /**
+   * Manual toggle: also resets the automatic cycle so the 3-min
+   * countdown restarts from the moment the user presses play/pause.
+   */
+  togglePlay(): void {
+    if (this.isPlaying()) {
+      this.pause();
+      // Cancel any scheduled cycle reset so it stays paused until the user resumes
+      if (this.cycleTimeoutId) {
+        clearTimeout(this.cycleTimeoutId);
+        this.cycleTimeoutId = null;
+      }
+    } else {
+      this.play();
+      this.scheduleCycle(); // restart cycle from this moment
+    }
   }
 
   nextTrack(): void {
@@ -253,6 +324,15 @@ export class AudioPlayerService {
     if (this.intervalId) {
       clearInterval(this.intervalId);
       this.intervalId = null;
+    }
+  }
+
+  /** Cleans up all timers (call on service destroy or page unload) */
+  cleanup(): void {
+    this.stopProceduralBeats();
+    if (this.cycleTimeoutId) {
+      clearTimeout(this.cycleTimeoutId);
+      this.cycleTimeoutId = null;
     }
   }
 
