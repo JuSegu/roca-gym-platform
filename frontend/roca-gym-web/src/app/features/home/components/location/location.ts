@@ -47,18 +47,18 @@ export class Location {
 
   readonly transportOptions = [
     {
-      title: 'En TransMilenio / Bus',
-      desc: 'Ubicado sobre la Calle 80, a pasos de las estaciones y paraderos principales con fácil acceso peatonal.',
+      title: 'En TransMilenio',
+      desc: 'Te puedes bajar en la estación Quirigua y llegas caminando directo sobre la Calle 80.',
       icon: '🚇',
     },
     {
-      title: 'En Vehículo / Moto',
-      desc: 'Parqueadero privado y vigilado cercano para miembros activos de ROCA GYM.',
-      icon: '🚗',
+      title: 'En Moto',
+      desc: 'Puedes parquear tu moto sin ningún problema al frente del gimnasio mientras entrenas.',
+      icon: '🏍️',
     },
     {
-      title: 'En Bicicleta',
-      desc: 'Bicicletero seguro dentro de las instalaciones para que entrenes con tranquilidad.',
+      title: 'A Pie / Bicicleta',
+      desc: 'Acceso directo y seguro sobre el corredor principal de la Calle 80 #92-49.',
       icon: '🚲',
     },
   ];
