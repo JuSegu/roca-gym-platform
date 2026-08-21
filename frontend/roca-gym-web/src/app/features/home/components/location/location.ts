@@ -1,4 +1,4 @@
-import { Component, signal } from '@angular/core';
+import { Component } from '@angular/core';
 import { CommonModule } from '@angular/common';
 
 @Component({
@@ -9,7 +9,11 @@ import { CommonModule } from '@angular/common';
   styleUrl: './location.css',
 })
 export class Location {
-  // Horarios para los 7 días de la semana
+  readonly address = 'Calle 80 #92-49';
+  readonly mapsUrl = 'https://maps.google.com/?q=Calle+80+%2392-49';
+  readonly wazeUrl = 'https://waze.com/ul?q=Calle+80+%2392-49';
+
+  // Horarios exactos para los 7 días de la semana
   readonly schedules = [
     {
       days: 'Lunes a Viernes',
@@ -20,34 +24,41 @@ export class Location {
     },
     {
       days: 'Sábados',
-      hours: '6:00 AM – 8:00 PM',
+      hours: '8:00 AM – 3:00 PM',
       tag: 'Fin de Semana',
       tagColor: 'bg-yellow-500/15 text-yellow-400 border-yellow-500/30',
       icon: '⚡',
     },
     {
-      days: 'Domingos & Festivos',
-      hours: '7:00 AM – 4:00 PM',
-      tag: 'Recuperación & Cardio',
+      days: 'Domingos',
+      hours: '8:00 AM – 1:00 PM',
+      tag: 'Domingo Activo',
       tagColor: 'bg-red-500/15 text-red-400 border-red-500/30',
       icon: '🔥',
+    },
+    {
+      days: 'Festivos',
+      hours: '8:00 AM – 2:00 PM',
+      tag: 'Día Festivo',
+      tagColor: 'bg-amber-500/15 text-amber-400 border-amber-500/30',
+      icon: '🏆',
     },
   ];
 
   readonly transportOptions = [
     {
-      title: 'En TransMilenio / Metro',
-      desc: 'A solo 2 cuadras de la estación principal. Acceso directo por puente peatonal.',
+      title: 'En TransMilenio / Bus',
+      desc: 'Ubicado sobre la Calle 80, a pasos de las estaciones y paraderos principales con fácil acceso peatonal.',
       icon: '🚇',
     },
     {
       title: 'En Vehículo / Moto',
-      desc: 'Parqueadero privado y vigilado gratis las primeras 2 horas para miembros activos.',
+      desc: 'Parqueadero privado y vigilado cercano para miembros activos de ROCA GYM.',
       icon: '🚗',
     },
     {
       title: 'En Bicicleta',
-      desc: 'Bicicletero cerrado con candado de seguridad y lockers dentro del gimnasio.',
+      desc: 'Bicicletero seguro dentro de las instalaciones para que entrenes con tranquilidad.',
       icon: '🚲',
     },
   ];
