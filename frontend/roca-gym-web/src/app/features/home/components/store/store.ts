@@ -8,6 +8,7 @@ export interface Product {
   price: number;
   priceFormatted: string;
   description: string;
+  image: string;
   icon: string;
   popular?: boolean;
 }
@@ -34,6 +35,7 @@ export class Store {
       price: 165000,
       priceFormatted: '$165.000 COP',
       description: 'Aislado de suero premium 90% proteína pura, cero azúcar y rápida absorción muscular.',
+      image: '/images/products/whey-protein.jpg',
       icon: '🥤',
       popular: true,
     },
@@ -44,6 +46,7 @@ export class Store {
       price: 110000,
       priceFormatted: '$110.000 COP',
       description: 'Creatina 100% micronizada de alta pureza para fuerza explosiva y aumento de masa magra.',
+      image: '/images/products/creatine.jpg',
       icon: '⚡',
       popular: true,
     },
@@ -54,6 +57,7 @@ export class Store {
       price: 95000,
       priceFormatted: '$95.000 COP',
       description: 'Fórmula explosiva con cafeína, beta-alanina y citrulina para máxima potencia en cada serie.',
+      image: '/images/products/preworkout.jpg',
       icon: '🔥',
       popular: true,
     },
@@ -64,6 +68,7 @@ export class Store {
       price: 85000,
       priceFormatted: '$85.000 COP',
       description: 'Aminoácidos esenciales 4:1:1 con electrolitos para recuperación intra y post entrenamiento.',
+      image: '/images/products/creatine.jpg',
       icon: '🧪',
     },
     {
@@ -73,6 +78,7 @@ export class Store {
       price: 65000,
       priceFormatted: '$65.000 COP',
       description: 'Algodón pesado prémium, corte drop-shoulder con logo de alta durabilidad.',
+      image: '/images/products/tshirt.jpg',
       icon: '👕',
       popular: true,
     },
@@ -83,6 +89,7 @@ export class Store {
       price: 130000,
       priceFormatted: '$130.000 COP',
       description: 'Buzo térmico grueso con capota estructurada y corte atlético para entrenar o calle.',
+      image: '/images/products/tshirt.jpg',
       icon: '🧥',
     },
     {
@@ -92,6 +99,7 @@ export class Store {
       price: 95000,
       priceFormatted: '$95.000 COP',
       description: 'Cuero genuino de alta resistencia con doble hebilla de acero para sentadilla y peso muerto.',
+      image: '/images/products/belt.jpg',
       icon: '🏋️',
       popular: true,
     },
@@ -102,6 +110,7 @@ export class Store {
       price: 45000,
       priceFormatted: '$45.000 COP',
       description: 'Shaker libre de BPA con mezclador anti-grumos y correas de agarre con almohadilla de neopreno.',
+      image: '/images/products/shaker-straps.jpg',
       icon: '🎒',
     },
   ];
