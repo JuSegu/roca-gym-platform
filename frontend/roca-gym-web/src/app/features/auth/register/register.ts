@@ -21,7 +21,7 @@ export class Register implements OnInit {
     name: new FormControl('', [Validators.required, Validators.minLength(3)]),
     email: new FormControl('', [Validators.required, Validators.email]),
     phone: new FormControl(''),
-    plan: new FormControl('Plan Anual VIP', [Validators.required]),
+    plan: new FormControl('Plan Anual', [Validators.required]),
     password: new FormControl('', [Validators.required, Validators.minLength(6)]),
     confirmPassword: new FormControl('', [Validators.required]),
     terms: new FormControl(true, [Validators.requiredTrue]),
@@ -53,7 +53,7 @@ export class Register implements OnInit {
         email: val.email || '',
         phone: val.phone || '',
         password: val.password || '',
-        plan: val.plan || 'Plan Anual VIP',
+        plan: val.plan || 'Plan Anual',
       });
       this.errorMessage = null;
       this.router.navigate(['/']);
@@ -71,7 +71,7 @@ export class Register implements OnInit {
       email: val.email || '',
       phone: val.phone || '',
       password: val.password || '',
-      plan: val.plan || 'Plan Anual VIP',
+      plan: val.plan || 'Plan Anual',
     });
 
     if (success) {

@@ -22,10 +22,10 @@
       </div>
 
       @if (!isOrderPlaced()) {
-        <!-- Banner VIP -->
+        <!-- Banner Descuento Miembro -->
         @if (auth.isLoggedIn()) {
           <div class="mt-4 flex items-center justify-between rounded-xl border border-red-600/40 bg-red-950/40 p-3 text-xs">
-            <span class="font-bold text-red-400">🔥 ¡15% Descuento VIP Aplicado!</span>
+            <span class="font-bold text-red-400">🔥 ¡15% Descuento de Miembro Aplicado!</span>
             <span class="font-black text-white">-15%</span>
           </div>
         } @else {
@@ -92,7 +92,7 @@
 
             @if (cart.discountAmount() > 0) {
               <div class="flex justify-between text-xs text-red-400 font-bold">
-                <span>Descuento VIP (15%):</span>
+                <span>Descuento Miembro (15%):</span>
                 <span>-${{ cart.discountAmount().toFixed(2) }} USD</span>
               </div>
             }
@@ -139,7 +139,7 @@
               </div>
               @if (order.discount > 0) {
                 <div class="mt-2 flex justify-between text-xs text-red-400 font-bold">
-                  <span>Descuento VIP (15%)</span>
+                  <span>Descuento Miembro (15%)</span>
                   <span>-${{ order.discount.toFixed(2) }}</span>
                 </div>
               }
