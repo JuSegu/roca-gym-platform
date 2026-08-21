@@ -1,36 +1,43 @@
 @if (cart.isCartOpen()) {
-  <div class="fixed inset-0 z-50 flex justify-end bg-black/80 backdrop-blur-md">
-    <!-- Click backdrop to close -->
-    <div class="absolute inset-0" (click)="closeCart()"></div>
+  <div class="fixed inset-0 z-50 flex justify-end bg-black/80 backdrop-blur-sm transition-all duration-300">
+    
+    <!-- Backdrop Click to Close -->
+    <div class="absolute inset-0" (click)="cart.closeCart()"></div>
 
     <!-- Drawer Content -->
-    <div class="relative flex h-full w-full max-w-md flex-col border-l border-white/10 bg-zinc-950 p-6 shadow-[0_0_50px_rgba(220,38,38,0.25)]">
+    <div class="relative z-10 flex h-full w-full max-w-md flex-col border-l border-white/10 bg-zinc-950 p-6 shadow-2xl">
       
-      <!-- Header -->
+      <!-- Drawer Header -->
       <div class="flex items-center justify-between border-b border-white/10 pb-4">
-        <div class="flex items-center gap-2">
-          <span class="text-xl">🛒</span>
-          <h2 class="text-xl font-black uppercase text-white">Tu Carrito ROCA</h2>
+        <div class="flex items-center gap-3">
+          <span class="text-2xl">🛍️</span>
+          <div>
+            <h3 class="text-lg font-black uppercase text-white">Carrito de Compras</h3>
+            <p class="text-xs text-gray-400">Tienda Oficial ROCA GYM</p>
+          </div>
         </div>
         <button
           type="button"
-          (click)="closeCart()"
-          class="rounded-lg border border-white/10 p-2 text-gray-400 hover:text-white"
+          (click)="cart.closeCart()"
+          class="flex h-8 w-8 items-center justify-center rounded-lg border border-white/10 text-sm text-gray-400 hover:text-white"
         >
           ✕
         </button>
       </div>
 
       @if (!isOrderPlaced()) {
-        <!-- Banner Descuento Miembro -->
+        <!-- Banner Descuento 5% Miembro -->
         @if (auth.isLoggedIn()) {
           <div class="mt-4 flex items-center justify-between rounded-xl border border-red-600/40 bg-red-950/40 p-3 text-xs">
-            <span class="font-bold text-red-400">🔥 ¡15% Descuento de Miembro Aplicado!</span>
-            <span class="font-black text-white">-15%</span>
+            <div>
+              <span class="font-bold text-red-400">🔥 ¡5% Descuento Aplicado!</span>
+              <p class="text-[10px] text-gray-300">Beneficio activo por tener plan en ROCA GYM</p>
+            </div>
+            <span class="font-black text-white text-sm">-5%</span>
           </div>
         } @else {
           <div class="mt-4 rounded-xl border border-white/10 bg-zinc-900 p-3 text-xs text-gray-400">
-            💡 <strong class="text-white">Tip:</strong> Inicia sesión para obtener <span class="text-red-500 font-bold">15% OFF</span> en toda la tienda.
+            💡 <strong class="text-white">Tip:</strong> Inicia sesión con cualquier plan activo para obtener <span class="text-red-500 font-bold">5% de descuento</span> en toda la tienda.
           </div>
         }
 
@@ -49,7 +56,7 @@
                   <span class="text-2xl">{{ item.icon }}</span>
                   <div>
                     <h4 class="text-sm font-bold text-white">{{ item.name }}</h4>
-                    <p class="text-xs text-red-500 font-black">${{ item.price }} USD</p>
+                    <p class="text-xs text-red-500 font-black">{{ item.priceFormatted }}</p>
                   </div>
                 </div>
 
@@ -87,19 +94,19 @@
           <div class="mt-auto border-t border-white/10 pt-4 space-y-2">
             <div class="flex justify-between text-xs text-gray-400">
               <span>Subtotal:</span>
-              <span>${{ cart.subtotal().toFixed(2) }} USD</span>
+              <span>{{ cart.formatCOP(cart.subtotal()) }}</span>
             </div>
 
             @if (cart.discountAmount() > 0) {
               <div class="flex justify-between text-xs text-red-400 font-bold">
-                <span>Descuento Miembro (15%):</span>
-                <span>-${{ cart.discountAmount().toFixed(2) }} USD</span>
+                <span>Descuento Miembro (5%):</span>
+                <span>-{{ cart.formatCOP(cart.discountAmount()) }}</span>
               </div>
             }
 
             <div class="flex justify-between text-base font-black text-white border-t border-white/10 pt-2">
               <span>Total a Pagar:</span>
-              <span class="text-red-500">${{ cart.total().toFixed(2) }} USD</span>
+              <span class="text-red-500">{{ cart.formatCOP(cart.total()) }}</span>
             </div>
 
             <button
@@ -107,7 +114,7 @@
               (click)="checkout()"
               class="mt-4 w-full rounded-xl bg-red-600 py-4 text-xs font-black uppercase tracking-wider text-white shadow-[0_0_25px_rgba(220,38,38,0.3)] transition hover:bg-red-500"
             >
-              Confirmar & Pagar Order
+              Confirmar & Pagar Pedido
             </button>
           </div>
         }
@@ -133,33 +140,33 @@
                 @for (item of order.items; track item.id) {
                   <div class="flex justify-between text-xs text-gray-300">
                     <span>{{ item.icon }} {{ item.name }} ×{{ item.quantity }}</span>
-                    <span>${{ (item.price * item.quantity).toFixed(2) }}</span>
+                    <span>{{ cart.formatCOP(item.price * item.quantity) }}</span>
                   </div>
                 }
               </div>
               @if (order.discount > 0) {
                 <div class="mt-2 flex justify-between text-xs text-red-400 font-bold">
-                  <span>Descuento Miembro (15%)</span>
-                  <span>-${{ order.discount.toFixed(2) }}</span>
+                  <span>Descuento Miembro (5%)</span>
+                  <span>-{{ cart.formatCOP(order.discount) }}</span>
                 </div>
               }
               <div class="mt-2 flex justify-between border-t border-white/10 pt-2 font-black text-white">
                 <span>Total Pagado</span>
-                <span class="text-red-500">${{ order.total.toFixed(2) }} USD</span>
+                <span class="text-red-500">{{ cart.formatCOP(order.total) }}</span>
               </div>
             </div>
 
-            <p class="mt-3 text-xs text-gray-400">
-              Presenta el código <strong class="text-white">{{ order.pickupCode }}</strong> en recepción para retirar tus productos.
-            </p>
+            <div class="mt-4 rounded-xl border border-red-600/30 bg-black/60 p-4 text-xs text-gray-400">
+              <p>📍 Muestra tu <strong>Código de Retiro</strong> en recepción de la Sede Calle 80 #92-49 para reclamar tus productos.</p>
+            </div>
           }
 
           <button
             type="button"
-            (click)="closeCart()"
-            class="mt-6 w-full rounded-xl bg-red-600 py-3 text-xs font-black uppercase tracking-wider text-white transition hover:bg-red-500"
+            (click)="resetOrder()"
+            class="mt-6 w-full rounded-xl bg-white/10 py-3 text-xs font-black uppercase text-white hover:bg-white/20"
           >
-            Continuar Comprando
+            Seguir Comprando
           </button>
         </div>
       }

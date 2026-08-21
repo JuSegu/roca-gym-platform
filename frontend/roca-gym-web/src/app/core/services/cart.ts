@@ -38,9 +38,14 @@ export class CartService {
     this.cartItemsSignal().reduce((acc, item) => acc + item.price * item.quantity, 0)
   );
 
-  readonly discountRate = computed(() => (this.auth.isLoggedIn() ? 0.15 : 0));
+  // 5% de descuento para cualquier miembro con plan activo
+  readonly discountRate = computed(() => (this.auth.isLoggedIn() ? 0.05 : 0));
   readonly discountAmount = computed(() => this.subtotal() * this.discountRate());
   readonly total = computed(() => this.subtotal() - this.discountAmount());
+
+  formatCOP(amount: number): string {
+    return '$' + Math.round(amount).toLocaleString('es-CO') + ' COP';
+  }
 
   toggleCart(): void {
     this.isCartOpenSignal.update((open) => !open);

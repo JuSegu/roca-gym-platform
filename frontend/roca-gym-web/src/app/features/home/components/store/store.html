@@ -18,7 +18,7 @@
           Equípate para <span class="text-red-600">superar tus límites.</span>
         </h2>
         <p class="mt-4 text-base leading-relaxed text-gray-400">
-          Suplementos de grado farmacéutico, indumentaria y accesorios de alto rendimiento. <strong class="text-red-500 font-bold">15% OFF</strong> para miembros registrados con plan activo.
+          Suplementos de calidad prémium, indumentaria y accesorios de alto rendimiento. <strong class="text-red-500 font-bold">5% de descuento</strong> con cualquier plan activo.
         </p>
       </div>
 
@@ -30,7 +30,7 @@
       >
         <span>🛒 Carrito:</span>
         <span class="text-red-400">{{ cart.itemCount() }} item(s)</span>
-        <span class="font-bold text-white">${{ cart.total().toFixed(2) }}</span>
+        <span class="font-bold text-white">{{ cart.formatCOP(cart.total()) }}</span>
       </button>
     </div>
 
@@ -69,7 +69,7 @@
 
             <div class="mt-6 flex items-center justify-between border-t border-white/10 pt-4">
               <div>
-                <span class="text-xl font-black text-white">{{ product.priceFormatted }}</span>
+                <span class="text-lg font-black text-white">{{ product.priceFormatted }}</span>
               </div>
               <button
                 type="button"

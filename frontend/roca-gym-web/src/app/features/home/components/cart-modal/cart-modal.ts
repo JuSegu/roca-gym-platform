@@ -24,4 +24,9 @@ export class CartModal {
     const order = this.cart.checkout();
     if (order) this.isOrderPlaced.set(true);
   }
+
+  resetOrder(): void {
+    this.isOrderPlaced.set(false);
+    this.cart.closeCart();
+  }
 }

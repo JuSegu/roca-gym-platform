@@ -34,6 +34,7 @@ export class Plans {
       benefits: [
         'Acceso a todas las máquinas & peso libre',
         '1 Invitado diferente 2 veces al mes los fines de semana',
+        '5% OFF en Tienda de Suplementos ROCA',
         'Vestidores, duchas y lockers',
       ],
     },
@@ -47,8 +48,8 @@ export class Plans {
       benefits: [
         '5 meses de acceso continuo',
         '1 Invitado diferente 2 veces al mes los fines de semana',
+        '5% OFF en Tienda de Suplementos ROCA',
         '1 Evaluación física inicial',
-        '5% OFF en Tienda ROCA',
       ],
     },
     {
@@ -61,8 +62,8 @@ export class Plans {
       benefits: [
         '8 meses de entrenamiento total',
         '1 Invitado diferente 2 veces al mes los fines de semana',
+        '5% OFF en Tienda de Suplementos ROCA',
         '2 Evaluaciones físicas con entrenador',
-        '10% OFF en Tienda ROCA',
       ],
     },
     {
@@ -75,8 +76,8 @@ export class Plans {
       benefits: [
         'Acceso los 365 días del año',
         '1 Invitado diferente 2 veces al mes los fines de semana',
-        '15% OFF en suplementos y tienda',
-        'Rutinas guiadas en la plataforma',
+        '5% OFF en Tienda de Suplementos ROCA',
+        'Rutinas guiadas en la plataforma web',
       ],
     },
   ];
