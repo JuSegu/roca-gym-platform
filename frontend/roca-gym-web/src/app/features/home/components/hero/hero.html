@@ -1,43 +1,40 @@
 <section
   id="inicio"
-  class="relative flex min-h-screen items-center overflow-hidden bg-black px-6 pt-24"
+  class="relative flex min-h-screen items-center overflow-hidden bg-black px-6 pt-24 pb-16"
 >
-  <!-- Video de fondo -->
-  <video
-    class="absolute inset-0 h-full w-full object-cover"
-    autoplay
-    muted
-    loop
-    playsinline
-    poster="/images/facilities/entrenamiento.jpg"
-    aria-hidden="true"
-  >
-    <source src="/videos/roca-gym-hero.mp4" type="video/mp4" />
-  </video>
-  <div class="absolute inset-0 bg-black/65"></div>
+  <!-- MOTOR DEL RECORRIDO CINEMATOGRÁFICO EN VIVO (VIDEO TOUR EFFECT) -->
+  <div class="absolute inset-0 overflow-hidden pointer-events-none">
+    @for (scene of scenes; track scene.id; let i = $index) {
+      <div
+        class="absolute inset-0 h-full w-full transition-opacity duration-1000 ease-in-out"
+        [class.opacity-100]="currentSceneIndex() === i"
+        [class.opacity-0]="currentSceneIndex() !== i"
+      >
+        <img
+          [src]="scene.image"
+          [alt]="scene.title"
+          class="h-full w-full object-cover object-center transition-transform duration-[6000ms] ease-out"
+          [class.scale-110]="currentSceneIndex() === i"
+          [class.scale-100]="currentSceneIndex() !== i"
+        />
+      </div>
+    }
+  </div>
 
-  <!-- FONDO CON EFECTOS -->
-  <div
-    class="absolute inset-0 bg-[radial-gradient(circle_at_70%_40%,rgba(220,38,38,0.2),transparent_45%)]"
-  ></div>
+  <!-- CAPAS DE GRADIENTE & OSCURECIMIENTO CINEMATOGRÁFICO -->
+  <div class="absolute inset-0 bg-gradient-to-r from-black/90 via-black/75 to-black/60"></div>
+  <div class="absolute inset-0 bg-gradient-to-t from-black via-transparent to-black/80"></div>
+  <div class="absolute inset-0 bg-[radial-gradient(circle_at_20%_40%,rgba(220,38,38,0.25),transparent_55%)]"></div>
 
-  <div
-    class="absolute -right-40 top-1/4 h-96 w-96 rounded-full bg-red-600/10 blur-3xl pointer-events-none"
-  ></div>
-
-  <div
-    class="absolute -left-40 bottom-0 h-96 w-96 rounded-full bg-red-900/10 blur-3xl pointer-events-none"
-  ></div>
-
-  <!-- CONTENIDO -->
+  <!-- CONTENIDO PRINCIPAL -->
   <div class="relative z-10 mx-auto w-full max-w-7xl">
     <div class="max-w-4xl">
 
-      <!-- BADGE -->
+      <!-- BADGE DE SEDE Y HORARIOS -->
       <div
-        class="mb-6 inline-flex items-center gap-3 rounded-full border border-red-600/30 bg-red-600/10 px-4 py-2"
+        class="mb-6 inline-flex flex-wrap items-center gap-3 rounded-full border border-red-600/40 bg-black/60 px-4 py-2 backdrop-blur-md"
       >
-        <span class="h-2 w-2 animate-pulse rounded-full bg-red-500"></span>
+        <span class="h-2 w-2 animate-ping rounded-full bg-red-500"></span>
 
         <span
           class="text-xs font-bold uppercase tracking-[0.25em] text-red-500"
@@ -48,7 +45,7 @@
 
       <!-- TITLE -->
       <h1
-        class="text-6xl font-black uppercase leading-[0.85] tracking-tight text-white sm:text-7xl lg:text-9xl"
+        class="text-6xl font-black uppercase leading-[0.85] tracking-tight text-white sm:text-7xl lg:text-9xl drop-shadow-[0_10px_30px_rgba(0,0,0,0.9)]"
       >
         ROCA
         <span class="block text-red-600">
@@ -58,7 +55,7 @@
 
       <!-- DESCRIPTION -->
       <p
-        class="mt-6 max-w-2xl text-lg leading-relaxed text-gray-300 sm:text-xl"
+        class="mt-6 max-w-2xl text-lg leading-relaxed text-gray-200 sm:text-xl drop-shadow-md"
       >
         Entrena más fuerte. Supera tus límites. Maquinaria de alto impacto, la mejor comunidad y resultados reales.
       </p>
@@ -68,7 +65,7 @@
 
         <a
           href="#planes"
-          class="group inline-flex items-center justify-center gap-3 rounded-xl bg-red-600 px-7 py-4 text-sm font-black uppercase tracking-wider text-white shadow-[0_0_30px_rgba(220,38,38,0.3)] transition hover:bg-red-500 hover:shadow-[0_0_40px_rgba(220,38,38,0.5)]"
+          class="group inline-flex items-center justify-center gap-3 rounded-xl bg-red-600 px-7 py-4 text-sm font-black uppercase tracking-wider text-white shadow-[0_0_30px_rgba(220,38,38,0.4)] transition hover:bg-red-500 hover:shadow-[0_0_40px_rgba(220,38,38,0.6)]"
         >
           Ver planes
 
@@ -81,7 +78,7 @@
 
         <a
           href="#ubicacion"
-          class="inline-flex items-center justify-center gap-2 rounded-xl border border-white/20 bg-white/5 px-7 py-4 text-sm font-black uppercase tracking-wider text-white backdrop-blur transition hover:border-red-600/50 hover:bg-red-600/10"
+          class="inline-flex items-center justify-center gap-2 rounded-xl border border-white/20 bg-black/50 px-7 py-4 text-sm font-black uppercase tracking-wider text-white backdrop-blur-md transition hover:border-red-600/50 hover:bg-red-600/15"
         >
           <span>📍</span>
           <span>Sede, Horarios & Cómo Llegar</span>
@@ -89,14 +86,14 @@
 
       </div>
 
-      <!-- STATS & HORARIOS COMPLETOS PARA LOS 7 DÍAS -->
+      <!-- HORARIOS COMPLETOS PARA LOS 7 DÍAS -->
       <div
-        class="mt-14 grid max-w-3xl grid-cols-2 gap-4 border-t border-white/10 pt-6 sm:grid-cols-4"
+        class="mt-12 grid max-w-3xl grid-cols-2 gap-3.5 border-t border-white/10 pt-6 sm:grid-cols-4"
       >
 
         <!-- Lunes a Viernes -->
-        <div class="rounded-xl border border-white/5 bg-black/50 p-3.5">
-          <p class="text-base font-black text-white sm:text-lg">
+        <div class="rounded-xl border border-white/10 bg-black/65 p-3.5 backdrop-blur-md shadow-lg">
+          <p class="text-base font-black text-white sm:text-lg font-mono">
             5:00 AM
           </p>
           <p class="text-xs font-bold text-red-500">
@@ -110,8 +107,8 @@
         </div>
 
         <!-- Sábados -->
-        <div class="rounded-xl border border-white/5 bg-black/50 p-3.5">
-          <p class="text-base font-black text-white sm:text-lg">
+        <div class="rounded-xl border border-white/10 bg-black/65 p-3.5 backdrop-blur-md shadow-lg">
+          <p class="text-base font-black text-white sm:text-lg font-mono">
             8:00 AM
           </p>
           <p class="text-xs font-bold text-red-500">
@@ -125,8 +122,8 @@
         </div>
 
         <!-- Domingos & Festivos -->
-        <div class="rounded-xl border border-white/5 bg-black/50 p-3.5">
-          <p class="text-base font-black text-white sm:text-lg">
+        <div class="rounded-xl border border-white/10 bg-black/65 p-3.5 backdrop-blur-md shadow-lg">
+          <p class="text-base font-black text-white sm:text-lg font-mono">
             8:00 AM
           </p>
           <p class="text-xs font-bold text-red-500">
@@ -135,13 +132,13 @@
           <p
             class="mt-1 text-[10px] font-bold uppercase tracking-wider text-gray-400"
           >
-            Dom (Festivos a 2pm)
+            Dom (Festivos 8a-2p)
           </p>
         </div>
 
         <!-- Dirección Exacta -->
-        <div class="rounded-xl border border-white/5 bg-black/50 p-3.5">
-          <p class="text-base font-black text-white sm:text-lg">
+        <div class="rounded-xl border border-white/10 bg-black/65 p-3.5 backdrop-blur-md shadow-lg">
+          <p class="text-base font-black text-white sm:text-lg font-mono">
             Cll 80
           </p>
           <p class="text-xs font-bold text-red-500">
@@ -158,4 +155,41 @@
 
     </div>
   </div>
+
+  <!-- CONTROL Y CONTADOR FLOTANTE DEL RECORRIDO VIRTUAL (ESQUINA INFERIOR DERECHA DEL HERO) -->
+  <div class="absolute bottom-6 right-6 z-20 hidden md:flex flex-col items-end gap-2">
+    
+    <!-- Badge de Grabación en Vivo -->
+    <div class="flex items-center gap-2.5 rounded-full border border-white/15 bg-black/80 px-4 py-1.5 backdrop-blur-xl shadow-2xl">
+      <span class="flex h-2.5 w-2.5 rounded-full bg-red-600 animate-pulse"></span>
+      <span class="font-mono text-[11px] font-black uppercase text-white">
+        TOUR VIRTUAL · {{ scenes[currentSceneIndex()].step }}
+      </span>
+      <span class="text-xs text-red-500 font-bold">|</span>
+      <span class="text-[11px] font-bold text-gray-300">
+        {{ scenes[currentSceneIndex()].title }}
+      </span>
+    </div>
+
+    <!-- Navegador de Escenas en Miniatura / Selector Rápido -->
+    <div class="flex items-center gap-2">
+      @for (scene of scenes; track scene.id; let i = $index) {
+        <button
+          type="button"
+          (click)="selectScene(i)"
+          class="relative h-12 w-20 overflow-hidden rounded-lg border transition-all duration-300"
+          [class]="currentSceneIndex() === i ? 'border-red-500 scale-105 shadow-[0_0_15px_rgba(220,38,38,0.6)] ring-2 ring-red-600/40' : 'border-white/20 opacity-50 hover:opacity-100'"
+          [title]="scene.title"
+        >
+          <img [src]="scene.image" [alt]="scene.title" class="h-full w-full object-cover" />
+          <div class="absolute inset-0 bg-black/20"></div>
+          <span class="absolute bottom-0.5 right-1 text-[8px] font-mono font-bold text-white drop-shadow">
+            0{{ i + 1 }}
+          </span>
+        </button>
+      }
+    </div>
+
+  </div>
+
 </section>
