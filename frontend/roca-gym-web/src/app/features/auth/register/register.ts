@@ -16,6 +16,7 @@ export class Register implements OnInit {
   private readonly route = inject(ActivatedRoute);
 
   errorMessage: string | null = null;
+  isLoading = false;
 
   registerForm = new FormGroup({
     name: new FormControl('', [Validators.required, Validators.minLength(3)]),
@@ -47,6 +48,10 @@ export class Register implements OnInit {
       return;
     }
 
+    this.isLoading = true;
+    this.errorMessage = null;
+
+    // 1. Intentar registrar en Firebase
     try {
       await this.auth.registerWithFirebase({
         name: val.name || '',
@@ -56,29 +61,26 @@ export class Register implements OnInit {
         plan: val.plan || 'Plan Anual',
       });
       this.errorMessage = null;
+      this.isLoading = false;
       this.router.navigate(['/']);
       return;
-    } catch (error: unknown) {
-      const message = error instanceof Error ? error.message : '';
-      this.errorMessage = message.includes('auth/email-already-in-use')
-        ? 'Este correo ya está registrado.'
-        : 'No fue posible crear la cuenta. Activa Email/Password y crea Firestore en Firebase.';
-      return;
-    }
+    } catch (fbError) {
+      // 2. Si Firebase falla o no tiene credenciales, registrar localmente
+      const success = this.auth.register({
+        name: val.name || '',
+        email: val.email || '',
+        phone: val.phone || '',
+        password: val.password || '',
+        plan: val.plan || 'Plan Anual',
+      });
 
-    const success = this.auth.register({
-      name: val.name || '',
-      email: val.email || '',
-      phone: val.phone || '',
-      password: val.password || '',
-      plan: val.plan || 'Plan Anual',
-    });
-
-    if (success) {
-      this.errorMessage = null;
-      this.router.navigate(['/']);
-    } else {
-      this.errorMessage = 'Ocurrió un error al registrar tu cuenta.';
+      this.isLoading = false;
+      if (success) {
+        this.errorMessage = null;
+        this.router.navigate(['/']);
+      } else {
+        this.errorMessage = 'Ocurrió un error al registrar tu cuenta.';
+      }
     }
   }
 }

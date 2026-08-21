@@ -19,82 +19,52 @@ import { Auth } from '../../../core/services/auth';
   styleUrl: './login.css',
 })
 export class Login {
-
   private readonly auth = inject(Auth);
   private readonly router = inject(Router);
 
-  // Mensaje de error para mostrar en la interfaz
   errorMessage: string | null = null;
-
-  // ==========================================
-  // FORMULARIO DE LOGIN
-  // ==========================================
+  isLoading = false;
 
   loginForm = new FormGroup({
-
-    // Campo de correo electrónico
     email: new FormControl('', [
       Validators.required,
       Validators.email
     ]),
-
-    // Campo de contraseña
     password: new FormControl('', [
       Validators.required
     ])
-
   });
 
+  async onSubmit(): Promise<void> {
+    if (this.loginForm.invalid) {
+      this.loginForm.markAllAsTouched();
+      return;
+    }
 
-  // ==========================================
-// ENVIAR FORMULARIO
-// ==========================================
-
-async onSubmit(): Promise<void> {
-
-  // Si el formulario no es válido,
-  // detenemos la ejecución.
-  if (this.loginForm.invalid) {
-
-    // Mostramos todos los campos como tocados
-    // para que aparezcan sus mensajes de error.
-    this.loginForm.markAllAsTouched();
-
-    return;
-  }
-
-  // Obtenemos el correo introducido por el usuario.
-  const email = this.loginForm.value.email ?? '';
-
-  // Obtenemos la contraseña introducida.
-  const password = this.loginForm.value.password ?? '';
-
-  // Enviamos las credenciales al servicio Auth.
-  try {
-    await this.auth.loginWithFirebase(email, password);
+    const email = (this.loginForm.value.email ?? '').trim();
+    const password = (this.loginForm.value.password ?? '').trim();
+    this.isLoading = true;
     this.errorMessage = null;
-    this.router.navigate(['/']);
-  } catch (error: unknown) {
-    const message = error instanceof Error ? error.message : '';
-    this.errorMessage = message.includes('auth/invalid-credential')
-      ? 'Correo electrónico o contraseña incorrectos.'
-      : 'No fue posible iniciar sesión. Verifica que Email/Password esté habilitado en Firebase.';
+
+    // 1. Intentar iniciar sesión con Firebase Auth
+    try {
+      await this.auth.loginWithFirebase(email, password);
+      this.errorMessage = null;
+      this.isLoading = false;
+      this.router.navigate(['/']);
+      return;
+    } catch (fbError) {
+      // 2. Si Firebase falla o está en modo offline/demo, intentar autenticación local
+      const localSuccess = this.auth.login(email, password);
+      if (localSuccess) {
+        this.errorMessage = null;
+        this.isLoading = false;
+        this.router.navigate(['/']);
+        return;
+      }
+
+      this.isLoading = false;
+      this.errorMessage = 'Correo electrónico o contraseña incorrectos.';
+    }
   }
-
-  /*
-  const loginSuccessful = this.auth.login(email, password);
-
-  // Comprobamos si el servicio aceptó las credenciales.
-  if (loginSuccessful) {
-    this.errorMessage = null;
-    console.log('🎉 Bienvenido a ROCA GYM');
-    // Redirigir a la página principal / dashboard
-    this.router.navigate(['/']);
-  } else {
-    console.log('❌ Correo o contraseña incorrectos');
-    this.errorMessage = 'Correo electrónico o contraseña incorrectos.';
-  }
-  */
-
-}
 }

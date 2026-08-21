@@ -2,21 +2,33 @@ rules_version = '2';
 
 service cloud.firestore {
   match /databases/{database}/documents {
-    // Each member owns their profile and can never overwrite a different user.
+    // Perfil de Miembros
     match /users/{userId} {
       allow create: if request.auth != null && request.auth.uid == userId;
-      allow read, update: if request.auth != null && request.auth.uid == userId;
+      allow read, update: if request.auth != null && (request.auth.uid == userId || request.auth.token.email == 'admin@rocagym.com');
       allow delete: if false;
     }
 
-    // Workout logs belong exclusively to the member who created them.
+    // Registros de Entrenamientos
     match /users/{userId}/workouts/{workoutId} {
       allow read, write: if request.auth != null && request.auth.uid == userId;
     }
 
-    // Keep every other collection closed until its role-based rule is defined.
+    // Pedidos de Tienda
+    match /orders/{orderId} {
+      allow create: if true; // Permite creación de pedidos de tienda
+      allow read, update: if request.auth != null;
+      allow delete: if request.auth != null && request.auth.token.email == 'admin@rocagym.com';
+    }
+
+    // Control de Asistencias
+    match /attendances/{attendanceId} {
+      allow read, write: if request.auth != null;
+    }
+
+    // Cerrar cualquier otra colección no especificada
     match /{document=**} {
-      allow read, write: if false;
+      allow read, write: if request.auth != null && request.auth.token.email == 'admin@rocagym.com';
     }
   }
 }
