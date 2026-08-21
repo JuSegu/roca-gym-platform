@@ -11,6 +11,9 @@ import { CartModal } from './components/cart-modal/cart-modal';
 import { Footer } from './components/footer/footer';
 import { GymRadio } from './components/gym-radio/gym-radio';
 import { IdleScreen } from './components/idle-screen/idle-screen';
+import { Testimonials } from './components/testimonials/testimonials';
+import { Faq } from './components/faq/faq';
+import { WhatsappButton } from './components/whatsapp-button/whatsapp-button';
 import { Auth } from '../../core/services/auth';
 import { CartService } from '../../core/services/cart';
 
@@ -30,6 +33,9 @@ import { CartService } from '../../core/services/cart';
     GymRadio,
     Footer,
     IdleScreen,
+    Testimonials,
+    Faq,
+    WhatsappButton,
   ],
   templateUrl: './home.html',
   styleUrl: './home.css',

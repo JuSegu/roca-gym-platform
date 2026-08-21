@@ -31,26 +31,20 @@ export class CartModal {
     {
       id: 'Nequi / Daviplata',
       title: 'Nequi / Daviplata',
-      icon: '📱',
-      desc: 'Transferencia instantánea sin costo a la cuenta oficial de ROCA GYM.',
+      icon: '📲',
+      desc: 'Transfiere al número de ROCA GYM y presenta el comprobante en recepción.',
     },
     {
-      id: 'PSE / Bancolombia',
-      title: 'PSE / Transferencia',
+      id: 'Transferencia Bancaria',
+      title: 'Transferencia Bancaria',
       icon: '🏦',
-      desc: 'Débito seguro desde cualquier banco colombiano (Bancolombia, Davivienda, etc).',
+      desc: 'Pago por PSE, Bancolombia, Davivienda u otro banco colombiano.',
     },
     {
-      id: 'Tarjeta de Crédito / Débito',
-      title: 'Tarjeta Visa / Mastercard',
-      icon: '💳',
-      desc: 'Procesamiento seguro con pasarela cifrada de 256 bits.',
-    },
-    {
-      id: 'Efectivo o Datáfono en Recepción',
-      title: 'Pago en Recepción Sede Calle 80',
-      icon: '🏢',
-      desc: 'Paga al retirar tus suplementos con efectivo o datáfono.',
+      id: 'Efectivo en Recepción',
+      title: 'Efectivo en Sede',
+      icon: '💵',
+      desc: 'Paga en efectivo cuando retires tu pedido en Calle 80 #92-49.',
     },
   ];
 

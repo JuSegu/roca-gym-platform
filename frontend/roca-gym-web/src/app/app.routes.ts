@@ -13,6 +13,7 @@ import { Register } from './features/auth/register/register';
 import { ForgotPassword } from './features/auth/forgot-password/forgot-password';
 import { Admin } from './features/admin/admin';
 import { adminGuard } from './core/guards/admin.guard';
+import { NotFound } from './features/not-found/not-found';
 
 export const routes: Routes = [
   // Página principal
@@ -44,9 +45,9 @@ export const routes: Routes = [
     canActivate: [adminGuard],
   },
 
-  // Cualquier ruta inexistente vuelve al inicio
+  // Ruta 404 — página no encontrada con branding ROCA GYM
   {
     path: '**',
-    redirectTo: '',
+    component: NotFound,
   },
 ];

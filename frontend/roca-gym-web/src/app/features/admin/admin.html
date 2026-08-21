@@ -38,6 +38,36 @@
       </div>
     </div>
 
+    <!-- Gráfica de Ingresos (Admin) -->
+    <div class="mb-8 rounded-2xl border border-white/10 bg-black/60 p-6">
+      <div class="flex items-center justify-between border-b border-white/10 pb-4">
+        <div>
+          <h3 class="text-lg font-black uppercase text-white">Ingresos Últimos 7 Días</h3>
+          <p class="text-xs text-gray-400 mt-1">Ventas de tienda online y recepción</p>
+        </div>
+        <span class="text-2xl">📊</span>
+      </div>
+
+      <div class="mt-6 h-40 w-full flex items-end justify-between gap-2 px-2 sm:px-6">
+        @for (day of incomeChartData; track day.day) {
+          <div class="flex flex-col items-center gap-2 w-full group">
+            <div class="relative w-full flex justify-center h-32 items-end">
+              <!-- Tooltip -->
+              <div class="absolute -top-8 opacity-0 group-hover:opacity-100 transition-opacity bg-black border border-emerald-500/50 rounded px-2 py-1 text-[10px] font-bold text-emerald-400 z-10 whitespace-nowrap">
+                {{ formatCOP(day.amount) }}
+              </div>
+              <!-- Barra -->
+              <div
+                class="w-full max-w-[3rem] rounded-t-sm bg-gradient-to-t from-emerald-950 to-emerald-600 transition-all duration-500 group-hover:from-emerald-600 group-hover:to-emerald-400"
+                [style.height]="day.height"
+              ></div>
+            </div>
+            <span class="text-[10px] font-bold uppercase text-gray-400">{{ day.day }}</span>
+          </div>
+        }
+      </div>
+    </div>
+
     <!-- PESTAÑAS DE NAVEGACIÓN -->
     <nav class="mb-6 flex gap-2 overflow-x-auto pb-1" aria-label="Secciones administrativas">
       <button

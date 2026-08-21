@@ -41,6 +41,34 @@ export class Dashboard {
     this.routineService.getPercentagesTable(this.calculated1RM())
   );
 
+  // Alerta de Membresía
+  daysRemaining = computed(() => {
+    // Simulación: Quedan 4 días para que expire la membresía (para mostrar la alerta)
+    return 4; 
+  });
+
+  // Historial de Asistencias (Simulado para los últimos 14 días)
+  recentAttendances = [
+    { date: 'Hoy', attended: true },
+    { date: 'Ayer', attended: true },
+    { date: 'Mie', attended: false },
+    { date: 'Mar', attended: true },
+    { date: 'Lun', attended: true },
+    { date: 'Dom', attended: false },
+    { date: 'Sab', attended: false },
+  ];
+
+  // Datos para la gráfica de progreso de PRs
+  prChartData = [
+    { label: 'Ene', value: 80, height: '40%' },
+    { label: 'Feb', value: 85, height: '45%' },
+    { label: 'Mar', value: 92, height: '55%' },
+    { label: 'Abr', value: 95, height: '60%' },
+    { label: 'May', value: 105, height: '75%' },
+    { label: 'Jun', value: 110, height: '85%' },
+    { label: 'Jul', value: 120, height: '100%' },
+  ];
+
   // Pedidos del usuario en tienda
   myOrders = () => {
     const email = this.auth.currentUser()?.email;

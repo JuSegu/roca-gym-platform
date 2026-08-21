@@ -11,9 +11,8 @@ export interface OrderItem {
 
 export type PaymentMethod =
   | 'Nequi / Daviplata'
-  | 'PSE / Bancolombia'
-  | 'Tarjeta de Crédito / Débito'
-  | 'Efectivo o Datáfono en Recepción';
+  | 'Transferencia Bancaria'
+  | 'Efectivo en Recepción';
 
 export interface StoreOrder {
   id: string;

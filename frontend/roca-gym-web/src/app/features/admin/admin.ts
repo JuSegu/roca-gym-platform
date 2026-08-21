@@ -111,6 +111,17 @@ export class Admin {
   });
 
   // Métricas financieras y operativas
+  // Datos para la gráfica de ingresos de los últimos 7 días
+  incomeChartData = [
+    { day: 'Lun', amount: 150000, height: '30%' },
+    { day: 'Mar', amount: 320000, height: '64%' },
+    { day: 'Mie', amount: 210000, height: '42%' },
+    { day: 'Jue', amount: 180000, height: '36%' },
+    { day: 'Vie', amount: 450000, height: '90%' },
+    { day: 'Sab', amount: 500000, height: '100%' },
+    { day: 'Dom', amount: 120000, height: '24%' },
+  ];
+
   totalStoreRevenueCOP = computed(() =>
     this.db.orders().reduce((acc, o) => acc + o.total, 0)
   );
