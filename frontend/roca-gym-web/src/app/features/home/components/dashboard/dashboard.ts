@@ -7,17 +7,6 @@ import { GamificationService } from '../../../../core/services/gamification.serv
 import { RoutineService } from '../../../../core/services/routine.service';
 import { WorkoutModal } from '../workout-modal/workout-modal';
 
-interface ClassSession {
-  id: number;
-  name: string;
-  category: string;
-  time: string;
-  trainer: string;
-  capacity: string;
-  isFull: boolean;
-  booked: boolean;
-}
-
 @Component({
   selector: 'app-dashboard',
   standalone: true,
@@ -31,14 +20,14 @@ export class Dashboard {
   readonly gamification = inject(GamificationService);
   readonly routineService = inject(RoutineService);
 
-  // Active Tab
+  // Pestañas del Panel de Atleta
   activeTab = signal<'home' | 'routines' | 'gamification' | 'prs' | 'orders'>('home');
 
   // Modals
   showQrModal = signal(false);
   showWorkoutModal = signal(false);
 
-  // 1RM Calculator State
+  // Calculadora 1RM (Fuerza Máxima)
   calcExercise = signal<string>('Press de Banca Plano');
   calcWeight = signal<number>(80);
   calcReps = signal<number>(6);
@@ -52,45 +41,12 @@ export class Dashboard {
     this.routineService.getPercentagesTable(this.calculated1RM())
   );
 
-  // Filtered orders
+  // Pedidos del usuario en tienda
   myOrders = () => {
     const email = this.auth.currentUser()?.email;
     if (!email) return [];
     return this.db.orders().filter((o) => o.userEmail === email);
   };
-
-  classes = signal<ClassSession[]>([
-    {
-      id: 1,
-      name: 'Spinning Extreme',
-      category: 'Cardio & Resistencia',
-      time: '06:00 PM - 07:00 PM',
-      trainer: 'Carlos Mendoza',
-      capacity: '18 / 20 Cupos',
-      isFull: false,
-      booked: false,
-    },
-    {
-      id: 2,
-      name: 'CrossFit Power',
-      category: 'Fuerza & Condicionamiento',
-      time: '07:30 PM - 08:30 PM',
-      trainer: 'Valeria Gómez',
-      capacity: 'Lleno',
-      isFull: true,
-      booked: false,
-    },
-    {
-      id: 3,
-      name: 'Yoga & Recuperación',
-      category: 'Movilidad & Flexibilidad',
-      time: '08:30 PM - 09:30 PM',
-      trainer: 'Sofía Ramos',
-      capacity: '10 / 15 Cupos',
-      isFull: false,
-      booked: false,
-    },
-  ]);
 
   calcPercentage(value: number, target: number): number {
     if (!target || target <= 0) return 0;
@@ -108,17 +64,6 @@ export class Dashboard {
   startSpecificRoutine(routineId: string): void {
     this.routineService.setActiveRoutine(routineId);
     this.showWorkoutModal.set(true);
-  }
-
-  toggleBooking(classId: number): void {
-    this.classes.update((items) =>
-      items.map((item) => {
-        if (item.id === classId && !item.isFull) {
-          return { ...item, booked: !item.booked };
-        }
-        return item;
-      })
-    );
   }
 
   saveCalculatedPR(): void {

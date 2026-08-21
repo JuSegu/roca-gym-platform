@@ -255,62 +255,9 @@
 
         </div>
 
-        <!-- COLUMNA DERECHA: CLASES GRUPALES -->
+        <!-- COLUMNA DERECHA: ESTADO DEL PLAN Y SEDE -->
         <div class="space-y-8">
           
-          <div class="rounded-2xl border border-white/10 bg-zinc-950 p-6">
-            <div class="flex items-center justify-between border-b border-white/10 pb-4">
-              <h3 class="text-lg font-black uppercase text-white">Clases de Hoy</h3>
-              <span class="text-xs text-gray-500">Sede Central</span>
-            </div>
-
-            <div class="mt-4 space-y-4">
-              @for (c of classes(); track c.id) {
-                <div class="rounded-xl border border-white/10 bg-black/60 p-4">
-                  <div class="flex items-start justify-between">
-                    <div>
-                      <span class="text-[10px] font-bold uppercase tracking-wider text-red-500">{{ c.category }}</span>
-                      <h4 class="font-black text-white">{{ c.name }}</h4>
-                    </div>
-                    <span
-                      class="text-[10px] font-black uppercase px-2 py-0.5 rounded"
-                      [class]="c.isFull ? 'bg-zinc-800 text-gray-500' : 'bg-red-600/20 text-red-400'"
-                    >
-                      {{ c.capacity }}
-                    </span>
-                  </div>
-
-                  <div class="mt-3 flex items-center justify-between text-xs text-gray-400">
-                    <span>⏰ {{ c.time }}</span>
-                    <span>👨‍🏫 {{ c.trainer }}</span>
-                  </div>
-
-                  <button
-                    type="button"
-                    (click)="toggleBooking(c.id)"
-                    [disabled]="c.isFull"
-                    class="mt-4 w-full rounded-lg border py-2 text-xs font-black uppercase tracking-wider transition"
-                    [class]="
-                      c.booked
-                        ? 'border-green-600/50 bg-green-950/40 text-green-400'
-                        : c.isFull
-                        ? 'border-white/10 bg-zinc-900 text-gray-600 cursor-not-allowed'
-                        : 'border-red-600/50 bg-red-600/10 text-red-500 hover:bg-red-600 hover:text-white'
-                    "
-                  >
-                    @if (c.booked) {
-                      ✓ Clase Reservada
-                    } @else if (c.isFull) {
-                      Cupos Agotados
-                    } @else {
-                      Reservar Cupo
-                    }
-                  </button>
-                </div>
-              }
-            </div>
-          </div>
-
           <!-- Detalle de tu Plan -->
           <div class="rounded-2xl border border-white/10 bg-zinc-950 p-6">
             <h3 class="text-lg font-black uppercase text-white border-b border-white/10 pb-4">Detalle de tu Plan</h3>
@@ -331,7 +278,45 @@
             </div>
 
             <div class="mt-6 border-t border-white/10 pt-4">
-              <p class="text-xs text-gray-400">Beneficios incluidos: Acceso total a sala, 1 invitado diferente 2 veces al mes los fines de semana y 5% OFF en suplementos y tienda.</p>
+              <p class="text-xs text-gray-400 leading-relaxed">
+                ✨ <strong>Beneficios incluidos:</strong> Acceso ilimitado a sala de máquinas y peso libre, <strong>1 invitado diferente 2 veces al mes los fines de semana</strong> y <strong>5% OFF</strong> en toda la tienda de suplementos.
+              </p>
+            </div>
+          </div>
+
+          <!-- Estado de la Sede Calle 80 -->
+          <div class="rounded-2xl border border-white/10 bg-zinc-950 p-6">
+            <div class="flex items-center justify-between border-b border-white/10 pb-3">
+              <h3 class="text-base font-black uppercase text-white">Sede Calle 80 #92-49</h3>
+              <span class="text-xs text-green-400 font-bold">Abierto</span>
+            </div>
+
+            <div class="mt-4 space-y-2 text-xs text-gray-400">
+              <div class="flex justify-between">
+                <span>Aforo actual en sala:</span>
+                <strong class="text-white font-mono font-bold">{{ db.currentCapacity() }} / {{ db.maxCapacity }} Atletas</strong>
+              </div>
+              <div class="flex justify-between">
+                <span>Lunes a Viernes:</span>
+                <span class="text-zinc-300 font-mono">5:00 AM - 10:00 PM</span>
+              </div>
+              <div class="flex justify-between">
+                <span>Sábados:</span>
+                <span class="text-zinc-300 font-mono">8:00 AM - 3:00 PM</span>
+              </div>
+              <div class="flex justify-between">
+                <span>Domingos / Festivos:</span>
+                <span class="text-zinc-300 font-mono">8:00 AM - 1:00 PM / 2:00 PM</span>
+              </div>
+            </div>
+
+            <div class="mt-4 border-t border-white/10 pt-3">
+              <a
+                href="#ubicacion"
+                class="block w-full rounded-xl border border-white/10 bg-white/5 py-2.5 text-center text-xs font-black uppercase text-gray-300 hover:border-red-600/40 hover:text-white transition"
+              >
+                📍 Ver Cómo Llegar (Quirigua)
+              </a>
             </div>
           </div>
 
@@ -733,7 +718,7 @@
           <div class="flex flex-col items-center justify-center rounded-2xl border border-white/10 bg-zinc-950/80 py-20 text-center">
             <span class="text-5xl">🛍️</span>
             <h3 class="mt-4 text-xl font-black text-white">Aún no tienes compras</h3>
-            <p class="mt-2 text-sm text-gray-400">Explora la tienda y añade suplementos a tu carrito con tu 15% OFF de miembro activo.</p>
+            <p class="mt-2 text-sm text-gray-400">Explora la tienda oficial y añade suplementos con tu 5% OFF de miembro activo.</p>
           </div>
         } @else {
           <div class="space-y-4">
@@ -753,9 +738,10 @@
                         <p class="text-sm text-gray-300">{{ item.icon }} {{ item.name }} <span class="text-gray-500">×{{ item.quantity }}</span></p>
                       }
                     </div>
+                    <p class="mt-2 text-xs text-gray-400">💳 {{ order.paymentMethod }}</p>
                   </div>
                   <div class="flex flex-col items-start gap-2 sm:items-end">
-                    <p class="text-xl font-black text-white">${{ order.total.toFixed(2) }} <span class="text-xs font-bold text-gray-500">USD</span></p>
+                    <p class="text-xl font-black font-mono text-red-400">${{ order.total.toLocaleString('es-CO') }} COP</p>
                     <div class="rounded-lg border border-white/10 bg-black/40 px-3 py-1.5 text-center">
                       <p class="text-[9px] font-bold uppercase tracking-widest text-gray-500">Código de Retiro</p>
                       <p class="font-mono text-sm font-black text-red-300">{{ order.pickupCode }}</p>

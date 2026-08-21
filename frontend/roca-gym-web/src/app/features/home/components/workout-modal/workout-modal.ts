@@ -1,4 +1,4 @@
-import { Component, EventEmitter, Output, inject, signal, OnDestroy, OnInit } from '@angular/core';
+import { Component, EventEmitter, Output, inject, signal, computed, OnDestroy, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { Auth } from '../../../../core/services/auth';
@@ -6,7 +6,14 @@ import { RoutineService } from '../../../../core/services/routine.service';
 import { GamificationService } from '../../../../core/services/gamification.service';
 import { AudioPlayerService } from '../../../../core/services/audio-player.service';
 
-interface ActiveExercise {
+export interface SetEntry {
+  setNumber: number;
+  weight: number;
+  reps: number;
+  completed: boolean;
+}
+
+export interface ActiveExercise {
   id: number;
   name: string;
   muscleGroup: string;
@@ -16,7 +23,7 @@ interface ActiveExercise {
   image: string;
   restSeconds: number;
   notes: string;
-  completedSeries: boolean[];
+  sets: SetEntry[];
 }
 
 @Component({
@@ -38,52 +45,157 @@ export class WorkoutModal implements OnInit, OnDestroy {
   activeRoutine = this.routineService.activeRoutine;
   exercises = signal<ActiveExercise[]>([]);
 
+  // Live Workout Clock & Calories
+  elapsedSeconds = signal(0);
+  private workoutClockInterval: any = null;
+
   // Rest Timer
   restTime = signal(60);
   initialRestTime = signal(60);
   isTimerRunning = signal(false);
   private timerInterval: any = null;
 
+  // Achievement Popups during workout
+  newPrCelebration = signal<string | null>(null);
+
+  // Total Volume & Sets Computed
+  totalSetsCompleted = computed(() => {
+    return this.exercises().reduce(
+      (acc, ex) => acc + ex.sets.filter((s) => s.completed).length,
+      0
+    );
+  });
+
+  totalTargetSets = computed(() => {
+    return this.exercises().reduce((acc, ex) => acc + ex.sets.length, 0);
+  });
+
+  totalVolumeKg = computed(() => {
+    return this.exercises().reduce((acc, ex) => {
+      return (
+        acc +
+        ex.sets
+          .filter((s) => s.completed)
+          .reduce((sAcc, s) => sAcc + s.weight * s.reps, 0)
+      );
+    }, 0);
+  });
+
+  estimatedCalories = computed(() => {
+    const base = Math.floor(this.elapsedSeconds() * 0.12);
+    const setBonus = this.totalSetsCompleted() * 18;
+    return base + setBonus;
+  });
+
+  formattedWorkoutTime = computed(() => {
+    const total = this.elapsedSeconds();
+    const mins = Math.floor(total / 60);
+    const secs = total % 60;
+    return `${mins.toString().padStart(2, '0')}:${secs.toString().padStart(2, '0')}`;
+  });
+
   ngOnInit(): void {
     const routine = this.activeRoutine();
-    const exList: ActiveExercise[] = routine.exercises.map((ex) => ({
-      ...ex,
-      completedSeries: Array.from({ length: ex.targetSeries }, () => false),
-    }));
+    const exList: ActiveExercise[] = routine.exercises.map((ex) => {
+      const defaultWeightNum = parseInt(ex.defaultWeight) || 50;
+      const targetRepsNum = parseInt(ex.targetReps) || 10;
+
+      const sets: SetEntry[] = Array.from({ length: ex.targetSeries }, (_, i) => ({
+        setNumber: i + 1,
+        weight: defaultWeightNum,
+        reps: targetRepsNum,
+        completed: false,
+      }));
+
+      return {
+        ...ex,
+        sets,
+      };
+    });
+
     this.exercises.set(exList);
     this.initialRestTime.set(exList[0]?.restSeconds || 60);
     this.restTime.set(exList[0]?.restSeconds || 60);
+
+    // Iniciar cronómetro de entrenamiento en vivo
+    this.workoutClockInterval = setInterval(() => {
+      this.elapsedSeconds.update((s) => s + 1);
+    }, 1000);
   }
 
-  toggleSerie(exerciseId: number, serieIndex: number): void {
-    let wasNewlyCompleted = false;
+  toggleSet(exerciseId: number, setIndex: number): void {
+    let completedNow = false;
+    let exerciseName = '';
+    let currentWeight = 0;
+    let currentReps = 0;
 
     this.exercises.update((list) =>
       list.map((ex) => {
         if (ex.id === exerciseId) {
-          const updatedSeries = [...ex.completedSeries];
-          updatedSeries[serieIndex] = !updatedSeries[serieIndex];
-          if (updatedSeries[serieIndex]) wasNewlyCompleted = true;
-          return { ...ex, completedSeries: updatedSeries };
+          exerciseName = ex.name;
+          const updatedSets = ex.sets.map((s, idx) => {
+            if (idx === setIndex) {
+              const newState = !s.completed;
+              if (newState) {
+                completedNow = true;
+                currentWeight = s.weight;
+                currentReps = s.reps;
+              }
+              return { ...s, completed: newState };
+            }
+            return s;
+          });
+          return { ...ex, sets: updatedSets };
         }
         return ex;
       })
     );
 
-    if (wasNewlyCompleted) {
+    if (completedNow) {
+      // Reproducir sonido de serie lograda
       this.audio.playSetDoneSound();
-    }
+      this.gamification.addXp(35, `Serie completada en ${exerciseName}`);
 
-    const currentEx = this.exercises().find((e) => e.id === exerciseId);
-    if (currentEx) {
-      this.startRestTimer(currentEx.restSeconds);
+      // Comprobar si supera Récord Personal
+      if (currentWeight >= 80) {
+        this.routineService.addPersonalRecord(
+          exerciseName,
+          currentWeight,
+          currentReps,
+          `En entrenamiento en vivo: ${currentWeight}kg x ${currentReps}`
+        );
+        this.newPrCelebration.set(`🏆 ¡NUEVO RÉCORD: ${currentWeight} KG EN ${exerciseName.toUpperCase()}! (+100 XP)`);
+        setTimeout(() => this.newPrCelebration.set(null), 4000);
+      }
+
+      // Disparar timer de descanso automáticamente
+      const currentEx = this.exercises().find((e) => e.id === exerciseId);
+      if (currentEx) {
+        this.startRestTimer(currentEx.restSeconds);
+      }
     }
   }
 
-  updateWeight(exerciseId: number, weight: string): void {
+  addSet(exerciseId: number): void {
     this.exercises.update((list) =>
-      list.map((ex) => (ex.id === exerciseId ? { ...ex, defaultWeight: weight } : ex))
+      list.map((ex) => {
+        if (ex.id === exerciseId) {
+          const lastSet = ex.sets[ex.sets.length - 1];
+          const newSet: SetEntry = {
+            setNumber: ex.sets.length + 1,
+            weight: lastSet ? lastSet.weight : 50,
+            reps: lastSet ? lastSet.reps : 10,
+            completed: false,
+          };
+          return { ...ex, sets: [...ex.sets, newSet], targetSeries: ex.sets.length + 1 };
+        }
+        return ex;
+      })
     );
+  }
+
+  adjustRest(seconds: number): void {
+    this.restTime.update((t) => Math.max(0, t + seconds));
   }
 
   startRestTimer(seconds: number): void {
@@ -96,6 +208,7 @@ export class WorkoutModal implements OnInit, OnDestroy {
       this.restTime.update((t) => {
         if (t <= 1) {
           this.stopRestTimer();
+          this.audio.playLevelUpSound();
           return 0;
         }
         return t - 1;
@@ -122,21 +235,28 @@ export class WorkoutModal implements OnInit, OnDestroy {
 
   finishWorkout(): void {
     this.stopRestTimer();
+    if (this.workoutClockInterval) {
+      clearInterval(this.workoutClockInterval);
+      this.workoutClockInterval = null;
+    }
+
+    const durationMins = Math.max(1, Math.round(this.elapsedSeconds() / 60));
+    const calories = this.estimatedCalories();
     const routine = this.activeRoutine();
 
-    // 1. Record in Auth service
-    this.auth.recordWorkout(routine.estimatedCalories, routine.durationMinutes);
+    // 1. Guardar en Auth y estadísticas de usuario
+    this.auth.recordWorkout(calories, durationMins);
 
-    // 2. Award XP in Gamification service
-    this.gamification.addXp(180, `Rutina completada: ${routine.name}`);
+    // 2. Entregar XP Masivo
+    this.gamification.addXp(300, `Rutina completada: ${routine.name}`);
 
-    // 3. Evaluate Achievements
+    // 3. Evaluar logros
     const user = this.auth.currentUser();
     if (user) {
       this.gamification.evaluateStats(user.stats);
     }
 
-    // 4. Play Victory fanfare
+    // 4. Fanfarria de Victoria
     this.audio.playVictorySound();
 
     this.isFinished.set(true);
@@ -144,10 +264,16 @@ export class WorkoutModal implements OnInit, OnDestroy {
 
   onClose(): void {
     this.stopRestTimer();
+    if (this.workoutClockInterval) {
+      clearInterval(this.workoutClockInterval);
+    }
     this.close.emit();
   }
 
   ngOnDestroy(): void {
     this.stopRestTimer();
+    if (this.workoutClockInterval) {
+      clearInterval(this.workoutClockInterval);
+    }
   }
 }
