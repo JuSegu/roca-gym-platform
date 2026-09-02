@@ -1,49 +1,33 @@
-# ROCA GYM PLATFORM
+# Dependencies
+node_modules/
 
-Digital platform for Roca Gym.
+# Build output
+dist/
+.angular/
 
-## Overview
+# IDE
+.idea/
+.vscode/
+*.swp
+*.swo
 
-ROCA GYM PLATFORM is a web platform designed to digitally connect the gym, its members and its services.
+# OS files
+.DS_Store
+Thumbs.db
 
-## Main Features
+# Environment files
+.env
+.env.local
 
-- Public gym website
-- User authentication
-- Client profiles
-- Membership management
-- QR gym access
-- Workout routines
-- Exercise tracking
-- Progress tracking
-- Personal records
-- Gamification
-- Achievements
-- Leaderboards
-- Community
-- Online store
-- Administrative dashboard
+# Video files (too large for git)
+*.MOV
+*.mov
+*.mp4
+*.avi
 
-## Technology Stack
+# Logs
+*.log
+npm-debug.log*
 
-### Frontend
-- Angular
-- TypeScript
-- Tailwind CSS
-
-### Backend
-- ASP.NET Core
-- Entity Framework Core
-- REST API
-
-### Database
-- PostgreSQL
-
-### Infrastructure
-- Git
-- GitHub
-- Cloud hosting
-
-## Status
-
-🚧 In development
+# Misc
+.agents/
