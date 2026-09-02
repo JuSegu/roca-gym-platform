@@ -6,7 +6,7 @@ export interface TourScene {
   step: string;
   title: string;
   tagline: string;
-  image: string;
+  video: string;
 }
 
 @Component({
@@ -20,35 +20,35 @@ export class Hero implements OnInit, OnDestroy {
   private readonly platformId = inject(PLATFORM_ID);
   private timer: any = null;
 
-  // Escenas cinematográficas del recorrido virtual ROCA GYM
+  // Escenas cinematográficas del recorrido virtual ROCA GYM (videos reales)
   readonly scenes: TourScene[] = [
     {
       id: 'entrance',
       step: '01 / 04',
-      title: 'Entrada & Recepción Principal',
+      title: 'Recorrido del Gym',
       tagline: 'Acceso digital biométrico y ambiente de alto rendimiento',
-      image: '/images/tour/tour-01-entrance.webp',
+      video: '/videos/hero-bg.mp4',
     },
     {
       id: 'machines',
       step: '02 / 04',
-      title: 'Circuito de Máquinas de Fuerza',
+      title: 'Zona de Máquinas',
       tagline: 'Maquinaria pesada biomecánica para aislamiento muscular',
-      image: '/images/tour/tour-02-machines.webp',
+      video: '/videos/facility-1.mp4',
     },
     {
       id: 'freeweights',
       step: '03 / 04',
-      title: 'Zona de Peso Libre & Mancuernas',
+      title: 'Peso Libre & Mancuernas',
       tagline: 'Racks completos de mancuernas y bancas olímpicas',
-      image: '/images/tour/tour-03-freeweights.webp',
+      video: '/videos/facility-2.mp4',
     },
     {
       id: 'powerzone',
       step: '04 / 04',
-      title: 'Jaulas de Potencia & Sentadillas',
+      title: 'Zona de Potencia',
       tagline: 'Plataformas de levantamiento olímpico y barras calibradas',
-      image: '/images/tour/tour-04-powerzone.webp',
+      video: '/videos/facility-3.mp4',
     },
   ];
 
@@ -72,7 +72,7 @@ export class Hero implements OnInit, OnDestroy {
         const next = (this.currentSceneIndex() + 1) % this.scenes.length;
         this.currentSceneIndex.set(next);
       }
-    }, 4500);
+    }, 8000); // Longer interval for videos
   }
 
   private stopTourAutoplay(): void {

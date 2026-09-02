@@ -2,7 +2,7 @@
   id="inicio"
   class="relative flex min-h-[100dvh] items-center overflow-hidden bg-black px-4 pt-20 pb-20 sm:px-6 sm:pt-24 sm:pb-16"
 >
-  <!-- MOTOR DEL RECORRIDO CINEMATOGRÁFICO EN VIVO (VIDEO TOUR EFFECT) -->
+  <!-- MOTOR DEL RECORRIDO CINEMATOGRÁFICO EN VIVO (VIDEO TOUR) -->
   <div class="absolute inset-0 overflow-hidden pointer-events-none">
     @for (scene of scenes; track scene.id; let i = $index) {
       <div
@@ -10,13 +10,15 @@
         [class.opacity-100]="currentSceneIndex() === i"
         [class.opacity-0]="currentSceneIndex() !== i"
       >
-        <img
-          [src]="scene.image"
-          [alt]="scene.title"
-          class="h-full w-full object-cover object-center transition-transform duration-[6000ms] ease-out"
-          [class.scale-110]="currentSceneIndex() === i"
-          [class.scale-100]="currentSceneIndex() !== i"
-        />
+        <video
+          [src]="scene.video"
+          class="h-full w-full object-cover object-center"
+          autoplay
+          muted
+          loop
+          playsinline
+          preload="auto"
+        ></video>
       </div>
     }
   </div>
@@ -116,8 +118,8 @@
     </div>
   </div>
 
-  <!-- CONTROL Y CONTADOR FLOTANTE DEL RECORRIDO VIRTUAL (ESQUINA INFERIOR DERECHA DEL HERO) -->
-  <!-- Mobile: dots row at the bottom; Desktop: thumbnails + badge -->
+  <!-- CONTROL Y CONTADOR FLOTANTE DEL RECORRIDO VIRTUAL -->
+  <!-- Mobile: dots row at the bottom -->
   <div class="absolute bottom-4 left-1/2 z-20 flex -translate-x-1/2 items-center gap-2 md:hidden">
     @for (scene of scenes; track scene.id; let i = $index) {
       <button
@@ -130,9 +132,10 @@
     }
   </div>
 
+  <!-- Desktop: badge + dots -->
   <div class="absolute bottom-6 right-6 z-20 hidden md:flex flex-col items-end gap-2">
     
-    <!-- Badge de Grabación en Vivo -->
+    <!-- Badge de Recorrido en Vivo -->
     <div class="flex items-center gap-2.5 rounded-full border border-white/15 bg-black/80 px-4 py-1.5 backdrop-blur-xl shadow-2xl">
       <span class="flex h-2.5 w-2.5 rounded-full bg-red-600 animate-pulse"></span>
       <span class="font-mono text-[11px] font-black uppercase text-white">
@@ -144,22 +147,16 @@
       </span>
     </div>
 
-    <!-- Navegador de Escenas en Miniatura / Selector Rápido -->
+    <!-- Navegador de Escenas -->
     <div class="flex items-center gap-2">
       @for (scene of scenes; track scene.id; let i = $index) {
         <button
           type="button"
           (click)="selectScene(i)"
-          class="relative h-12 w-20 overflow-hidden rounded-lg border transition-all duration-300"
-          [class]="currentSceneIndex() === i ? 'border-red-500 scale-105 shadow-[0_0_15px_rgba(220,38,38,0.6)] ring-2 ring-red-600/40' : 'border-white/20 opacity-50 hover:opacity-100'"
+          class="relative h-2 rounded-full transition-all duration-300"
+          [class]="currentSceneIndex() === i ? 'w-8 bg-red-500 shadow-[0_0_15px_rgba(220,38,38,0.6)]' : 'w-3 bg-white/30 hover:bg-white/60'"
           [title]="scene.title"
-        >
-          <img [src]="scene.image" [alt]="scene.title" class="h-full w-full object-cover" />
-          <div class="absolute inset-0 bg-black/20"></div>
-          <span class="absolute bottom-0.5 right-1 text-[8px] font-mono font-bold text-white drop-shadow">
-            0{{ i + 1 }}
-          </span>
-        </button>
+        ></button>
       }
     </div>
 

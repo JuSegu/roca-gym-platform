@@ -1,6 +1,4 @@
-import { Component, inject } from '@angular/core';
-import { Router } from '@angular/router';
-import { Auth } from '../../../../core/services/auth';
+import { Component } from '@angular/core';
 
 export interface PlanItem {
   name: string;
@@ -20,8 +18,6 @@ export interface PlanItem {
   styleUrl: './plans.css',
 })
 export class Plans {
-  private readonly router = inject(Router);
-  readonly auth = inject(Auth);
 
   plans: PlanItem[] = [
     {
@@ -83,12 +79,10 @@ export class Plans {
   ];
 
   selectPlan(plan: PlanItem): void {
-    if (this.auth.isLoggedIn()) {
-      alert(`¡Excelente! Has seleccionado el ${plan.name}. Tu plan está activo.`);
-    } else {
-      this.router.navigate(['/register'], {
-        queryParams: { plan: plan.name },
-      });
-    }
+    // Abrir WhatsApp para consultar sobre el plan
+    const text = encodeURIComponent(
+      `¡Hola ROCA GYM! 💪 Estoy interesado en el ${plan.name} (${plan.price} ${plan.period}). ¿Me pueden dar más información?`
+    );
+    window.open(`https://wa.me/573123456789?text=${text}`, '_blank');
   }
 }

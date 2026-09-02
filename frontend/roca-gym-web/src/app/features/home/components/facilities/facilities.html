@@ -17,85 +17,48 @@
         Un espacio para <span class="text-red-600">superar tus límites.</span>
       </h2>
       <p class="mt-6 text-lg leading-relaxed text-gray-400">
-        Explora las diferentes zonas de ROCA GYM. Cada tarjeta cuenta con un recorrido dinámico de fotos en alta definición.
+        Explora las diferentes zonas de ROCA GYM con un recorrido en video real de nuestras instalaciones.
       </p>
     </div>
 
-    <!-- GALERÍA DE TARJETAS MULTI-SLIDE -->
+    <!-- GALERÍA DE TARJETAS CON VIDEO -->
     <div class="mt-16 grid gap-6 lg:grid-cols-3">
 
-      @for (card of facilities(); track card.id; let cardIdx = $index) {
+      @for (card of facilities(); track card.id) {
         <article
           class="group relative overflow-hidden rounded-2xl border border-white/10 bg-zinc-950 transition duration-300 hover:border-red-600/60 shadow-xl"
           [class]="card.colsSpan"
         >
-          <!-- SLIDES DE IMÁGENES CON ANIMACIÓN DE TRANSICIÓN SUAVE -->
+          <!-- VIDEO DE FONDO -->
           <div class="absolute inset-0 overflow-hidden">
-            @for (slide of card.slides; track slide.image; let slideIdx = $index) {
-              <div
-                class="absolute inset-0 h-full w-full transition-opacity duration-1000 ease-in-out"
-                [class.opacity-100]="card.currentSlide === slideIdx"
-                [class.opacity-0]="card.currentSlide !== slideIdx"
-              >
-                <img
-                  [src]="slide.image"
-                  [alt]="slide.caption"
-                  class="h-full w-full object-cover object-center transition-transform duration-[5000ms] ease-out"
-                  [class.scale-110]="card.currentSlide === slideIdx"
-                  [class.scale-100]="card.currentSlide !== slideIdx"
-                  loading="lazy"
-                />
-              </div>
-            }
+            <video
+              [src]="card.video"
+              class="h-full w-full object-cover object-center transition-transform duration-700 ease-out group-hover:scale-105"
+              autoplay
+              muted
+              loop
+              playsinline
+              preload="auto"
+            ></video>
           </div>
 
-          <!-- OVERLAYS DE GRADIENTE PARA MÁXIMO CONTRASTE Y LECTURA -->
+          <!-- OVERLAYS DE GRADIENTE -->
           <div class="absolute inset-0 bg-gradient-to-t from-black via-black/40 to-transparent"></div>
           <div class="absolute inset-0 bg-black/20 transition-opacity duration-300 group-hover:bg-black/30"></div>
 
-          <!-- BADGE DE CONTADOR DE SLIDES & CAPTION (SUPERIOR) -->
+          <!-- BADGE SUPERIOR -->
           <div class="absolute top-4 left-4 right-4 flex items-center justify-between z-10">
-            <!-- Etiqueta de la Categoría -->
             <span class="rounded-lg bg-black/70 px-3 py-1 text-[10px] font-black uppercase tracking-widest text-red-400 border border-white/10 backdrop-blur-md">
               {{ card.category }}
             </span>
-
-            <!-- Contador de Foto Actual (ej. 1 / 3) -->
             <div class="flex items-center gap-1.5 rounded-full bg-black/75 px-3 py-1 text-[11px] font-mono font-bold text-white border border-white/10 backdrop-blur-md">
-              <span>📷</span>
-              <span>{{ card.currentSlide + 1 }}/{{ card.slides.length }}</span>
+              <span>🎬</span>
+              <span>EN VIVO</span>
             </div>
           </div>
 
-          <!-- CONTROLES FLECHAS ANTERIOR / SIGUIENTE -->
-          <!-- Always visible on touch; hover-revealed on desktop -->
-          <div class="absolute inset-y-0 left-3 right-3 flex items-center justify-between z-20 pointer-events-none opacity-100 md:opacity-0 md:transition-opacity md:duration-300 md:group-hover:opacity-100">
-            <button
-              type="button"
-              (click)="prevSlide(cardIdx, $event)"
-              class="pointer-events-auto flex h-9 w-9 items-center justify-center rounded-full border border-white/20 bg-black/80 text-white backdrop-blur-md transition hover:scale-110 hover:border-red-600 hover:bg-red-600 shadow-lg"
-              title="Foto anterior"
-            >
-              ‹
-            </button>
-            <button
-              type="button"
-              (click)="nextSlide(cardIdx, $event)"
-              class="pointer-events-auto flex h-9 w-9 items-center justify-center rounded-full border border-white/20 bg-black/80 text-white backdrop-blur-md transition hover:scale-110 hover:border-red-600 hover:bg-red-600 shadow-lg"
-              title="Siguiente foto"
-            >
-              ›
-            </button>
-          </div>
-
-          <!-- CONTENIDO INFERIOR: TÍTULO, SUBTÍTULO Y PROGRESS DOTS -->
+          <!-- CONTENIDO INFERIOR -->
           <div class="absolute bottom-0 left-0 right-0 p-6 sm:p-8 z-10">
-            
-            <!-- Caption dinámica de la foto activa -->
-            <p class="text-[11px] font-bold text-red-400 uppercase tracking-wider">
-              • {{ card.slides[card.currentSlide].caption }}
-            </p>
-
             <h3 class="mt-1 text-2xl font-black uppercase text-white sm:text-3xl drop-shadow-md">
               {{ card.title }}
             </h3>
@@ -103,20 +66,6 @@
             <p class="mt-2 text-xs leading-relaxed text-gray-300 max-w-xl">
               {{ card.subtitle }}
             </p>
-
-            <!-- PUNTOS / BARRAS INDICADORAS DE SLIDES -->
-            <div class="mt-4 flex items-center gap-1.5">
-              @for (slide of card.slides; track slide.image; let sIdx = $index) {
-                <button
-                  type="button"
-                  (click)="setSlide(cardIdx, sIdx, $event)"
-                  class="h-1.5 rounded-full transition-all duration-300"
-                  [class]="card.currentSlide === sIdx ? 'w-6 bg-red-600 shadow-[0_0_10px_rgba(220,38,38,0.8)]' : 'w-2 bg-white/30 hover:bg-white/60'"
-                  [title]="slide.caption"
-                ></button>
-              }
-            </div>
-
           </div>
         </article>
       }

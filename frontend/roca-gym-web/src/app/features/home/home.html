@@ -1,18 +1,14 @@
 <app-navbar />
 
 <main>
-  @if (auth.isLoggedIn()) {
-    <app-dashboard />
-  } @else {
-    <app-hero />
-    <app-about />
-    <app-facilities />
-    <app-plans />
-    <app-location />
-    <app-store />
-    <app-testimonials />
-    <app-faq />
-  }
+  <app-hero />
+  <app-about />
+  <app-facilities />
+  <app-plans />
+  <app-location />
+  <app-store />
+  <app-testimonials />
+  <app-faq />
 </main>
 
 <app-whatsapp-button />

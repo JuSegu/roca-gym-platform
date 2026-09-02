@@ -76,69 +76,54 @@
 
           @if (cart.items().length > 0) {
 
-            <!-- DATOS DEL CLIENTE (SI ES INVITADO O MIEMBRO) -->
+            <!-- DATOS DEL CLIENTE -->
             <div class="rounded-2xl border border-white/10 bg-black/60 p-4">
               <div class="flex items-center justify-between border-b border-white/10 pb-3">
                 <span class="text-xs font-bold uppercase tracking-wider text-gray-400">Datos de Entrega</span>
-                @if (auth.isLoggedIn()) {
-                  <span class="rounded bg-green-500/20 text-green-400 text-[10px] font-black uppercase px-2 py-0.5 border border-green-500/30">
-                    Miembro Identificado ✓
-                  </span>
-                } @else {
-                  <span class="rounded bg-amber-500/20 text-amber-400 text-[10px] font-black uppercase px-2 py-0.5 border border-amber-500/30">
-                    Cliente Invitado
-                  </span>
-                }
+                <span class="rounded bg-amber-500/20 text-amber-400 text-[10px] font-black uppercase px-2 py-0.5 border border-amber-500/30">
+                  Datos del Cliente
+                </span>
               </div>
 
-              @if (auth.isLoggedIn()) {
-                <div class="mt-3 text-xs text-gray-300">
-                  <p>👤 <strong>Cliente:</strong> {{ auth.currentUser()?.name }}</p>
-                  <p class="mt-1">📧 <strong>Correo:</strong> {{ auth.currentUser()?.email }}</p>
-                  <p class="mt-1">📱 <strong>Celular:</strong> {{ auth.currentUser()?.phone || '+57 312 492 8821' }}</p>
-                  <p class="mt-2 text-green-400 font-bold">✨ ¡Descuento de miembro del 5% aplicado automáticamente!</p>
-                </div>
-              } @else {
-                <div class="mt-3 space-y-3">
-                  <p class="text-[11px] text-gray-400">
-                    Ingresa tus datos para registrar tu pedido y enviarte el código de retiro:
-                  </p>
+              <div class="mt-3 space-y-3">
+                <p class="text-[11px] text-gray-400">
+                  Ingresa tus datos para registrar tu pedido y enviarte el código de retiro:
+                </p>
 
+                <div>
+                  <label for="guest-name" class="block text-[10px] font-bold uppercase tracking-wider text-gray-400">Nombre Completo *</label>
+                  <input
+                    id="guest-name"
+                    type="text"
+                    [(ngModel)]="guestName"
+                    placeholder="Ej: Carlos Mendoza"
+                    class="mt-1 w-full rounded-xl border border-white/10 bg-zinc-900 px-3.5 py-2 text-xs text-white outline-none focus:border-red-500"
+                  />
+                </div>
+
+                <div class="grid grid-cols-2 gap-2">
                   <div>
-                    <label for="guest-name" class="block text-[10px] font-bold uppercase tracking-wider text-gray-400">Nombre Completo *</label>
+                    <label for="guest-phone" class="block text-[10px] font-bold uppercase tracking-wider text-gray-400">WhatsApp / Celular *</label>
                     <input
-                      id="guest-name"
-                      type="text"
-                      [(ngModel)]="guestName"
-                      placeholder="Ej: Carlos Mendoza"
+                      id="guest-phone"
+                      type="tel"
+                      [(ngModel)]="guestPhone"
+                      placeholder="Ej: 312 456 7890"
+                      class="mt-1 w-full rounded-xl border border-white/10 bg-zinc-900 px-3.5 py-2 text-xs text-white outline-none focus:border-red-500 font-mono"
+                    />
+                  </div>
+                  <div>
+                    <label for="guest-email" class="block text-[10px] font-bold uppercase tracking-wider text-gray-400">Correo (Opcional)</label>
+                    <input
+                      id="guest-email"
+                      type="email"
+                      [(ngModel)]="guestEmail"
+                      placeholder="correo@ejemplo.com"
                       class="mt-1 w-full rounded-xl border border-white/10 bg-zinc-900 px-3.5 py-2 text-xs text-white outline-none focus:border-red-500"
                     />
                   </div>
-
-                  <div class="grid grid-cols-2 gap-2">
-                    <div>
-                      <label for="guest-phone" class="block text-[10px] font-bold uppercase tracking-wider text-gray-400">WhatsApp / Celular *</label>
-                      <input
-                        id="guest-phone"
-                        type="tel"
-                        [(ngModel)]="guestPhone"
-                        placeholder="Ej: 312 456 7890"
-                        class="mt-1 w-full rounded-xl border border-white/10 bg-zinc-900 px-3.5 py-2 text-xs text-white outline-none focus:border-red-500 font-mono"
-                      />
-                    </div>
-                    <div>
-                      <label for="guest-email" class="block text-[10px] font-bold uppercase tracking-wider text-gray-400">Correo (Opcional)</label>
-                      <input
-                        id="guest-email"
-                        type="email"
-                        [(ngModel)]="guestEmail"
-                        placeholder="correo@ejemplo.com"
-                        class="mt-1 w-full rounded-xl border border-white/10 bg-zinc-900 px-3.5 py-2 text-xs text-white outline-none focus:border-red-500"
-                      />
-                    </div>
-                  </div>
                 </div>
-              }
+              </div>
             </div>
 
             <!-- SELECCIÓN DE MÉTODO DE PAGO -->

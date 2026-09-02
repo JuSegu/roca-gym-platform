@@ -1,7 +1,4 @@
-import { Injectable, signal, computed, inject } from '@angular/core';
-import { Auth } from './auth';
-import { DatabaseService, StoreOrder, PaymentMethod } from './database';
-import { GamificationService } from './gamification.service';
+import { Injectable, signal, computed } from '@angular/core';
 
 export interface CartItem {
   id: number;
@@ -13,14 +10,26 @@ export interface CartItem {
   icon: string;
 }
 
+export type PaymentMethod = 'Nequi / Daviplata' | 'Transferencia Bancaria' | 'Efectivo en Recepción';
+
+export interface StoreOrder {
+  id: string;
+  userName: string;
+  customerPhone: string;
+  items: { id: number; name: string; price: number; quantity: number; icon: string }[];
+  subtotal: number;
+  discount: number;
+  total: number;
+  paymentMethod: PaymentMethod;
+  pickupCode: string;
+  transactionRef: string;
+  date: Date;
+}
+
 @Injectable({
   providedIn: 'root',
 })
 export class CartService {
-  private readonly auth = inject(Auth);
-  private readonly db = inject(DatabaseService);
-  private readonly gamification = inject(GamificationService);
-
   private readonly cartItemsSignal = signal<CartItem[]>([]);
   readonly items = this.cartItemsSignal.asReadonly();
 
@@ -38,10 +47,10 @@ export class CartService {
     this.cartItemsSignal().reduce((acc, item) => acc + item.price * item.quantity, 0)
   );
 
-  // 5% de descuento para cualquier miembro con plan activo
-  readonly discountRate = computed(() => (this.auth.isLoggedIn() ? 0.05 : 0));
-  readonly discountAmount = computed(() => this.subtotal() * this.discountRate());
-  readonly total = computed(() => this.subtotal() - this.discountAmount());
+  // Sin descuento de miembro (ya no hay login)
+  readonly discountRate = computed(() => 0);
+  readonly discountAmount = computed(() => 0);
+  readonly total = computed(() => this.subtotal());
 
   formatCOP(amount: number): string {
     return '$' + Math.round(amount).toLocaleString('es-CO') + ' COP';
@@ -109,13 +118,11 @@ export class CartService {
   ): StoreOrder | null {
     if (this.cartItemsSignal().length === 0) return null;
 
-    const user = this.auth.currentUser();
-    const finalName = customerInfo?.name?.trim() || (user ? user.name : 'Cliente ROCA');
-    const finalEmail = customerInfo?.email?.trim() || (user ? user.email : 'cliente@rocagym.com');
-    const finalPhone = customerInfo?.phone?.trim() || (user?.phone || '+57 300 000 0000');
+    const finalName = customerInfo?.name?.trim() || 'Cliente ROCA';
+    const finalPhone = customerInfo?.phone?.trim() || '+57 300 000 0000';
 
-    const order = this.db.createOrder({
-      userEmail: finalEmail,
+    const order: StoreOrder = {
+      id: 'ORD-' + Date.now().toString(36).toUpperCase(),
       userName: finalName,
       customerPhone: finalPhone,
       items: this.cartItemsSignal().map((i) => ({
@@ -129,15 +136,13 @@ export class CartService {
       discount: this.discountAmount(),
       total: this.total(),
       paymentMethod,
+      pickupCode: 'REC-' + Math.floor(100 + Math.random() * 900),
       transactionRef: transactionRef || (paymentMethod === 'Efectivo en Recepción' ? 'PAGO-RECEPCION' : 'APROB-' + Math.floor(100000 + Math.random() * 900000)),
-    });
+      date: new Date(),
+    };
 
     this.lastOrderSignal.set(order);
     this.clearCart();
-
-    // Recompensar con XP y desbloqueo de logro de nutrición
-    this.gamification.unlockBadge('vip_supplements');
-    this.gamification.addXp(100, 'Pedido en tienda ROCA completado');
 
     return order;
   }

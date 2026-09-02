@@ -6,12 +6,8 @@ export interface FacilityCard {
   category: string;
   title: string;
   subtitle: string;
-  colsSpan: string; // e.g. 'lg:col-span-2' or 'lg:col-span-1'
-  slides: {
-    image: string;
-    caption: string;
-  }[];
-  currentSlide: number;
+  colsSpan: string;
+  video: string;
 }
 
 @Component({
@@ -23,9 +19,8 @@ export interface FacilityCard {
 })
 export class Facilities implements OnInit, OnDestroy {
   private readonly platformId = inject(PLATFORM_ID);
-  private timer: any = null;
 
-  // Estado reactivo de las 4 tarjetas de instalaciones con múltiples slides cada una
+  // Tarjetas de instalaciones con videos reales del gym
   facilities = signal<FacilityCard[]>([
     {
       id: 'training',
@@ -33,21 +28,7 @@ export class Facilities implements OnInit, OnDestroy {
       title: 'Zona de Fuerza & Alto Impacto',
       subtitle: 'Maquinaria pesada biomecánica, poleas y estaciones guiadas para hipertrofia.',
       colsSpan: 'lg:col-span-2 min-h-[420px]',
-      currentSlide: 0,
-      slides: [
-        {
-          image: '/images/tour/tour-02-machines.webp',
-          caption: 'Circuito de Máquinas de Alto Impacto',
-        },
-        {
-          image: '/images/tour/tour-04-powerzone.webp',
-          caption: 'Jaulas de Potencia & Sentadilla',
-        },
-        {
-          image: '/images/facilities/community.webp',
-          caption: 'Entrenamiento Funcional & Peso Muerto',
-        },
-      ],
+      video: '/videos/hero-bg.mp4',
     },
     {
       id: 'freeweights',
@@ -55,17 +36,7 @@ export class Facilities implements OnInit, OnDestroy {
       title: 'Zona de Pesas & Mancuernas',
       subtitle: 'Racks completos de mancuernas hasta 50kg y bancas olímpicas.',
       colsSpan: 'lg:col-span-1 min-h-[420px]',
-      currentSlide: 0,
-      slides: [
-        {
-          image: '/images/tour/tour-03-freeweights.webp',
-          caption: 'Racks de Mancuernas & Peso Libre',
-        },
-        {
-          image: '/images/facilities/pesas.webp',
-          caption: 'Bancas de Competición Planas e Inclinadas',
-        },
-      ],
+      video: '/videos/facility-1.mp4',
     },
     {
       id: 'cardio',
@@ -73,17 +44,7 @@ export class Facilities implements OnInit, OnDestroy {
       title: 'Zona de Cardio & Rendimiento',
       subtitle: 'Cintas curvas Woodway, Air Bikes, remos Concept2 y escaladoras.',
       colsSpan: 'lg:col-span-1 min-h-[360px]',
-      currentSlide: 0,
-      slides: [
-        {
-          image: '/images/facilities/cardio-zone.webp',
-          caption: 'Cintas Curvas, Air Bikes & Remos',
-        },
-        {
-          image: '/images/facilities/cardio.webp',
-          caption: 'Resistencia & Quema Calórica',
-        },
-      ],
+      video: '/videos/facility-2.mp4',
     },
     {
       id: 'community',
@@ -91,80 +52,11 @@ export class Facilities implements OnInit, OnDestroy {
       title: 'Tu Próximo Entrenamiento',
       subtitle: 'Ambiente motivacional con la mejor energía, luces neón y asesoría.',
       colsSpan: 'lg:col-span-2 min-h-[360px]',
-      currentSlide: 0,
-      slides: [
-        {
-          image: '/images/facilities/community.webp',
-          caption: 'Comunidad Activa & Levantamientos en Equipo',
-        },
-        {
-          image: '/images/tour/tour-01-entrance.webp',
-          caption: 'Recepción & Entrada Biométrica Moderna',
-        },
-        {
-          image: '/images/facilities/ambiente.webp',
-          caption: 'Ambiente Exclusivo y Sonido Envolvente',
-        },
-      ],
+      video: '/videos/facility-3.mp4',
     },
   ]);
 
-  ngOnInit(): void {
-    if (isPlatformBrowser(this.platformId)) {
-      this.startSlideshowTimer();
-    }
-  }
+  ngOnInit(): void {}
 
-  ngOnDestroy(): void {
-    if (this.timer) {
-      clearInterval(this.timer);
-      this.timer = null;
-    }
-  }
-
-  private startSlideshowTimer(): void {
-    this.timer = setInterval(() => {
-      this.facilities.update((items) =>
-        items.map((card) => ({
-          ...card,
-          currentSlide: (card.currentSlide + 1) % card.slides.length,
-        }))
-      );
-    }, 4000);
-  }
-
-  nextSlide(cardIndex: number, event?: Event): void {
-    if (event) event.stopPropagation();
-    this.facilities.update((items) =>
-      items.map((card, idx) =>
-        idx === cardIndex
-          ? { ...card, currentSlide: (card.currentSlide + 1) % card.slides.length }
-          : card
-      )
-    );
-  }
-
-  prevSlide(cardIndex: number, event?: Event): void {
-    if (event) event.stopPropagation();
-    this.facilities.update((items) =>
-      items.map((card, idx) =>
-        idx === cardIndex
-          ? {
-              ...card,
-              currentSlide:
-                (card.currentSlide - 1 + card.slides.length) % card.slides.length,
-            }
-          : card
-      )
-    );
-  }
-
-  setSlide(cardIndex: number, slideIndex: number, event?: Event): void {
-    if (event) event.stopPropagation();
-    this.facilities.update((items) =>
-      items.map((card, idx) =>
-        idx === cardIndex ? { ...card, currentSlide: slideIndex } : card
-      )
-    );
-  }
+  ngOnDestroy(): void {}
 }

@@ -1,9 +1,7 @@
 import { Component, inject, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { CartService } from '../../../../core/services/cart';
-import { Auth } from '../../../../core/services/auth';
-import { PaymentMethod } from '../../../../core/services/database';
+import { CartService, PaymentMethod } from '../../../../core/services/cart';
 
 @Component({
   selector: 'app-cart-modal',
@@ -14,7 +12,6 @@ import { PaymentMethod } from '../../../../core/services/database';
 })
 export class CartModal {
   readonly cart = inject(CartService);
-  readonly auth = inject(Auth);
 
   isOrderPlaced = signal(false);
   isProcessing = signal(false);
@@ -22,7 +19,7 @@ export class CartModal {
 
   selectedPaymentMethod = signal<PaymentMethod>('Nequi / Daviplata');
   
-  // Datos del cliente invitado si no ha iniciado sesión
+  // Datos del cliente (siempre invitado, ya no hay login)
   guestName = signal('');
   guestPhone = signal('');
   guestEmail = signal('');
@@ -62,16 +59,14 @@ export class CartModal {
   processCheckout(): void {
     if (this.cart.itemCount() === 0) return;
 
-    // Si no ha iniciado sesión, validar nombre y celular
-    if (!this.auth.isLoggedIn()) {
-      if (!this.guestName().trim() || this.guestName().trim().length < 3) {
-        this.errorMessage.set('Por favor ingresa tu nombre completo para identificar tu pedido.');
-        return;
-      }
-      if (!this.guestPhone().trim() || this.guestPhone().trim().length < 7) {
-        this.errorMessage.set('Por favor ingresa tu número de celular o WhatsApp de contacto.');
-        return;
-      }
+    // Validar nombre y celular
+    if (!this.guestName().trim() || this.guestName().trim().length < 3) {
+      this.errorMessage.set('Por favor ingresa tu nombre completo para identificar tu pedido.');
+      return;
+    }
+    if (!this.guestPhone().trim() || this.guestPhone().trim().length < 7) {
+      this.errorMessage.set('Por favor ingresa tu número de celular o WhatsApp de contacto.');
+      return;
     }
 
     this.errorMessage.set(null);
@@ -81,13 +76,11 @@ export class CartModal {
       const order = this.cart.checkout(
         this.selectedPaymentMethod(),
         undefined,
-        this.auth.isLoggedIn()
-          ? undefined
-          : {
-              name: this.guestName().trim(),
-              phone: this.guestPhone().trim(),
-              email: this.guestEmail().trim() || 'cliente@rocagym.com',
-            }
+        {
+          name: this.guestName().trim(),
+          phone: this.guestPhone().trim(),
+          email: this.guestEmail().trim() || 'cliente@rocagym.com',
+        }
       );
 
       this.isProcessing.set(false);
@@ -109,7 +102,7 @@ export class CartModal {
       `¡Hola ROCA GYM! 💪 Acabo de generar mi orden en la web:\n` +
       `📦 Orden: ${order.id}\n` +
       `👤 Cliente: ${order.userName}\n` +
-      `📱 Teléfono: ${order.customerPhone || 'Registrado'}\n` +
+      `📱 Teléfono: ${order.customerPhone || 'N/A'}\n` +
       `🔑 Código de Retiro: ${order.pickupCode}\n` +
       `💰 Total: ${this.cart.formatCOP(order.total)}\n` +
       `💳 Método: ${order.paymentMethod}\n` +
